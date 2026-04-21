@@ -142,6 +142,15 @@
     padding: 24px 20px 20px;
   }
 
+  .home-version {
+    text-align: center;
+    padding: 32px 20px 20px;
+    font-size: 11px;
+    color: var(--text-4);
+    letter-spacing: 1.5px;
+    text-transform: uppercase;
+  }
+
   .home-hero h1 {
     font-family: 'Bebas Neue', sans-serif;
     font-size: 56px;
@@ -383,10 +392,10 @@
 
   .ex.open .ex-chevron { transform: rotate(90deg); }
 
-  /* Stats — always visible */
+  /* Stats — always visible. Flex-based so the last row always fills the width */
   .ex-stats {
-    display: grid;
-    grid-template-columns: repeat(auto-fit, minmax(72px, 1fr));
+    display: flex;
+    flex-wrap: wrap;
     gap: 1px;
     background: var(--border);
     border-top: 1px solid var(--border);
@@ -394,8 +403,35 @@
 
   .stat {
     background: var(--surface);
-    padding: 10px 10px 11px;
+    padding: 10px 8px 11px;
     text-align: center;
+    flex: 1 1 0;
+    min-width: 0;
+  }
+
+  /* 5 stats: 3 on top row, 2 on bottom. Force 33% on top 3, 50% on bottom 2 */
+  .ex-stats.cols-5 .stat { flex-basis: calc(33.333% - 1px); }
+  .ex-stats.cols-5 .stat:nth-child(n+4) { flex-basis: calc(50% - 1px); }
+
+  /* 6 stats: 3+3 */
+  .ex-stats.cols-6 .stat { flex-basis: calc(33.333% - 1px); }
+
+  /* 4 stats: 2+2 on narrow screens, 4 on wider */
+  .ex-stats.cols-4 .stat { flex-basis: calc(25% - 1px); }
+
+  /* 3 stats: 3 columns */
+  .ex-stats.cols-3 .stat { flex-basis: calc(33.333% - 1px); }
+
+  /* 2 stats: half-half */
+  .ex-stats.cols-2 .stat { flex-basis: calc(50% - 1px); }
+
+  /* 1 stat: full width */
+  .ex-stats.cols-1 .stat { flex-basis: 100%; }
+
+  @media (max-width: 400px) {
+    .ex-stats.cols-4 .stat { flex-basis: calc(50% - 1px); }
+    .ex-stats.cols-5 .stat { flex-basis: calc(33.333% - 1px); }
+    .ex-stats.cols-5 .stat:nth-child(n+4) { flex-basis: calc(50% - 1px); }
   }
 
   .stat-label {
@@ -1135,6 +1171,7 @@
       <p>4 séances · 60 min chrono</p>
     </div>
     <div class="home-sessions" id="home-sessions"></div>
+    <div class="home-version">v1.3 · 21 avr. 2026</div>
   </section>
 
   <section class="view" id="view-session">
@@ -1538,7 +1575,7 @@ function renderEx(ex, num, inSuperset, sessionKey, blocIdx, exIdx) {
         <div class="ex-note-indicator"></div>
         <div class="ex-chevron">›</div>
       </div>
-      <div class="ex-stats">${statsHtml}</div>
+      <div class="ex-stats cols-${sortedKeys.length}">${statsHtml}</div>
       ${details ? `<div class="ex-details">${details}</div>` : ''}
       ${chargeBlock}
       <div class="ex-note">
