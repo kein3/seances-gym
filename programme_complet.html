@@ -12,7 +12,7 @@
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
 <link href="https://fonts.googleapis.com/css2?family=Bebas+Neue&family=Inter:wght@300;400;500;600;700&display=swap" rel="stylesheet">
 <style>
-  :root {
+  :root, :root[data-theme="dark"] {
     --bg: #0a0a0a;
     --surface: #141414;
     --surface-2: #1c1c1c;
@@ -21,9 +21,32 @@
     --text-2: #999;
     --text-3: #555;
     --text-4: #333;
+    --warn-bg: rgba(245, 168, 74, 0.08);
+    --warn-border: rgba(245, 168, 74, 0.2);
+    --warn-text: #f5a84a;
+    --alt-bg: rgba(100, 170, 255, 0.05);
+    --alt-border: rgba(100, 170, 255, 0.15);
+    --alt-icon: #64aaff;
     --accent: #c03a2b;
     --safe-top: env(safe-area-inset-top, 0px);
     --safe-bottom: env(safe-area-inset-bottom, 0px);
+  }
+
+  :root[data-theme="light"] {
+    --bg: #f5f4f1;
+    --surface: #ffffff;
+    --surface-2: #edece7;
+    --border: #d8d6cf;
+    --text: #1a1a1a;
+    --text-2: #55514a;
+    --text-3: #8a857c;
+    --text-4: #b5b0a6;
+    --warn-bg: rgba(200, 110, 20, 0.08);
+    --warn-border: rgba(200, 110, 20, 0.25);
+    --warn-text: #a8540d;
+    --alt-bg: rgba(40, 100, 180, 0.05);
+    --alt-border: rgba(40, 100, 180, 0.2);
+    --alt-icon: #2d6bb3;
   }
 
   * { margin: 0; padding: 0; box-sizing: border-box; -webkit-tap-highlight-color: transparent; }
@@ -422,11 +445,11 @@
     display: flex;
     gap: 8px;
     font-size: 12.5px;
-    color: #f5a84a;
+    color: var(--warn-text);
     line-height: 1.5;
     padding: 10px 12px;
-    background: rgba(245, 168, 74, 0.08);
-    border: 1px solid rgba(245, 168, 74, 0.2);
+    background: var(--warn-bg);
+    border: 1px solid var(--warn-border);
     border-radius: 8px;
     margin-top: 12px;
   }
@@ -443,8 +466,8 @@
     color: var(--text-2);
     line-height: 1.5;
     padding: 10px 12px;
-    background: rgba(100, 170, 255, 0.05);
-    border: 1px solid rgba(100, 170, 255, 0.15);
+    background: var(--alt-bg);
+    border: 1px solid var(--alt-border);
     border-radius: 8px;
     margin-top: 12px;
   }
@@ -452,7 +475,7 @@
   .detail-alt::before {
     content: '↻';
     flex-shrink: 0;
-    color: #64aaff;
+    color: var(--alt-icon);
     font-size: 14px;
   }
 
@@ -628,6 +651,143 @@
     text-align: center;
   }
 
+  /* ══ THEME TOGGLE ══ */
+  .btn-theme {
+    width: 36px;
+    height: 36px;
+    border-radius: 50%;
+    background: var(--surface);
+    border: none;
+    color: var(--text-2);
+    cursor: pointer;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-size: 16px;
+    flex-shrink: 0;
+  }
+
+  .btn-theme:active { background: var(--surface-2); }
+
+  /* ══ BLOC NAV (sticky in session view) ══ */
+  .bloc-nav {
+    position: sticky;
+    top: 0;
+    z-index: 5;
+    background: var(--bg);
+    border-bottom: 1px solid var(--border);
+    padding: 8px 12px;
+    display: flex;
+    gap: 6px;
+    overflow-x: auto;
+    scrollbar-width: none;
+    -webkit-overflow-scrolling: touch;
+  }
+
+  .bloc-nav::-webkit-scrollbar { display: none; }
+
+  .bloc-nav-btn {
+    flex-shrink: 0;
+    min-width: 44px;
+    height: 40px;
+    padding: 0 12px;
+    background: var(--surface);
+    border: 1px solid var(--border);
+    border-radius: 10px;
+    color: var(--text-2);
+    font-family: 'Bebas Neue', sans-serif;
+    font-size: 16px;
+    letter-spacing: 0.5px;
+    cursor: pointer;
+    display: flex;
+    align-items: center;
+    gap: 6px;
+    white-space: nowrap;
+  }
+
+  .bloc-nav-btn .num {
+    color: var(--accent-color);
+    font-size: 18px;
+  }
+
+  .bloc-nav-btn.active {
+    background: var(--accent-color);
+    border-color: var(--accent-color);
+    color: #fff;
+  }
+
+  .bloc-nav-btn.active .num {
+    color: #fff;
+  }
+
+  .bloc {
+    scroll-margin-top: 60px;
+  }
+
+  /* ══ NOTES ══ */
+  .ex-note-indicator {
+    display: none;
+    width: 6px;
+    height: 6px;
+    border-radius: 50%;
+    background: var(--accent-color);
+    flex-shrink: 0;
+    margin-right: 2px;
+  }
+
+  .ex.has-note .ex-note-indicator { display: block; }
+
+  .ex-note {
+    border-top: 1px solid var(--border);
+    background: var(--surface-2);
+    padding: 12px 16px;
+  }
+
+  .ex-note-label {
+    font-size: 10px;
+    letter-spacing: 1.5px;
+    text-transform: uppercase;
+    color: var(--text-3);
+    font-weight: 600;
+    margin-bottom: 6px;
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+  }
+
+  .ex-note-clear {
+    background: none;
+    border: none;
+    color: var(--text-3);
+    font-size: 11px;
+    cursor: pointer;
+    letter-spacing: 0;
+    text-transform: none;
+    font-weight: 400;
+  }
+
+  .ex-note-clear:active { color: var(--text); }
+
+  .ex-note textarea {
+    width: 100%;
+    background: var(--bg);
+    border: 1px solid var(--border);
+    border-radius: 8px;
+    color: var(--text);
+    font-family: inherit;
+    font-size: 13px;
+    line-height: 1.5;
+    padding: 10px 12px;
+    resize: vertical;
+    min-height: 60px;
+    outline: none;
+    -webkit-appearance: none;
+  }
+
+  .ex-note textarea:focus {
+    border-color: var(--accent-color);
+  }
+
   /* ══ Responsive tweaks ══ */
   @media (min-width: 600px) {
     .home-hero h1 { font-size: 72px; }
@@ -643,6 +803,7 @@
     <button class="btn-back" id="btn-back" aria-label="Retour">←</button>
     <div class="topbar-title" id="topbar-title">Programme</div>
     <div class="topbar-accent" id="topbar-accent"></div>
+    <button class="btn-theme" id="btn-theme" aria-label="Changer de thème">☾</button>
   </div>
 </header>
 
@@ -699,7 +860,10 @@ function renderHome() {
 }
 
 // ═══ RENDER SESSION ═══
+let currentSessionKey = null;
+
 function openSession(key) {
+  currentSessionKey = key;
   const s = sessions[key];
   const m = meta[key];
   document.body.classList.remove('view-home');
@@ -714,26 +878,92 @@ function openSession(key) {
     `<span class="session-pill${i === 0 ? ' primary' : ''}">${escape(p)}</span>`
   ).join('');
 
-  const blocs = s.blocs.map((b, idx) => renderBloc(b, idx + 1, m.accent)).join('');
+  // Bloc nav buttons
+  const blocNav = s.blocs.map((b, idx) => {
+    const num = String(idx + 1).padStart(2, '0');
+    const name = b.name || '';
+    return `<button class="bloc-nav-btn" data-bloc="${idx}"><span class="num">${num}</span>${name ? escape(name) : ''}</button>`;
+  }).join('');
+
+  const blocs = s.blocs.map((b, idx) => renderBloc(b, idx + 1, m.accent, key)).join('');
 
   document.getElementById('session-content').innerHTML = `
     <div class="session-hero" style="--accent-color:${m.accent}">
       <h1>${escape(s.title)}</h1>
       <div class="session-pills">${pills}</div>
     </div>
-    ${blocs}
+    <nav class="bloc-nav" id="bloc-nav">${blocNav}</nav>
+    <div id="bloc-list">${blocs}</div>
   `;
 
   // Bind exercise toggles
   document.querySelectorAll('.ex-head').forEach(h => {
-    h.addEventListener('click', () => h.closest('.ex').classList.toggle('open'));
+    h.addEventListener('click', (e) => {
+      // don't toggle if clicking inside textarea or clear button
+      if (e.target.tagName === 'TEXTAREA' || e.target.classList.contains('ex-note-clear')) return;
+      h.closest('.ex').classList.toggle('open');
+    });
   });
+
+  // Bind bloc nav
+  document.querySelectorAll('.bloc-nav-btn').forEach(btn => {
+    btn.addEventListener('click', () => {
+      const idx = parseInt(btn.dataset.bloc);
+      const target = document.getElementById(`bloc-${idx}`);
+      if (target) {
+        const main = document.getElementById('main');
+        const navEl = document.getElementById('bloc-nav');
+        const navHeight = navEl ? navEl.offsetHeight : 0;
+        main.scrollTo({
+          top: target.offsetTop - navHeight - 8,
+          behavior: 'smooth'
+        });
+      }
+    });
+  });
+
+  // Bind notes
+  bindNotes();
+  restoreNotes();
+  trackBlocScroll();
 
   // Scroll to top
   document.getElementById('main').scrollTop = 0;
 }
 
-function renderBloc(b, num, accent) {
+// Track which bloc is currently visible
+function trackBlocScroll() {
+  const main = document.getElementById('main');
+  const blocs = document.querySelectorAll('.bloc');
+  const navBtns = document.querySelectorAll('.bloc-nav-btn');
+  const navEl = document.getElementById('bloc-nav');
+
+  const update = () => {
+    if (!navEl) return;
+    const navBottom = navEl.getBoundingClientRect().bottom;
+    let activeIdx = 0;
+    blocs.forEach((b, i) => {
+      const rect = b.getBoundingClientRect();
+      if (rect.top <= navBottom + 20) activeIdx = i;
+    });
+    navBtns.forEach((btn, i) => {
+      btn.classList.toggle('active', i === activeIdx);
+    });
+    // scroll active button into view
+    const activeBtn = navBtns[activeIdx];
+    if (activeBtn) {
+      activeBtn.scrollIntoView({ behavior: 'smooth', block: 'nearest', inline: 'center' });
+    }
+  };
+
+  main.removeEventListener('scroll', main._blocScrollHandler || (() => {}));
+  main._blocScrollHandler = update;
+  main.addEventListener('scroll', update, { passive: true });
+  update();
+}
+
+function renderBloc(b, num, accent, sessionKey) {
+  const blocIdx = num - 1;
   const chip = b.chip || `Bloc 0${num}`;
   const name = b.name || '';
   const sub = b.sub || '';
@@ -743,13 +973,13 @@ function renderBloc(b, num, accent) {
 
   // Regular exercises
   (b.exercises || []).forEach((ex, i) => {
-    body += renderEx(ex, i + 1);
+    body += renderEx(ex, i + 1, false, sessionKey, blocIdx, i);
   });
 
   // Supersets
   (b.supersets || []).forEach((ss, idx) => {
     const exHtml = ss.exercises.map((ex, i) => 
-      renderEx(ex, String.fromCharCode(65 + i), true) // A, B, C...
+      renderEx(ex, String.fromCharCode(65 + i), true, sessionKey, blocIdx, `ss${idx}-${i}`)
     ).join('');
     const rest = ss.rest ? `<div class="superset-footer">${escape(ss.rest)}</div>` : '';
     body += `
@@ -822,7 +1052,7 @@ function renderBloc(b, num, accent) {
   }
 
   return `
-    <section class="bloc">
+    <section class="bloc" id="bloc-${blocIdx}">
       <div class="bloc-header">
         <div class="bloc-num">0${num}</div>
         <div class="bloc-title-group">
@@ -836,7 +1066,7 @@ function renderBloc(b, num, accent) {
   `;
 }
 
-function renderEx(ex, num, inSuperset) {
+function renderEx(ex, num, inSuperset, sessionKey, blocIdx, exIdx) {
   const stats = ex.stats || {};
   const statsOrder = ['Séries', 'Reps', 'Charge', 'Tempo', 'Amplitude', 'Taps', 'Pause', 'Repos'];
   const sortedKeys = Object.keys(stats).sort((a, b) => {
@@ -867,20 +1097,74 @@ function renderEx(ex, num, inSuperset) {
     details += `<div class="detail-alt"><div><strong>${escape(ex.alt.label)}</strong>${escape(ex.alt.text)}</div></div>`;
   }
 
+  const noteKey = `note:${sessionKey}:${blocIdx}:${exIdx}`;
+
   return `
-    <div class="ex">
+    <div class="ex" data-note-key="${noteKey}">
       <div class="ex-head">
         <div class="ex-num">${escape(String(num))}</div>
         <div class="ex-head-text">
           <div class="ex-name">${escape(ex.name)}</div>
           ${ex.sub ? `<div class="ex-sub">${escape(ex.sub)}</div>` : ''}
         </div>
+        <div class="ex-note-indicator"></div>
         <div class="ex-chevron">›</div>
       </div>
       <div class="ex-stats">${statsHtml}</div>
       ${details ? `<div class="ex-details">${details}</div>` : ''}
+      <div class="ex-note">
+        <div class="ex-note-label">
+          <span>Ma note</span>
+          <button class="ex-note-clear" data-clear="${noteKey}">Effacer</button>
+        </div>
+        <textarea placeholder="Charge du jour, sensations, à retenir…" data-note="${noteKey}"></textarea>
+      </div>
     </div>
   `;
+}
+
+// ═══ NOTES ═══
+function bindNotes() {
+  document.querySelectorAll('textarea[data-note]').forEach(ta => {
+    ta.addEventListener('input', () => {
+      const key = ta.dataset.note;
+      const ex = ta.closest('.ex');
+      if (ta.value.trim()) {
+        try { localStorage.setItem(key, ta.value); } catch(e) {}
+        ex.classList.add('has-note');
+      } else {
+        try { localStorage.removeItem(key); } catch(e) {}
+        ex.classList.remove('has-note');
+      }
+    });
+    // prevent taps in textarea from toggling the ex
+    ta.addEventListener('click', e => e.stopPropagation());
+  });
+
+  document.querySelectorAll('.ex-note-clear').forEach(btn => {
+    btn.addEventListener('click', e => {
+      e.stopPropagation();
+      const key = btn.dataset.clear;
+      const ta = document.querySelector(`textarea[data-note="${key}"]`);
+      if (ta) {
+        ta.value = '';
+        try { localStorage.removeItem(key); } catch(e) {}
+        ta.closest('.ex').classList.remove('has-note');
+      }
+    });
+  });
+}
+
+function restoreNotes() {
+  document.querySelectorAll('textarea[data-note]').forEach(ta => {
+    try {
+      const v = localStorage.getItem(ta.dataset.note);
+      if (v) {
+        ta.value = v;
+        ta.closest('.ex').classList.add('has-note');
+      }
+    } catch(e) {}
+  });
 }
 
 // ═══ NAVIGATION ═══
@@ -913,6 +1197,27 @@ function escape(s) {
     .replace(/>/g, '&gt;')
     .replace(/"/g, '&quot;');
 }
+
+// ═══ THEME ═══
+const themeBtn = document.getElementById('btn-theme');
+function setTheme(t) {
+  document.documentElement.setAttribute('data-theme', t);
+  themeBtn.textContent = t === 'dark' ? '☾' : '☀';
+  try { localStorage.setItem('theme', t); } catch(e) {}
+  // Update status bar meta
+  const meta = document.querySelector('meta[name="theme-color"]');
+  if (meta) meta.setAttribute('content', t === 'dark' ? '#0a0a0a' : '#f5f4f1');
+}
+themeBtn.addEventListener('click', () => {
+  const current = document.documentElement.getAttribute('data-theme') || 'dark';
+  setTheme(current === 'dark' ? 'light' : 'dark');
+});
+// Restore saved theme
+try {
+  const saved = localStorage.getItem('theme');
+  if (saved) setTheme(saved);
+  else setTheme('dark');
+} catch(e) { setTheme('dark'); }
 
 // ═══ INIT ═══
 renderHome();
