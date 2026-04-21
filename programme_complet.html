@@ -52,7 +52,6 @@
   * { margin: 0; padding: 0; box-sizing: border-box; -webkit-tap-highlight-color: transparent; }
 
   html, body {
-    height: 100%;
     background: var(--bg);
     color: var(--text);
     font-family: 'Inter', -apple-system, BlinkMacSystemFont, sans-serif;
@@ -62,11 +61,15 @@
     overscroll-behavior: none;
   }
 
-  body { display: flex; flex-direction: column; overflow: hidden; }
+  body {
+    min-height: 100%;
+    -webkit-overflow-scrolling: touch;
+  }
 
   /* ══ TOP BAR ══ */
   .topbar {
-    flex-shrink: 0;
+    position: sticky;
+    top: 0;
     background: var(--bg);
     border-bottom: 1px solid var(--border);
     padding-top: var(--safe-top);
@@ -120,12 +123,8 @@
 
   body.view-session .topbar-accent { display: block; }
 
-  /* ══ MAIN SCROLL ══ */
+  /* ══ MAIN ══ */
   main {
-    flex: 1;
-    overflow-y: auto;
-    -webkit-overflow-scrolling: touch;
-    overscroll-behavior-y: contain;
     padding-bottom: calc(24px + var(--safe-bottom));
     transition: padding-bottom 0.3s;
   }
@@ -710,10 +709,10 @@
 
   .btn-theme:active { background: var(--surface-2); }
 
-  /* ══ BLOC NAV (sticky in session view) ══ */
+  /* ══ BLOC NAV (sticky below topbar) ══ */
   .bloc-nav {
     position: sticky;
-    top: 0;
+    top: calc(52px + var(--safe-top));
     z-index: 5;
     background: var(--bg);
     border-bottom: 1px solid var(--border);
@@ -762,7 +761,7 @@
   }
 
   .bloc {
-    scroll-margin-top: 60px;
+    scroll-margin-top: calc(52px + 56px + var(--safe-top));
   }
 
   /* ══ NOTES ══ */
@@ -1171,7 +1170,7 @@
       <p>4 séances · 60 min chrono</p>
     </div>
     <div class="home-sessions" id="home-sessions"></div>
-    <div class="home-version">v1.3 · 21 avr. 2026</div>
+    <div class="home-version">v1.4 · 21 avr. 2026</div>
   </section>
 
   <section class="view" id="view-session">
@@ -1291,13 +1290,7 @@ function openSession(key) {
       const idx = parseInt(btn.dataset.bloc);
       const target = document.getElementById(`bloc-${idx}`);
       if (target) {
-        const main = document.getElementById('main');
-        const navEl = document.getElementById('bloc-nav');
-        const navHeight = navEl ? navEl.offsetHeight : 0;
-        main.scrollTo({
-          top: target.offsetTop - navHeight - 8,
-          behavior: 'smooth'
-        });
+        target.scrollIntoView({ behavior: 'smooth', block: 'start' });
       }
     });
   });
@@ -1311,20 +1304,18 @@ function openSession(key) {
   trackBlocScroll();
 
   // Scroll to top
-  document.getElementById('main').scrollTop = 0;
+  window.scrollTo(0, 0);
 }
 
 // Track which bloc is currently visible
 let _blocScrollHandler = null;
 
 function trackBlocScroll() {
-  const main = document.getElementById('main');
   const blocs = document.querySelectorAll('.bloc');
   const navBtns = document.querySelectorAll('.bloc-nav-btn');
   const navEl = document.getElementById('bloc-nav');
   let ticking = false;
   let lastActiveIdx = -1;
-  let lastUserScrollTs = 0;
 
   const update = () => {
     ticking = false;
@@ -1342,15 +1333,11 @@ function trackBlocScroll() {
       });
       lastActiveIdx = activeIdx;
 
-      // Only scroll active button into view if user paused scrolling
-      // (avoids fighting vertical scroll with horizontal nav scroll)
       const activeBtn = navBtns[activeIdx];
       if (activeBtn && navEl) {
         const btnRect = activeBtn.getBoundingClientRect();
         const navRect = navEl.getBoundingClientRect();
-        // Only if button is actually off-screen
         if (btnRect.left < navRect.left + 10 || btnRect.right > navRect.right - 10) {
-          // Use direct scrollLeft instead of scrollIntoView to avoid vertical side-effects
           const targetLeft = activeBtn.offsetLeft - navEl.clientWidth / 2 + activeBtn.offsetWidth / 2;
           navEl.scrollTo({ left: targetLeft, behavior: 'smooth' });
         }
@@ -1359,20 +1346,18 @@ function trackBlocScroll() {
   };
 
   const onScroll = () => {
-    lastUserScrollTs = Date.now();
     if (!ticking) {
       ticking = true;
       requestAnimationFrame(update);
     }
   };
 
-  // Properly remove previous listener from previous session render
+  // Properly remove previous listener
   if (_blocScrollHandler) {
-    main.removeEventListener('scroll', _blocScrollHandler);
+    window.removeEventListener('scroll', _blocScrollHandler);
   }
   _blocScrollHandler = onScroll;
-  main.addEventListener('scroll', onScroll, { passive: true });
-  // Run once
+  window.addEventListener('scroll', onScroll, { passive: true });
   lastActiveIdx = -1;
   update();
 }
@@ -1938,7 +1923,7 @@ function goHome() {
   document.getElementById('topbar-title').textContent = 'Programme';
   document.getElementById('view-session').classList.remove('active');
   document.getElementById('view-home').classList.add('active');
-  document.getElementById('main').scrollTop = 0;
+  window.scrollTo(0, 0);
   // Close timer on navigation back
   if (timerInterval) clearInterval(timerInterval);
   timerInterval = null;
