@@ -1059,8 +1059,10 @@
     position: fixed;
     bottom: calc(16px + var(--safe-bottom));
     left: 50%;
-    transform: translateX(-50%) translateY(120%);
-    transition: transform 0.3s cubic-bezier(0.2, 0.9, 0.3, 1);
+    transform: translateX(-50%) translateY(200%);
+    transition: transform 0.3s cubic-bezier(0.2, 0.9, 0.3, 1), opacity 0.2s, visibility 0s 0.3s;
+    visibility: hidden;
+    opacity: 0;
     z-index: 50;
     background: var(--surface);
     border: 1px solid var(--border);
@@ -1072,10 +1074,20 @@
     box-shadow: 0 10px 40px rgba(0,0,0,0.4);
     min-width: 260px;
     max-width: calc(100% - 24px);
+    pointer-events: none;
   }
 
   .timer-overlay.active {
     transform: translateX(-50%) translateY(0);
+    visibility: visible;
+    opacity: 1;
+    pointer-events: auto;
+    transition: transform 0.3s cubic-bezier(0.2, 0.9, 0.3, 1), opacity 0.2s, visibility 0s;
+  }
+
+  /* Always hide timer when on home view */
+  body.view-home .timer-overlay {
+    display: none !important;
   }
 
   .timer-overlay.ending {
@@ -1170,7 +1182,7 @@
       <p>4 séances · 60 min chrono</p>
     </div>
     <div class="home-sessions" id="home-sessions"></div>
-    <div class="home-version">v1.4 · 21 avr. 2026</div>
+    <div class="home-version">v1.5 · 21 avr. 2026</div>
   </section>
 
   <section class="view" id="view-session">
