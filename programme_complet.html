@@ -127,6 +127,11 @@
     -webkit-overflow-scrolling: touch;
     overscroll-behavior-y: contain;
     padding-bottom: calc(24px + var(--safe-bottom));
+    transition: padding-bottom 0.3s;
+  }
+
+  body.timer-active main {
+    padding-bottom: calc(110px + var(--safe-bottom));
   }
 
   .view { display: none; }
@@ -788,6 +793,210 @@
     border-color: var(--accent-color);
   }
 
+  /* ══ REST TIMER BUTTON (inline in stats row) ══ */
+  .stat.rest {
+    cursor: pointer;
+    position: relative;
+    transition: background 0.12s;
+  }
+
+  .stat.rest:active { background: var(--surface-2); }
+
+  .stat.rest::after {
+    content: '▶';
+    position: absolute;
+    top: 4px;
+    right: 6px;
+    font-size: 8px;
+    color: var(--accent-color);
+    opacity: 0.6;
+  }
+
+  /* ══ CHARGE TRACKER ══ */
+  .ex-charge {
+    border-top: 1px solid var(--border);
+    background: var(--surface-2);
+    padding: 12px 16px;
+  }
+
+  .ex-charge-row {
+    display: flex;
+    align-items: center;
+    gap: 10px;
+  }
+
+  .ex-charge-label {
+    font-size: 10px;
+    letter-spacing: 1.5px;
+    text-transform: uppercase;
+    color: var(--text-3);
+    font-weight: 600;
+    flex-shrink: 0;
+  }
+
+  .ex-charge-input {
+    flex: 1;
+    background: var(--bg);
+    border: 1px solid var(--border);
+    border-radius: 8px;
+    color: var(--text);
+    font-family: 'Bebas Neue', sans-serif;
+    font-size: 18px;
+    letter-spacing: 0.5px;
+    padding: 6px 12px;
+    outline: none;
+    -webkit-appearance: none;
+    text-align: center;
+    min-width: 0;
+  }
+
+  .ex-charge-input:focus { border-color: var(--accent-color); }
+
+  .ex-charge-input::placeholder {
+    color: var(--text-4);
+    font-family: inherit;
+  }
+
+  .ex-charge-save {
+    background: var(--accent-color);
+    border: none;
+    border-radius: 8px;
+    color: #fff;
+    font-size: 11px;
+    font-weight: 600;
+    letter-spacing: 1px;
+    padding: 8px 14px;
+    text-transform: uppercase;
+    cursor: pointer;
+    flex-shrink: 0;
+  }
+
+  .ex-charge-save:active { opacity: 0.7; }
+
+  .ex-charge-save.saved {
+    background: var(--surface);
+    color: var(--text-3);
+    border: 1px solid var(--border);
+  }
+
+  .ex-charge-history {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 6px;
+    margin-top: 8px;
+  }
+
+  .ex-charge-history:empty { display: none; }
+
+  .history-chip {
+    font-size: 11px;
+    color: var(--text-3);
+    background: var(--surface);
+    border: 1px solid var(--border);
+    padding: 3px 8px;
+    border-radius: 6px;
+    font-variant-numeric: tabular-nums;
+  }
+
+  .history-chip strong {
+    color: var(--text-2);
+    font-weight: 600;
+  }
+
+  .history-chip.latest strong {
+    color: var(--accent-color);
+  }
+
+  /* ══ TIMER OVERLAY ══ */
+  .timer-overlay {
+    position: fixed;
+    bottom: calc(16px + var(--safe-bottom));
+    left: 50%;
+    transform: translateX(-50%) translateY(120%);
+    transition: transform 0.3s cubic-bezier(0.2, 0.9, 0.3, 1);
+    z-index: 50;
+    background: var(--surface);
+    border: 1px solid var(--border);
+    border-radius: 16px;
+    padding: 14px 18px;
+    display: flex;
+    align-items: center;
+    gap: 14px;
+    box-shadow: 0 10px 40px rgba(0,0,0,0.4);
+    min-width: 260px;
+    max-width: calc(100% - 24px);
+  }
+
+  .timer-overlay.active {
+    transform: translateX(-50%) translateY(0);
+  }
+
+  .timer-overlay.ending {
+    animation: pulseBg 0.6s ease-in-out infinite alternate;
+  }
+
+  @keyframes pulseBg {
+    from { box-shadow: 0 10px 40px rgba(0,0,0,0.4); }
+    to { box-shadow: 0 0 0 4px color-mix(in srgb, var(--accent-color) 40%, transparent), 0 10px 40px rgba(0,0,0,0.4); }
+  }
+
+  .timer-overlay.done .timer-value {
+    color: var(--accent-color);
+  }
+
+  .timer-info {
+    flex: 1;
+    min-width: 0;
+  }
+
+  .timer-label {
+    font-size: 10px;
+    letter-spacing: 1.5px;
+    text-transform: uppercase;
+    color: var(--text-3);
+    font-weight: 600;
+    line-height: 1;
+    margin-bottom: 4px;
+  }
+
+  .timer-value {
+    font-family: 'Bebas Neue', sans-serif;
+    font-size: 36px;
+    line-height: 0.9;
+    color: var(--text);
+    font-variant-numeric: tabular-nums;
+    letter-spacing: 1px;
+  }
+
+  .timer-close {
+    background: var(--surface-2);
+    border: none;
+    color: var(--text-2);
+    font-size: 16px;
+    width: 32px;
+    height: 32px;
+    border-radius: 50%;
+    cursor: pointer;
+    flex-shrink: 0;
+  }
+
+  .timer-close:active { background: var(--border); }
+
+  .timer-extend {
+    background: var(--accent-color);
+    border: none;
+    color: #fff;
+    font-size: 11px;
+    font-weight: 600;
+    letter-spacing: 0.5px;
+    padding: 8px 12px;
+    border-radius: 8px;
+    cursor: pointer;
+    flex-shrink: 0;
+  }
+
+  .timer-extend:active { opacity: 0.75; }
+
   /* ══ Responsive tweaks ══ */
   @media (min-width: 600px) {
     .home-hero h1 { font-size: 72px; }
@@ -820,6 +1029,15 @@
     <div id="session-content"></div>
   </section>
 </main>
+
+<div class="timer-overlay" id="timer-overlay">
+  <div class="timer-info">
+    <div class="timer-label" id="timer-label">Repos</div>
+    <div class="timer-value" id="timer-value">00:00</div>
+  </div>
+  <button class="timer-extend" id="timer-extend">+30s</button>
+  <button class="timer-close" id="timer-close" aria-label="Fermer">✕</button>
+</div>
 
 <script id="payload" type="application/json">{"order": ["pecs", "dos", "bas", "hyrox"], "meta": {"pecs": {"label": "PECS · ÉPAULES", "short": "Pecs", "accent": "#c03a2b", "icon": "🔴"}, "dos": {"label": "DOS · BICEPS", "short": "Dos", "accent": "#c9932e", "icon": "🟡"}, "bas": {"label": "BAS DU CORPS", "short": "Jambes", "accent": "#3d6b45", "icon": "🟢"}, "hyrox": {"label": "HYROX PARC", "short": "Hyrox", "accent": "#d96820", "icon": "🟠"}}, "sessions": {"pecs": {"title": "Pecs · Épaules · Biceps", "pills": ["⏱ ~60 min chrono", "Niveau avancé · ~70 kg", "Force + Hypertrophie", "Matériel regroupé par station"], "blocs": [{"chip": "Bloc 01", "name": "Barre + Rack", "sub": "Force · Pecs + Épaules", "duration": "~22 min · repos 2'30–3'", "icon": "🏋️", "exercises": [{"name": "Développé Couché Barre", "sub": "Barre libre · Rack · Pectoraux moyens + Deltoïdes antérieurs", "execution": "Allongé, pieds à plat au sol, fessiers en contact avec le banc. Prise légèrement plus large que les épaules. Descends la barre vers le bas des pecs (ligne des tétons) en contrôlant 2 sec, touche légèrement, pousse en expirant. Coudes à ~75° du corps — pas à 90° (risque coiffe des rotateurs) ni collés.", "avoid": "Ne rebondis pas la barre sur la poitrine — ça sort les pecs du travail et risque de blesser les côtes.", "alt": {"label": "Alternative si rack occupé", "text": "Développé couché haltères : meilleure amplitude, moins de risque si tu t'entraînes seul. Charge ~30–40 kg par haltère. Ou pompes lestées (gilet) 4×6–8."}, "stats": {"Séries": "4", "Reps": "5–6", "Charge": "55–65 kg", "Tempo": "2-0-1", "Repos": "3 min"}}, {"name": "Développé Militaire Barre", "sub": "Barre libre · Debout · Deltoïdes antérieurs + Médians", "execution": "Debout, prise légèrement plus large que les épaules. Barre au niveau du cou/menton en bas. Pousse verticalement au-dessus de la tête en rentrant légèrement la tête pour laisser passer la barre, puis reporte la tête en avant une fois passée. Gaîne abdominal tout au long — ne cambre pas les lombaires.", "avoid": "Ne cambre pas le dos pour compenser — si tu dois le faire, la charge est trop lourde.", "alt": {"label": "Alternative si barre occupée", "text": "Développé militaire haltères assis (dos droit, sans dossier) : ~20–28 kg par haltère. Plus de stabilisation requise, excellent pour les 3 chefs du deltoïde."}, "stats": {"Séries": "4", "Reps": "6–8", "Charge": "40–50 kg", "Repos": "2'30"}}], "supersets": []}, {"chip": "Bloc 02", "name": "Haltères", "sub": "Épaules · Biceps", "duration": "~18 min · repos 75 sec", "icon": "💪", "exercises": [], "supersets": [{"exercises": [{"name": "Élévations Latérales", "sub": "Haltères · Deltoïdes médians", "execution": "Haltères légers, légère flexion coude. Monte jusqu'à hauteur des épaules, pouce légèrement vers le bas (comme si tu versais un verre). Contrôle la descente en 3 sec.", "avoid": "Pas d'élan — réduis la charge si tu dois te pencher pour monter.", "alt": {"label": "Alternative", "text": "Élévations latérales câble basse (1 bras) : tension constante même en bas. ~7–10 kg par côté."}, "stats": {"Reps": "15", "Charge": "8–12 kg"}}, {"name": "Oiseau Penché", "sub": "Haltères · Deltoïdes postérieurs", "execution": "Buste penché à 45–60°, bras légèrement fléchis. Ouvre les bras en rotation externe en montant. Deltoïde postérieur souvent sous-développé — essentiel pour l'équilibre épaule.", "avoid": "Le mouvement s'arrête à hauteur des épaules — pas au-dessus.", "alt": {"label": "Alternative", "text": "Face pull corde poulie (hauteur yeux) : mêmes muscles avec tension constante. 15–20 reps, ~15–20 kg."}, "stats": {"Reps": "15", "Charge": "10–14 kg"}}], "rest": "Repos entre les rounds : 75 sec"}, {"exercises": [{"name": "Curl Haltères Alterné", "sub": "Haltères · Debout · Chef long biceps", "execution": "Monte un bras à la fois. Supination progressive (tourne la paume vers le ciel en montant). Coude fixe contre le corps. Pause 1 sec en haut.", "avoid": "Pas d'élan du buste — réduis la charge si tu balances.", "alt": {"label": "Alternative", "text": "Curl barre EZ debout ~30–35 kg si haltères tous occupés."}, "stats": {"Reps": "10", "Charge": "12–16 kg"}}, {"name": "Curl Marteau", "sub": "Haltères · Prise neutre · Brachial", "execution": "Pouce vers le haut tout au long du mouvement. Reps lentes, contraction 1 sec en haut. Cible le brachial et le long supinateur — donne l'épaisseur au bras.", "avoid": "Ne retourne pas la paume en chemin — prise neutre stricte.", "alt": {"label": "Alternative", "text": "Curl marteau corde poulie basse : tension constante. ~15–20 kg câble."}, "stats": {"Reps": "10", "Charge": "14–18 kg"}}], "rest": "Repos entre les rounds : 75 sec"}]}, {"chip": "Bloc 03", "name": "Câbles", "sub": "Pecs · Biceps · Tension constante", "duration": "~10 min · repos 60–75 sec", "icon": "🔗", "exercises": [{"name": "Câbles Croisés — Écartés Pecs", "sub": "Poulie haute · Adduction horizontale · Étirement maximum", "execution": "Poulies en position haute. Penché légèrement en avant, bras tendus en arc, ramène les mains vers le centre et légèrement vers le bas. Croise légèrement les mains en fin de mouvement pour maximiser la contraction. Bras toujours légèrement fléchis — ne verrouille jamais les coudes. Contrôle le retour en 3 secondes pour profiter de l'étirement.", "avoid": "Ne tire pas avec les bras fléchis — tu transformes ça en développé debout. L'arc de cercle bras tendus est la clé.", "alt": {"label": "Alternative si poulies occupées", "text": "Écartés haltères couché banc plat : ~14–18 kg par haltère, même mouvement en arc. 3×12. Ou développé décliné haltères pour les pecs inférieurs."}, "stats": {"Séries": "3", "Reps": "12–15", "Charge": "10–16 kg", "Repos": "75 sec"}}, {"name": "Curl Poulie Basse EZ", "sub": "Câble · Barre EZ · Tension constante · Finition biceps", "execution": "Avantage du câble : tension constante sur tout l'arc, même en bas. Reste bien droit, coudes fixes sur les côtés. Reps lentes — l'objectif est la congestion maximale. Les biceps ont déjà bien travaillé sur le superset haltères — reste sur une charge raisonnable et soigne le ressenti.", "avoid": "Ne recule pas les pieds pour te donner de l'élan — ça vide l'exercice de son intérêt.", "alt": {"label": "Alternative si poulie occupée", "text": "Curl haltères incliné sur banc 45° : bras qui pendent derrière toi en étirement maximal. Charge légère (~10–12 kg), reps lentes. Excellent pour la finition."}, "stats": {"Séries": "2", "Reps": "15", "Charge": "15–20 kg", "Repos": "60 sec"}}], "supersets": []}, {"chip": "Bloc 04", "name": "Barres Parallèles", "sub": "Finition pecs inférieurs", "duration": "~5 min · repos 60 sec", "icon": "⚫", "exercises": [{"name": "Dips Pectoraux", "sub": "Barres parallèles · Pecs inférieurs · Poids de corps", "execution": "Penche le buste légèrement en avant (15–30°) pour cibler les pectoraux inférieurs — si tu restes droit, tu travailles surtout les triceps. Descends jusqu'à ce que les épaules soient sous les coudes, remonte sans verrouiller les coudes. Excellent exercice de finition car il étire bien les pecs en position basse — les muscles sont déjà bien fatigués à ce stade.", "avoid": "Ne descends pas trop bas si tu ressens une gêne à l'épaule antérieure — arrête-toi quand les bras sont parallèles au sol.", "alt": {"label": "Alternative si barres non dispo", "text": "Développé décliné haltères sur banc décliné (~20–26 kg par haltère) : cible pareillement les pecs inférieurs. Ou pompes pieds surélevés sur banc 3×15."}, "stats": {"Séries": "3", "Reps": "10–15", "Charge": "Poidsde corps", "Repos": "60 sec"}}], "supersets": []}]}, "dos": {"title": "Dos · Biceps", "pills": ["⏱ 60 min chrono", "Niveau avancé", "~70 kg corps", "Barres · Câbles · Traction"], "blocs": [{"chip": "Bloc 01", "name": "Force", "duration": "~22 min · repos 2 min", "exercises": [{"name": "Tractions — Tempo 3-1-1", "sub": "Barre de traction · Prise pronation (mains vers le sol)", "execution": "Prise un peu plus large que les épaules. Initie le mouvement en rentrant les omoplates avant de tirer. Descends en 3 secondes, pause 1 sec bras quasi tendus (garde une légère flexion), remonte en 1 sec. Regarde légèrement vers le haut en montant.", "avoid": "Ne laisse pas les épaules remonter vers les oreilles en haut du mouvement — tiens les omoplates basses et serrées.", "alt": {"label": "Alternative si barre indisponible", "text": "Tractions australiennes (barre Smith ou barre basse ~1m) : corps incliné sous la barre, talons au sol, tire la poitrine vers la barre. Même tempo 3-1-1."}, "stats": {"Séries": "4", "Reps": "6–8", "Charge": "Poidsde corps", "Tempo": "3-1-1", "Repos": "2 min"}}, {"name": "Rowing Barre — Yates Row", "sub": "Barre libre · Prise pronation (mains vers le sol)", "execution": "Buste incliné à 70–80° (légèrement plus droit qu'un rowing classique). Tire la barre vers le bas du ventre / nombril, coudes collés au corps. Dos plat, cuisses gaînées. Contrôle la descente — pas de lâcher.", "avoid": "Ne laisse pas le bas du dos s'arrondir sous la charge. Si ça arrondit, descends le poids.", "alt": {"label": "Alternative si barre occupée", "text": "Rowing 1 bras haltère appuyé sur banc : genou et main d'appui sur le banc, tire l'haltère vers la hanche. Avantage : amplitude plus grande et isolation parfaite de chaque côté. Même charge par bras."}, "stats": {"Séries": "4", "Reps": "6–8", "Charge": "60–70 kg", "Repos": "2 min"}}], "supersets": []}, {"chip": "Bloc 02", "name": "Hypertrophie", "duration": "~13 min · repos 60 sec", "exercises": [{"name": "Rowing Poulie Basse", "sub": "Câble · Poignée neutre (paumes face à face)", "execution": "Assis, dos droit (pas de balancement). Tire la poignée vers le bas du sternum, fais une pause d'1 sec en contractant les rhomboïdes, puis relâche lentement. Ne te penche pas en arrière pour compenser — ça transfère la charge sur les lombaires.", "avoid": "Évite de laisser les épaules partir en avant en fin d'extension — ça sur-sollicite l'articulation.", "alt": {"label": "Alternative si poulie occupée", "text": "Rowing 1 bras haltère genou sur banc : même mouvement de tirage, poignet neutre, pause squeeze en haut. 10–12 reps par côté. Charge équivalente par bras (~25–30 kg)."}, "stats": {"Séries": "3", "Reps": "10–12", "Charge": "50–60 kg", "Repos": "60 sec"}}, {"name": "Tirage Vertical Prise Neutre", "sub": "Poulie haute ou machine · Poignée serrée neutre", "execution": "Buste très légèrement incliné en arrière. Descends la barre vers le haut du buste (jamais derrière la nuque). Coudes qui viennent vers les hanches. Cherche l'étirement maximal du grand dorsal en haut — sens le muscle s'allonger avant de retirer.", "avoid": "Ne tire pas derrière la nuque — gros risque cervical. La barre s'arrête au niveau du menton / clavicules.", "alt": {"label": "Alternative si machine occupée", "text": "Tractions prise serrée neutre à la barre (si des anneaux ou poignées neutres sont disponibles) — ou tractions prise supination (prise en dessous), qui cible le même angle et intègre davantage les biceps."}, "stats": {"Séries": "3", "Reps": "10–12", "Charge": "55–65 kg", "Repos": "60 sec"}}, {"name": "Pull-over Poulie Haute", "sub": "Câble · Corde ou barre droite · Bras tendus", "execution": "Debout, légèrement penché en avant, bras quasi tendus (micro-flexion du coude). L'axe de rotation est l'épaule uniquement — les coudes ne fléchissent pas pendant le mouvement. Descends la corde jusqu'aux hanches, remonte lentement en sentant l'étirement du dorsal. Exercice d'isolation pure.", "avoid": "Si tu fléchis les coudes, tu transformes le mouvement en pushdown — la charge doit rester légère pour garder la tension sur le dorsal.", "alt": {"label": "Alternative si poulie occupée", "text": "Pull-over haltère allongé sur banc : 1 haltère tenu à deux mains, descends les bras derrière la tête (étirement maximal du dorsal), remonte bras quasi tendus. ~15–20 kg. Très efficace en étirement."}, "stats": {"Séries": "3", "Reps": "12–15", "Charge": "20–25 kg", "Repos": "60 sec"}}], "supersets": []}, {"chip": "Bloc 03", "name": "Finition Dos", "duration": "~4 min · repos 45 sec", "exercises": [{"name": "Face Pull Corde", "sub": "Câble · Hauteur des yeux · Corde double", "execution": "Poulie à hauteur des yeux, prise les pouces vers toi. Tire vers le visage en gardant les coudes à hauteur des épaules ou plus haut. Ouvre les bras en fin de mouvement (rotation externe maximale) — c'est là que les rhomboïdes et la coiffe travaillent vraiment. Pause 1 sec, relâche contrôlé.", "avoid": "Ne tire pas avec les coudes vers le bas — c'est devenu un tirage horizontal classique, tu perds l'effet rotation externe.", "alt": {"label": "Alternative si poulie occupée", "text": "Oiseau haltères debout penché (butterfly inversé) : buste penché à 45°, haltères légers (~6–10 kg), bras légèrement fléchis, ouvre les bras en arc en rotation externe. Même muscles, même intensité — 15–20 reps."}, "stats": {"Séries": "3", "Reps": "15–20", "Charge": "15–20 kg", "Repos": "45 sec"}}], "supersets": []}, {"chip": "Bloc 04", "name": "Biceps", "duration": "~10 min", "exercises": [{"name": "Curl Poulie Basse EZ", "sub": "Câble · Barre EZ · Finition", "execution": "Avantage du câble : tension constante sur tout l'arc du mouvement, même en bas (contrairement aux haltères). Reste bien droit, coudes fixes sur les côtés. Reps lentes et contrôlées — l'objectif ici est la congestion maximale en fin de séance, pas la charge.", "avoid": "Ne recule pas les pieds pour te donner de l'élan — ça vide l'exercice de son intérêt.", "alt": {"label": "Alternative si poulie occupée", "text": "Curl haltères incliné sur banc (~45°) : assis sur banc incliné, bras qui pendent derrière toi — ça met le biceps en étirement maximal dès le départ. Charge légère (~10–12 kg), reps lentes. Excellent pour la finition."}, "stats": {"Séries": "2", "Reps": "15", "Charge": "20–25 kg", "Repos": "45 sec"}}], "supersets": [{"exercises": [{"name": "Curl Haltères Alterné", "sub": "Haltères · Debout", "execution": "Monte un bras à la fois. Effectue une supination progressive (tourne la paume vers le ciel en montant). Coude fixe contre le corps — ne le projette pas en avant.", "avoid": "Pas d'élan du buste pour compenser.", "alt": {"label": "Alternative", "text": "Curl barre EZ debout : même rep range, charge ~30–35 kg. Moins d'isolation par côté mais utile si haltères libres occupés."}, "stats": {"Reps": "10", "Charge": "12–16 kg"}}, {"name": "Curl Marteau", "sub": "Haltères · Prise neutre", "execution": "Pouce vers le haut tout au long du mouvement, pas de rotation. Mouvement lent et contrôlé. Tiens la contraction 1 sec en haut. Cible le brachial et le long supinateur — donne l'épaisseur.", "avoid": "Ne retourne pas la paume en chemin — garde la prise neutre.", "alt": {"label": "Alternative", "text": "Curl marteau à la corde poulie basse : tension constante sur tout l'arc, excellent si haltères libres sont tous pris. ~15–20 kg câble, même rep range."}, "stats": {"Reps": "10", "Charge": "14–18 kg"}}], "rest": "Repos entre les rounds : 75 sec"}]}]}, "bas": {"title": "Bas du corps", "pills": ["⏱ 60 min chrono", "Niveau avancé", "Force + Hypertrophie", "🦵 Genoux sensibles"], "blocs": [{"chip": "Bloc 01", "name": "Force", "duration": "~22 min · repos 2'30–3'", "exercises": [{"name": "Squat Barre — Back Squat", "sub": "Barre libre · Rack · Profondeur contrôlée", "execution": "Pieds largeur d'épaules, légèrement ouverts (15–30°). Barre posée sur les trapèzes moyens (low bar) ou hauts (high bar — genoux plus sollicités). Descends en poussant les genoux dans l'axe des orteils, buste légèrement incliné, dos gaîné. Descend jusqu'à la parallèle ou juste en dessous selon le confort.", "avoid": "Ne laisse pas les genoux s'effondrer vers l'intérieur (valgus) sous la charge — c'est le premier facteur de blessure.", "alt": {"label": "Alternative si rack occupé ou douleur", "text": "Squat goblet avec kettlebell ou haltère (~20–30 kg) : tenu contre la poitrine, favorise un buste droit et réduit la pression sur les genoux. Ou presse à cuisses pieds hauts (voir exo 3) comme remplacement direct."}, "stats": {"Séries": "4", "Reps": "5–6", "Charge": "80–100 kg", "Repos": "3 min"}}, {"name": "Romanian Deadlift", "sub": "Barre libre · Ischio-jambiers + Fessiers", "execution": "Debout, barre en pronation dans les mains. Descends la barre le long des jambes en poussant les hanches vers l'arrière (hip hinge), jambes quasi tendues (légère flexion genou). Sens l'étirement maximal des ischios avant de remonter en contractant les fessiers. Dos strictement plat tout au long.", "avoid": "Ne laisse pas le bas du dos s'arrondir en bas du mouvement — arrête-toi quand tu sens la limite de ton étirement ischio.", "alt": {"label": "Alternative si barre occupée", "text": "Romanian deadlift haltères : exactement le même mouvement, 2 haltères (~25–35 kg chacun). Amplitude souvent meilleure car les haltères passent à l'extérieur des jambes. Même charges et reps."}, "stats": {"Séries": "4", "Reps": "6–8", "Charge": "70–90 kg", "Repos": "2'30"}}], "supersets": []}, {"chip": "Bloc 02", "name": "Hypertrophie", "duration": "~18 min · repos 90 sec", "exercises": [{"name": "Presse à Cuisses — Pieds Hauts", "sub": "Machine guidée · Fessiers + Ischios prioritaires", "execution": "Place les pieds en haut de la plateforme (largeur d'épaules). Cette position haute réduit la flexion du genou et transfère le travail vers les fessiers et ischios. Descends jusqu'à 90° de flexion max — les lombaires ne doivent pas décoller du dossier. Remonte sans verrouiller les genoux en haut.", "avoid": "Ne décolle pas les fessiers du siège en fin de descente — ça transfère la charge sur les lombaires.", "alt": {"label": "Alternative si machine occupée", "text": "Squat bulgare haltères (exo 4 ci-dessous peut être avancé) ou Squat goblet à la kettlebell 4×12 (~25–30 kg) : buste droit, profondeur confortable. Moins de charge mais stimulus hypertrophique similaire."}, "stats": {"Séries": "3", "Reps": "10–12", "Charge": "120–160 kg", "Repos": "90 sec"}}, {"name": "Leg Curl Couché", "sub": "Machine · Ischio-jambiers · Isolation", "execution": "Allongé ventre sur la machine. Le coussin doit être au niveau des chevilles (pas du mollet). Fléchis en ramenant les talons vers les fesses, pause 1 sec en contraction maximale, redescends en 3 secondes. Garde les hanches en contact avec la machine — ne les soulève pas pour aider.", "avoid": "Ne soulève pas les hanches pour compenser — ça sort les ischios du travail et compresse les lombaires.", "alt": {"label": "Alternative si machine occupée", "text": "Nordic curl au sol (genou à terre, partenaire ou barre fixe qui bloque les chevilles) : descends en freinant avec les ischios, remonte en poussant avec les mains. Très intense — 3×6–8 suffit. Ou good morning barre légère (~30–40 kg) 3×12."}, "stats": {"Séries": "3", "Reps": "10–12", "Charge": "35–50 kg", "Repos": "90 sec"}}, {"name": "Fentes Bulgares Haltères", "sub": "Haltères · Pied arrière surélevé · Unilatéral", "execution": "Pied arrière posé sur un banc (~genou fléchi à 90°). Pied avant avancé suffisamment pour que le genou avant ne dépasse pas la pointe du pied en descendant. Descends verticalement, buste droit. Remonte en poussant sur le talon avant — sens le fessier et le quadri travailler.", "avoid": "Ne laisse pas le genou avant s'effondrer vers l'intérieur — garde le genou dans l'axe du 2e orteil tout au long du mouvement.", "alt": {"label": "Alternative si douleur ou déséquilibre", "text": "Fente avant marchée haltères (~12–16 kg/main) : même stimulus, plus de contrôle sur la trajectoire du genou. Ou hip thrust à la barre pour fessiers (voir bloc finition). 3×12 pas/jambe."}, "stats": {"Séries": "3", "Reps": "10/jambe", "Charge": "16–22 kg×2", "Repos": "90 sec"}}], "supersets": []}, {"chip": "Bloc 03", "name": "Finition", "duration": "~10 min · repos 45–60 sec", "exercises": [{"name": "Leg Extension — Amplitude Réduite", "sub": "Machine · Quadriceps · Charge légère", "execution": "Charge légère — l'objectif est la congestion, pas la force. Travaille en amplitude partielle : de 90° à environ 45° de flexion (pas jusqu'à extension complète). Cela évite la zone de tension maximale sur le tendon rotulien. Reps lentes, contraction de 1 sec à chaque rep.", "avoid": "Ne charge pas lourd sur cet exercice avec des genoux sensibles — c'est un exercice de finition, pas de force.", "alt": {"label": "Alternative si douleur ou machine indisponible", "text": "Wall sit isométrique : dos au mur, cuisses parallèles au sol, 3×30–45 sec. Ou terminal knee extension avec élastique : debout, élastique derrière le genou, petites extensions finales à 20°. Parfait pour les genoux sensibles."}, "stats": {"Séries": "3", "Reps": "15", "Charge": "25–35 kg", "Amplitude": "Partielle", "Repos": "60 sec"}}, {"name": "Mollets Debout", "sub": "Machine ou barre sur trapèzes · Gastrocnémiens", "execution": "Avant-pieds sur une marche ou plateforme. Descends talons vers le bas pour un étirement maximal (2 sec), remonte sur la pointe des pieds en 1 sec, pause 1 sec en haut avec contraction. Les mollets sont des muscles résistants — ils ont besoin d'amplitude complète et de volume pour progresser.", "avoid": "Ne fais pas des mini-reps avec juste le talon qui monte légèrement — l'amplitude complète est ce qui crée l'hypertrophie sur les mollets.", "alt": {"label": "Alternative si machine occupée", "text": "Mollets à la presse à cuisses : pieds en bas de la plateforme, pousse sur la pointe des pieds sans déverrouiller la sécurité. Ou mollets debout 1 jambe avec haltère (~20 kg) pour plus d'intensité et d'équilibre."}, "stats": {"Séries": "4", "Reps": "15–20", "Charge": "60–80 kg", "Tempo": "2-1-1", "Repos": "45 sec"}}], "supersets": []}]}, "hyrox": {"title": "Hyrox · Parc", "pills": ["⏱ 60 min", "🌳 Sans matériel · Parc", "Débutant · 1ère prépa", "Cardio + Force fonctionnelle"], "blocs": [{"chip": "Bloc 01", "name": "Simulation Hyrox", "sub": "4 rounds · Course + Station", "duration": "~28 min", "icon": "🏁", "exercises": [], "supersets": [], "sim_title": "⚡ 4 Rounds — Boucle 400m → Retour base camp → Station Toutes les stations se font à ton point fixe sur la pelouse · Allure course : tu dois pouvoir parler", "rounds": [{"num": "1", "run_icon": "🏃", "run_label": "Course", "run_val": "400 m", "st_icon": "💥", "st_label": "Station 1 — Pompes explosives", "st_val": "10 reps", "st_sub": "Pousse assez fort pour décoller les mains du sol · claque des mains si possible · simulation poussée explosive Hyrox"}, {"num": "2", "run_icon": "🏃", "run_label": "Course", "run_val": "400 m", "st_icon": "🔥", "st_label": "Station 2 — Mountain climbers", "st_val": "40 reps (20/jambe)", "st_sub": "Rythme rapide, hanches basses, épaules au-dessus des mains · simulation ski erg cadence"}, {"num": "3", "run_icon": "🏃", "run_label": "Course", "run_val": "400 m", "st_icon": "⚡", "st_label": "Station 3 — Sprint 50m aller-retour", "st_val": "3 allers-retours", "st_sub": "Depuis le point fixe · effort 90% · simulation des changements de rythme Hyrox"}, {"num": "4", "run_icon": "🏃", "run_label": "Course", "run_val": "400 m", "st_icon": "🦘", "st_label": "Station 4 — Sauts en longueur enchaînés", "st_val": "8 sauts", "st_sub": "Saute le plus loin possible, enchaîne sans pause entre chaque saut · travail puissance + coordination"}], "sim_footer": "Total : 1600m de course + 4 stations à ton point fixe Entre les rounds : 90 sec max de marche — reste près de ton point fixe"}, {"chip": "Bloc 02", "name": "Renforcement Fonctionnel", "sub": "Zones clés Hyrox · Sur la pelouse · Point fixe", "duration": "~15 min · repos 60 sec", "icon": "💪", "exercises": [{"name": "Pompes — Tempo 2-1-1", "sub": "Poids de corps · Pectoraux + Triceps + Gainage", "execution": "Corps droit de la tête aux talons, mains légèrement plus larges que les épaules. Descends en 2 sec, pause 1 sec en bas (coudes à ~75°), remonte en 1 sec. Gaîne l'abdomen — si le bas du dos se creuse, pose les genoux. La qualité prime sur la quantité.", "avoid": "Ne laisse pas les hanches s'affaisser — ton corps doit former une planche rigide.", "stats": {"Séries": "3", "Reps": "12–15", "Tempo": "2-1-1", "Repos": "60 sec"}}, {"name": "Glute Bridge — Unilatéral", "sub": "Sol · Fessiers + Ischios · Pied opposé en l'air", "execution": "Allongé sur le dos, un pied à plat, l'autre jambe tendue en l'air. Pousse sur le talon, monte les hanches jusqu'à alignement épaule-genou-cheville, contraction fessier 2 sec en haut. Redescends lentement. Travail unilatéral = correction des déséquilibres très fréquents chez les coureurs.", "avoid": "Ne laisse pas les hanches basculer de côté quand tu montes — maintiens le bassin horizontal.", "stats": {"Séries": "3", "Reps": "12/côté", "Pause": "2 sec en haut", "Repos": "60 sec"}}, {"name": "Planche + Shoulder Taps", "sub": "Sol · Gainage global · Stabilité", "execution": "Position planche sur les mains. Alterne en touchant l'épaule opposée avec la main, sans laisser les hanches bouger. Place les pieds légèrement plus larges que les épaules pour plus de stabilité. Respire normalement — le but est de maintenir l'effort sous tension continue, comme en condition Hyrox.", "avoid": "Ne laisse pas les hanches monter en l'air ou descendre — reste parfaitement horizontal.", "stats": {"Séries": "3", "Taps": "20/côté", "Repos": "60 sec"}}], "supersets": []}, {"chip": "Bloc 03", "name": "AMRAP Finition", "sub": "As Many Rounds As Possible · 5 min · À ton point fixe", "duration": "~5 min", "icon": "🔁", "exercises": [], "supersets": [], "amrap": {"header": "🔁 AMRAP 5 min — Enchaîne en boucle Pas de repos · Réduis l'intensité si besoin mais ne t'arrête pas", "movements": [{"icon": "💥", "label": "Mouvement A", "val": "5 Burpees", "sub": "Saut en extension complète"}, {"icon": "🦵", "label": "Mouvement B", "val": "10 Squat jumps", "sub": "Bras tendus en haut"}, {"icon": "🏃", "label": "Mouvement C", "val": "200 m sprint", "sub": "Effort 80% — pas à fond"}], "footer": "Note le nombre de rounds complets — c'est ton score à battre la prochaine fois 🎯 Objectif débutant : 3–4 rounds"}}]}}}</script>
 <script>
@@ -925,6 +1143,9 @@ function openSession(key) {
   // Bind notes
   bindNotes();
   restoreNotes();
+  bindCharges();
+  restoreCharges();
+  bindRestTimers();
   trackBlocScroll();
 
   // Scroll to top
@@ -932,33 +1153,65 @@ function openSession(key) {
 }
 
 // Track which bloc is currently visible
+let _blocScrollHandler = null;
+
 function trackBlocScroll() {
   const main = document.getElementById('main');
   const blocs = document.querySelectorAll('.bloc');
   const navBtns = document.querySelectorAll('.bloc-nav-btn');
   const navEl = document.getElementById('bloc-nav');
+  let ticking = false;
+  let lastActiveIdx = -1;
+  let lastUserScrollTs = 0;
 
   const update = () => {
+    ticking = false;
     if (!navEl) return;
     const navBottom = navEl.getBoundingClientRect().bottom;
     let activeIdx = 0;
     blocs.forEach((b, i) => {
       const rect = b.getBoundingClientRect();
-      if (rect.top <= navBottom + 20) activeIdx = i;
+      if (rect.top <= navBottom + 40) activeIdx = i;
     });
-    navBtns.forEach((btn, i) => {
-      btn.classList.toggle('active', i === activeIdx);
-    });
-    // scroll active button into view
-    const activeBtn = navBtns[activeIdx];
-    if (activeBtn) {
-      activeBtn.scrollIntoView({ behavior: 'smooth', block: 'nearest', inline: 'center' });
+
+    if (activeIdx !== lastActiveIdx) {
+      navBtns.forEach((btn, i) => {
+        btn.classList.toggle('active', i === activeIdx);
+      });
+      lastActiveIdx = activeIdx;
+
+      // Only scroll active button into view if user paused scrolling
+      // (avoids fighting vertical scroll with horizontal nav scroll)
+      const activeBtn = navBtns[activeIdx];
+      if (activeBtn && navEl) {
+        const btnRect = activeBtn.getBoundingClientRect();
+        const navRect = navEl.getBoundingClientRect();
+        // Only if button is actually off-screen
+        if (btnRect.left < navRect.left + 10 || btnRect.right > navRect.right - 10) {
+          // Use direct scrollLeft instead of scrollIntoView to avoid vertical side-effects
+          const targetLeft = activeBtn.offsetLeft - navEl.clientWidth / 2 + activeBtn.offsetWidth / 2;
+          navEl.scrollTo({ left: targetLeft, behavior: 'smooth' });
+        }
+      }
     }
   };
 
-  main.removeEventListener('scroll', main._blocScrollHandler || (() => {}));
-  main._blocScrollHandler = update;
-  main.addEventListener('scroll', update, { passive: true });
+  const onScroll = () => {
+    lastUserScrollTs = Date.now();
+    if (!ticking) {
+      ticking = true;
+      requestAnimationFrame(update);
+    }
+  };
+
+  // Properly remove previous listener from previous session render
+  if (_blocScrollHandler) {
+    main.removeEventListener('scroll', _blocScrollHandler);
+  }
+  _blocScrollHandler = onScroll;
+  main.addEventListener('scroll', onScroll, { passive: true });
+  // Run once
+  lastActiveIdx = -1;
   update();
 }
 
@@ -1075,11 +1328,45 @@ function renderEx(ex, num, inSuperset, sessionKey, blocIdx, exIdx) {
     return (ai === -1 ? 99 : ai) - (bi === -1 ? 99 : bi);
   });
 
+  // Parse rest duration (seconds) from "2 min", "90 sec", "2'30", "3 min" etc.
+  function parseRestSeconds(restStr) {
+    if (!restStr) return 0;
+    const s = String(restStr).toLowerCase();
+    // Try "X'YY" (e.g. 2'30)
+    let m = s.match(/(\d+)\s*['′]\s*(\d+)/);
+    if (m) return parseInt(m[1]) * 60 + parseInt(m[2]);
+    // "X min YY sec"
+    m = s.match(/(\d+)\s*min\s*(\d+)\s*sec/);
+    if (m) return parseInt(m[1]) * 60 + parseInt(m[2]);
+    // Range first: "45-60 sec" or "60–75 sec" → take lower bound
+    m = s.match(/(\d+)\s*[\-–]\s*\d+\s*sec/);
+    if (m) return parseInt(m[1]);
+    m = s.match(/(\d+)\s*[\-–]\s*\d+\s*min/);
+    if (m) return parseInt(m[1]) * 60;
+    // "X min"
+    m = s.match(/(\d+(?:[.,]\d+)?)\s*min/);
+    if (m) {
+      const v = parseFloat(m[1].replace(',', '.'));
+      return Math.round(v * 60);
+    }
+    // "XX sec"
+    m = s.match(/(\d+)\s*sec/);
+    if (m) return parseInt(m[1]);
+    // First number fallback, assume minutes if < 20
+    m = s.match(/(\d+)/);
+    if (m) {
+      const n = parseInt(m[1]);
+      return n < 20 ? n * 60 : n;
+    }
+    return 0;
+  }
+
   const statsHtml = sortedKeys.map(k => {
     const isRest = k === 'Repos';
     const val = String(stats[k]).replace(/Poidsde corps/i, 'Poids corps');
+    const restAttr = isRest ? ` data-rest-seconds="${parseRestSeconds(val)}" data-rest-label="${escape(ex.name)}"` : '';
     return `
-      <div class="stat${isRest ? ' rest' : ''}">
+      <div class="stat${isRest ? ' rest' : ''}"${restAttr}>
         <div class="stat-label">${escape(k)}</div>
         <div class="stat-value">${escape(val)}</div>
       </div>
@@ -1098,6 +1385,22 @@ function renderEx(ex, num, inSuperset, sessionKey, blocIdx, exIdx) {
   }
 
   const noteKey = `note:${sessionKey}:${blocIdx}:${exIdx}`;
+  const chargeKey = `charge:${sessionKey}:${blocIdx}:${exIdx}`;
+  const chargeHistKey = `chargeHist:${sessionKey}:${blocIdx}:${exIdx}`;
+
+  // Only show charge tracker if the exercise has a "Charge" stat (skip pure bodyweight)
+  const hasCharge = stats['Charge'] && !/poids.{0,5}corps/i.test(stats['Charge']);
+
+  const chargeBlock = hasCharge ? `
+    <div class="ex-charge">
+      <div class="ex-charge-row">
+        <div class="ex-charge-label">Charge</div>
+        <input type="text" inputmode="decimal" class="ex-charge-input" placeholder="${escape(stats['Charge'])}" data-charge="${chargeKey}" data-hist="${chargeHistKey}">
+        <button class="ex-charge-save" data-charge-save="${chargeKey}" data-hist="${chargeHistKey}">Valider</button>
+      </div>
+      <div class="ex-charge-history" data-charge-hist-display="${chargeHistKey}"></div>
+    </div>
+  ` : '';
 
   return `
     <div class="ex" data-note-key="${noteKey}">
@@ -1112,12 +1415,13 @@ function renderEx(ex, num, inSuperset, sessionKey, blocIdx, exIdx) {
       </div>
       <div class="ex-stats">${statsHtml}</div>
       ${details ? `<div class="ex-details">${details}</div>` : ''}
+      ${chargeBlock}
       <div class="ex-note">
         <div class="ex-note-label">
           <span>Ma note</span>
           <button class="ex-note-clear" data-clear="${noteKey}">Effacer</button>
         </div>
-        <textarea placeholder="Charge du jour, sensations, à retenir…" data-note="${noteKey}"></textarea>
+        <textarea placeholder="Sensations, ressenti, \u00e0 retenir\u2026" data-note="${noteKey}"></textarea>
       </div>
     </div>
   `;
@@ -1167,6 +1471,192 @@ function restoreNotes() {
   });
 }
 
+// ═══ CHARGE TRACKER ═══
+function formatDate(d) {
+  const now = new Date();
+  const then = new Date(d);
+  if (isNaN(then.getTime())) return '';
+  const days = Math.max(0, Math.floor((now - then) / (1000 * 60 * 60 * 24)));
+  if (days === 0) return "aujourd'hui";
+  if (days === 1) return 'hier';
+  if (days < 7) return `il y a ${days}j`;
+  if (days < 30) return `il y a ${Math.floor(days / 7)}sem`;
+  return then.toLocaleDateString('fr-FR', { day: 'numeric', month: 'short' });
+}
+
+function renderChargeHistory(histKey) {
+  const displayEl = document.querySelector(`[data-charge-hist-display="${histKey}"]`);
+  if (!displayEl) return;
+  let hist = [];
+  try { hist = JSON.parse(localStorage.getItem(histKey) || '[]'); } catch(e) {}
+  if (!hist.length) {
+    displayEl.innerHTML = '';
+    return;
+  }
+  // Show up to 3 most recent
+  const recent = hist.slice(-3).reverse();
+  displayEl.innerHTML = recent.map((h, i) => 
+    `<span class="history-chip${i === 0 ? ' latest' : ''}"><strong>${escape(h.v)}</strong> · ${escape(formatDate(h.d))}</span>`
+  ).join('');
+}
+
+function bindCharges() {
+  document.querySelectorAll('[data-charge-save]').forEach(btn => {
+    btn.addEventListener('click', e => {
+      e.stopPropagation();
+      const key = btn.dataset.chargeSave;
+      const histKey = btn.dataset.hist;
+      const input = document.querySelector(`[data-charge="${key}"]`);
+      if (!input) return;
+      const val = input.value.trim();
+      if (!val) return;
+
+      // Save current value
+      try { localStorage.setItem(key, val); } catch(e) {}
+
+      // Append to history — avoid duplicate if same value & same day
+      let hist = [];
+      try { hist = JSON.parse(localStorage.getItem(histKey) || '[]'); } catch(e) {}
+      const today = new Date().toISOString().slice(0, 10);
+      const lastEntry = hist[hist.length - 1];
+      if (!lastEntry || lastEntry.v !== val || lastEntry.d.slice(0, 10) !== today) {
+        hist.push({ v: val, d: new Date().toISOString() });
+        // Keep last 20
+        if (hist.length > 20) hist = hist.slice(-20);
+        try { localStorage.setItem(histKey, JSON.stringify(hist)); } catch(e) {}
+      }
+
+      // Visual feedback
+      btn.classList.add('saved');
+      btn.textContent = 'Enregistré';
+      setTimeout(() => {
+        btn.classList.remove('saved');
+        btn.textContent = 'Valider';
+      }, 1500);
+
+      renderChargeHistory(histKey);
+    });
+  });
+
+  // Prevent taps inside input from collapsing the exercise
+  document.querySelectorAll('.ex-charge-input').forEach(input => {
+    input.addEventListener('click', e => e.stopPropagation());
+  });
+}
+
+function restoreCharges() {
+  document.querySelectorAll('[data-charge]').forEach(input => {
+    try {
+      const v = localStorage.getItem(input.dataset.charge);
+      if (v) input.value = v;
+    } catch(e) {}
+    renderChargeHistory(input.dataset.hist);
+  });
+}
+
+// ═══ REST TIMER ═══
+let timerInterval = null;
+let timerEndTime = 0;
+let timerTotalSeconds = 0;
+const timerOverlay = document.getElementById('timer-overlay');
+const timerLabel = document.getElementById('timer-label');
+const timerValue = document.getElementById('timer-value');
+const timerExtend = document.getElementById('timer-extend');
+const timerClose = document.getElementById('timer-close');
+
+function formatMS(totalSec) {
+  if (totalSec < 0) totalSec = 0;
+  const m = Math.floor(totalSec / 60);
+  const s = totalSec % 60;
+  return `${String(m).padStart(2, '0')}:${String(s).padStart(2, '0')}`;
+}
+
+function bindRestTimers() {
+  document.querySelectorAll('.stat.rest').forEach(stat => {
+    stat.addEventListener('click', e => {
+      e.stopPropagation();
+      const seconds = parseInt(stat.dataset.restSeconds || '0');
+      const label = stat.dataset.restLabel || 'Repos';
+      if (seconds > 0) startRestTimer(seconds, label);
+    });
+  });
+}
+
+function startRestTimer(seconds, label) {
+  if (timerInterval) clearInterval(timerInterval);
+  timerOverlay.classList.remove('done', 'ending');
+  timerOverlay.classList.add('active');
+  document.body.classList.add('timer-active');
+  timerLabel.textContent = label.length > 28 ? label.slice(0, 26) + '…' : label;
+  timerTotalSeconds = seconds;
+  timerEndTime = Date.now() + seconds * 1000;
+  updateTimerDisplay();
+
+  timerInterval = setInterval(() => {
+    const remaining = Math.ceil((timerEndTime - Date.now()) / 1000);
+    if (remaining <= 0) {
+      clearInterval(timerInterval);
+      timerInterval = null;
+      timerValue.textContent = '00:00';
+      timerOverlay.classList.remove('ending');
+      timerOverlay.classList.add('done');
+      triggerBuzz();
+    } else if (remaining <= 5) {
+      timerOverlay.classList.add('ending');
+      timerValue.textContent = formatMS(remaining);
+    } else {
+      timerValue.textContent = formatMS(remaining);
+    }
+  }, 250);
+}
+
+function updateTimerDisplay() {
+  const remaining = Math.ceil((timerEndTime - Date.now()) / 1000);
+  timerValue.textContent = formatMS(remaining);
+}
+
+function triggerBuzz() {
+  // iOS Safari doesn't support Vibration API but we can try
+  if (navigator.vibrate) navigator.vibrate([200, 100, 200, 100, 400]);
+
+  // Audio beep
+  try {
+    const ctx = new (window.AudioContext || window.webkitAudioContext)();
+    const now = ctx.currentTime;
+    [0, 0.25, 0.5].forEach(delay => {
+      const osc = ctx.createOscillator();
+      const gain = ctx.createGain();
+      osc.connect(gain);
+      gain.connect(ctx.destination);
+      osc.frequency.value = 880;
+      gain.gain.setValueAtTime(0, now + delay);
+      gain.gain.linearRampToValueAtTime(0.3, now + delay + 0.02);
+      gain.gain.linearRampToValueAtTime(0, now + delay + 0.18);
+      osc.start(now + delay);
+      osc.stop(now + delay + 0.2);
+    });
+  } catch(e) {}
+}
+
+timerExtend.addEventListener('click', () => {
+  if (timerInterval) {
+    // still running → add 30s
+    timerEndTime += 30 * 1000;
+    timerOverlay.classList.remove('ending', 'done');
+    updateTimerDisplay();
+  } else {
+    // done → restart with 30s
+    startRestTimer(30, timerLabel.textContent);
+  }
+});
+
+timerClose.addEventListener('click', () => {
+  if (timerInterval) clearInterval(timerInterval);
+  timerInterval = null;
+  timerOverlay.classList.remove('active', 'ending', 'done');
+  document.body.classList.remove('timer-active');
+});
+
 // ═══ NAVIGATION ═══
 function goHome() {
   document.body.classList.add('view-home');
@@ -1176,6 +1666,11 @@ function goHome() {
   document.getElementById('view-session').classList.remove('active');
   document.getElementById('view-home').classList.add('active');
   document.getElementById('main').scrollTop = 0;
+  // Close timer on navigation back
+  if (timerInterval) clearInterval(timerInterval);
+  timerInterval = null;
+  timerOverlay.classList.remove('active', 'ending', 'done');
+  document.body.classList.remove('timer-active');
   history.replaceState({ view: 'home' }, '');
 }
 
