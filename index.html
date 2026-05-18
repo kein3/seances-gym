@@ -890,6 +890,39 @@
     opacity: 0.6;
   }
 
+
+  .stat.rest {
+    border: 1px solid color-mix(in srgb, var(--accent-color) 45%, var(--border));
+    background: color-mix(in srgb, var(--accent-color) 8%, var(--surface));
+  }
+
+  .rest-start-chip {
+    display: inline-block;
+    margin-top: 6px;
+    padding: 4px 8px;
+    border-radius: 999px;
+    background: var(--accent-color);
+    color: #fff;
+    font-size: 9px;
+    font-weight: 700;
+    letter-spacing: 0.7px;
+    text-transform: uppercase;
+    line-height: 1;
+  }
+
+  .superset-footer.timer-ready {
+    cursor: pointer;
+    color: #fff;
+    background: color-mix(in srgb, var(--accent-color) 80%, var(--surface-2));
+    border-top-color: var(--accent-color);
+    font-weight: 600;
+  }
+
+  .superset-footer.timer-ready::after {
+    content: '  ▶';
+    font-size: 10px;
+  }
+
   /* ══ CHARGE TRACKER ══ */
   .ex-charge {
     border-top: 1px solid var(--border);
@@ -1485,7 +1518,8 @@ function renderBloc(b, num, accent, sessionKey) {
     const exHtml = ss.exercises.map((ex, i) => 
       renderEx(ex, String.fromCharCode(65 + i), true, sessionKey, blocIdx, `ss${idx}-${i}`)
     ).join('');
-    const rest = ss.rest ? `<div class="superset-footer">${escape(ss.rest)}</div>` : '';
+    const restSeconds = ss.rest ? parseRestSeconds(ss.rest) : 0;
+    const rest = ss.rest ? `<div class="superset-footer${restSeconds ? ' timer-ready' : ''}"${restSeconds ? ` data-rest-seconds="${restSeconds}" data-rest-label="Superset"` : ''}>${escape(ss.rest)}${restSeconds ? ' · lancer chrono' : ''}</div>` : '';
     body += `
       <div class="superset">
         <div class="superset-banner">⚡ Superset</div>
@@ -1620,6 +1654,7 @@ function renderEx(ex, num, inSuperset, sessionKey, blocIdx, exIdx) {
       <div class="stat${isRest ? ' rest' : ''}"${restAttr}>
         <div class="stat-label">${escape(k)}</div>
         <div class="stat-value">${escape(val)}</div>
+        ${isRest ? '<div class="rest-start-chip">Lancer</div>' : ''}
       </div>
     `;
   }).join('');
@@ -2060,7 +2095,7 @@ function formatMS(totalSec) {
 }
 
 function bindRestTimers() {
-  document.querySelectorAll('.stat.rest').forEach(stat => {
+  document.querySelectorAll('.stat.rest, .superset-footer.timer-ready').forEach(stat => {
     stat.addEventListener('click', e => {
       e.stopPropagation();
       const seconds = parseInt(stat.dataset.restSeconds || '0');
