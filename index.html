@@ -597,6 +597,35 @@
     text-align: center;
   }
 
+  .superset-meta {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    gap: 10px;
+    padding: 10px 14px;
+    background: color-mix(in srgb, var(--accent-color) 10%, var(--surface));
+    border-bottom: 1px solid var(--border);
+    font-size: 12px;
+    color: var(--text-2);
+  }
+
+  .superset-rounds {
+    font-family: 'Bebas Neue', sans-serif;
+    font-size: 22px;
+    line-height: 1;
+    color: var(--accent-color);
+    letter-spacing: 0.6px;
+    white-space: nowrap;
+  }
+
+  .superset-sequence {
+    text-align: right;
+    font-size: 11px;
+    color: var(--text-3);
+    text-transform: uppercase;
+    letter-spacing: 0.8px;
+  }
+
   .superset .ex {
     border: none;
     border-radius: 0;
@@ -1420,7 +1449,7 @@
       <button class="home-tool-btn danger" id="btn-reset-data">Réinitialiser</button>
     </div>
     <input type="file" id="import-file" accept="application/json" hidden>
-    <div class="home-version">v3.3 · superset chrono · mai 2026</div>
+    <div class="home-version">v3.4 · tours superset · mai 2026</div>
   </section>
 
   <section class="view" id="view-session">
@@ -1633,13 +1662,19 @@ function renderBloc(b, num, accent, sessionKey) {
 
   // Supersets
   (b.supersets || []).forEach((ss, idx) => {
+    const rounds = getSupersetRounds(ss);
+    const sequence = getSupersetSequence(ss);
     const exHtml = ss.exercises.map((ex, i) => 
       renderEx(ex, String.fromCharCode(65 + i), true, sessionKey, blocIdx, `ss${idx}-${i}`)
     ).join('');
     const rest = ss.rest ? renderSupersetRest(ss.rest, idx + 1) : '';
     body += `
       <div class="superset">
-        <div class="superset-banner">⚡ Superset</div>
+        <div class="superset-banner">⚡ Superset ${String(idx + 1).padStart(2, '0')}</div>
+        <div class="superset-meta">
+          <div class="superset-rounds">${escape(rounds)} tours</div>
+          <div class="superset-sequence">${escape(sequence)}</div>
+        </div>
         ${exHtml}
         ${rest}
       </div>
@@ -1721,6 +1756,26 @@ function renderBloc(b, num, accent, sessionKey) {
   `;
 }
 
+
+function getSupersetRounds(ss) {
+  if (!ss) return '3';
+  const explicit = ss.rounds || ss.tours || ss.sets || ss.series || ss.séries;
+  if (explicit) return String(explicit).replace(/\s*tours?$/i, '').trim();
+  const exercises = ss.exercises || [];
+  for (const ex of exercises) {
+    const stats = ex.stats || {};
+    const val = stats['Séries'] || stats['Series'] || stats['Tours'];
+    if (val) return String(val).replace(/\s*tours?$/i, '').trim();
+  }
+  return '3';
+}
+
+function getSupersetSequence(ss) {
+  const count = Math.max(0, (ss && ss.exercises ? ss.exercises.length : 0));
+  if (!count) return 'Enchaînement';
+  const letters = Array.from({ length: count }, (_, i) => String.fromCharCode(65 + i)).join(' + ');
+  return `Enchaîne ${letters}`;
+}
 
 function renderSupersetRest(restText, supersetNum) {
   const seconds = parseRestSeconds(restText);
