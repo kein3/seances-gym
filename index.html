@@ -618,6 +618,60 @@
     text-align: center;
   }
 
+
+
+  .superset-rest-card {
+    width: calc(100% - 24px);
+    margin: 10px 12px 12px;
+    padding: 12px 14px;
+    border: 1px solid color-mix(in srgb, var(--accent-color) 55%, var(--border));
+    border-radius: 12px;
+    background: color-mix(in srgb, var(--accent-color) 12%, var(--surface-2));
+    color: var(--text);
+    font-family: inherit;
+    cursor: pointer;
+    display: grid;
+    grid-template-columns: 1fr auto;
+    gap: 4px 12px;
+    align-items: center;
+    text-align: left;
+    -webkit-appearance: none;
+  }
+
+  .superset-rest-card:active {
+    transform: scale(0.99);
+    background: color-mix(in srgb, var(--accent-color) 20%, var(--surface-2));
+  }
+
+  .superset-rest-label {
+    font-size: 10px;
+    letter-spacing: 1.5px;
+    text-transform: uppercase;
+    color: var(--accent-color);
+    font-weight: 700;
+  }
+
+  .superset-rest-value {
+    font-size: 13px;
+    color: var(--text);
+    font-weight: 600;
+    line-height: 1.35;
+  }
+
+  .superset-rest-start {
+    grid-row: 1 / span 2;
+    grid-column: 2;
+    padding: 8px 12px;
+    border-radius: 999px;
+    background: var(--accent-color);
+    color: #fff;
+    font-size: 10px;
+    font-weight: 800;
+    letter-spacing: 0.8px;
+    text-transform: uppercase;
+    white-space: nowrap;
+  }
+
   /* ══ HYROX SPECIFIC ══ */
   .hyrox-round {
     background: var(--surface);
@@ -1366,7 +1420,7 @@
       <button class="home-tool-btn danger" id="btn-reset-data">Réinitialiser</button>
     </div>
     <input type="file" id="import-file" accept="application/json" hidden>
-    <div class="home-version">v3.2 · validée · mai 2026</div>
+    <div class="home-version">v3.3 · superset chrono · mai 2026</div>
   </section>
 
   <section class="view" id="view-session">
@@ -1582,8 +1636,7 @@ function renderBloc(b, num, accent, sessionKey) {
     const exHtml = ss.exercises.map((ex, i) => 
       renderEx(ex, String.fromCharCode(65 + i), true, sessionKey, blocIdx, `ss${idx}-${i}`)
     ).join('');
-    const restSeconds = ss.rest ? parseRestSeconds(ss.rest) : 0;
-    const rest = ss.rest ? `<div class="superset-footer${restSeconds ? ' timer-ready' : ''}"${restSeconds ? ` data-rest-seconds="${restSeconds}" data-rest-label="Superset"` : ''}>${escape(ss.rest)}${restSeconds ? ' · lancer chrono' : ''}</div>` : '';
+    const rest = ss.rest ? renderSupersetRest(ss.rest, idx + 1) : '';
     body += `
       <div class="superset">
         <div class="superset-banner">⚡ Superset</div>
@@ -1665,6 +1718,21 @@ function renderBloc(b, num, accent, sessionKey) {
       </div>
       ${body}
     </section>
+  `;
+}
+
+
+function renderSupersetRest(restText, supersetNum) {
+  const seconds = parseRestSeconds(restText);
+  if (!seconds) {
+    return `<div class="superset-footer">${escape(restText)}</div>`;
+  }
+  return `
+    <button type="button" class="superset-rest-card timer-ready" data-rest-seconds="${seconds}" data-rest-label="Superset ${supersetNum}">
+      <span class="superset-rest-label">Repos superset</span>
+      <span class="superset-rest-start">Lancer</span>
+      <span class="superset-rest-value">${escape(restText)}</span>
+    </button>
   `;
 }
 
@@ -2188,7 +2256,7 @@ function formatMS(totalSec) {
 }
 
 function bindRestTimers() {
-  document.querySelectorAll('.stat.rest, .superset-footer.timer-ready').forEach(stat => {
+  document.querySelectorAll('.stat.rest, .superset-footer.timer-ready, .superset-rest-card.timer-ready').forEach(stat => {
     stat.addEventListener('click', e => {
       e.stopPropagation();
       const seconds = parseInt(stat.dataset.restSeconds || '0');
