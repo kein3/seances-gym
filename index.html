@@ -182,7 +182,7 @@
   .home-tools {
     padding: 0 12px 18px;
     display: grid;
-    grid-template-columns: repeat(3, 1fr);
+    grid-template-columns: repeat(4, 1fr);
     gap: 8px;
   }
 
@@ -203,6 +203,11 @@
 
   .home-tool-btn:active, .session-tool-btn:active { background: var(--surface-2); }
   .home-tool-btn.danger { color: #d9534f; }
+  .home-tool-btn.active {
+    background: var(--accent);
+    border-color: var(--accent);
+    color: #fff;
+  }
 
   .app-hint {
     margin: 0 12px 14px;
@@ -216,7 +221,7 @@
   }
 
   @media (max-width: 420px) {
-    .home-tools { grid-template-columns: 1fr; }
+    .home-tools { grid-template-columns: repeat(2, 1fr); }
     .home-hero h1 { font-size: 50px; }
     .session-card { padding: 16px 16px 14px; }
     .ex-head { padding: 13px 14px; }
@@ -968,6 +973,22 @@
     font-family: inherit;
   }
 
+  .ex-charge-use-last {
+    background: var(--surface);
+    border: 1px solid var(--border);
+    border-radius: 8px;
+    color: var(--text-2);
+    font-size: 11px;
+    font-weight: 700;
+    letter-spacing: 0.6px;
+    padding: 8px 10px;
+    text-transform: uppercase;
+    cursor: pointer;
+    flex-shrink: 0;
+  }
+
+  .ex-charge-use-last:active { background: var(--surface-2); }
+
   .ex-charge-save {
     background: var(--accent-color);
     border: none;
@@ -1256,7 +1277,20 @@
 
   .timer-close:active { background: var(--border); }
 
-  .timer-extend {
+  .timer-adjust {
+    background: var(--surface-2);
+    border: none;
+    color: var(--text-2);
+    font-size: 12px;
+    font-weight: 700;
+    letter-spacing: 0.4px;
+    padding: 8px 10px;
+    border-radius: 8px;
+    cursor: pointer;
+    flex-shrink: 0;
+  }
+
+  .timer-adjust.primary {
     background: var(--accent-color);
     border: none;
     color: #fff;
@@ -1269,7 +1303,32 @@
     flex-shrink: 0;
   }
 
-  .timer-extend:active { opacity: 0.75; }
+  .timer-adjust:active { opacity: 0.75; }
+
+
+
+  /* ══ COMPACT MODE ══ */
+  body.compact-mode .session-hero { padding: 14px 16px 16px; }
+  body.compact-mode .session-hero h1 { font-size: 34px; }
+  body.compact-mode .session-pills { display: none; }
+  body.compact-mode .bloc { padding-top: 18px; }
+  body.compact-mode .bloc-header { margin-bottom: 10px; }
+  body.compact-mode .bloc-num { font-size: 34px; }
+  body.compact-mode .bloc-name { font-size: 20px; }
+  body.compact-mode .bloc-sub,
+  body.compact-mode .bloc-duration { display: none; }
+  body.compact-mode .ex { border-radius: 10px; margin-bottom: 8px; }
+  body.compact-mode .ex-head { padding: 11px 13px; }
+  body.compact-mode .ex-name { font-size: 14px; }
+  body.compact-mode .ex-sub { display: none; }
+  body.compact-mode .stat { padding: 8px 6px 9px; }
+  body.compact-mode .stat-label { font-size: 8px; }
+  body.compact-mode .stat-value { font-size: 18px; }
+  body.compact-mode .ex-details,
+  body.compact-mode .ex-note { display: none !important; }
+  body.compact-mode .charge-insight { padding: 8px 10px; margin-bottom: 8px; }
+  body.compact-mode .ex-charge { padding: 10px 12px; }
+  body.compact-mode .ex-charge-history { display: none; }
 
   /* ══ Responsive tweaks ══ */
   @media (min-width: 600px) {
@@ -1300,10 +1359,11 @@
     <div class="home-tools">
       <button class="home-tool-btn" id="btn-export">Exporter</button>
       <button class="home-tool-btn" id="btn-import">Importer</button>
+      <button class="home-tool-btn" id="btn-compact">Compact</button>
       <button class="home-tool-btn danger" id="btn-reset-data">Réinitialiser</button>
     </div>
     <input type="file" id="import-file" accept="application/json" hidden>
-    <div class="home-version">v1.7 · 18 mai 2026</div>
+    <div class="home-version">v1.8 · 18 mai 2026</div>
   </section>
 
   <section class="view" id="view-session">
@@ -1316,7 +1376,8 @@
     <div class="timer-label" id="timer-label">Repos</div>
     <div class="timer-value" id="timer-value">00:00</div>
   </div>
-  <button class="timer-extend" id="timer-extend">+30s</button>
+  <button class="timer-adjust" id="timer-reduce">-30s</button>
+  <button class="timer-adjust primary" id="timer-extend">+30s</button>
   <button class="timer-close" id="timer-close" aria-label="Fermer">✕</button>
 </div>
 
@@ -1679,7 +1740,7 @@ function renderEx(ex, num, inSuperset, sessionKey, blocIdx, exIdx) {
 
   const chargeBlock = hasCharge ? `
     <div class="ex-charge">
-      <div class="charge-insight" data-charge-insight="${chargeHistKey}" data-target-charge="${escape(stats['Charge'])}">
+      <div class="charge-insight" data-charge-insight="${chargeHistKey}" data-target-charge="${escape(stats['Charge'])}" data-charge-context="${escape([ex.name, ex.sub, stats['Charge']].filter(Boolean).join(' '))}">
         <div class="charge-insight-row">
           <span class="charge-insight-label">Dernière</span>
           <span class="charge-insight-value" data-last-charge="${chargeHistKey}">—</span>
@@ -1692,6 +1753,7 @@ function renderEx(ex, num, inSuperset, sessionKey, blocIdx, exIdx) {
       <div class="ex-charge-row">
         <div class="ex-charge-label">Charge</div>
         <input type="text" inputmode="decimal" class="ex-charge-input" placeholder="${escape(stats['Charge'])}" data-charge="${chargeKey}" data-hist="${chargeHistKey}">
+        <button class="ex-charge-use-last" data-use-last="${chargeKey}" data-hist="${chargeHistKey}">Dernière</button>
         <button class="ex-charge-save" data-charge-save="${chargeKey}" data-hist="${chargeHistKey}">Valider</button>
       </div>
       <div class="ex-charge-history" data-charge-hist-display="${chargeHistKey}"></div>
@@ -1856,9 +1918,12 @@ function parseChargeNumber(value) {
   return parseFloat(matches[matches.length - 1]);
 }
 
-function inferChargeStep(value, target) {
-  const s = String(value || target || '').toLowerCase();
-  if (s.includes('haltère') || s.includes('×2') || s.includes('x2') || s.includes('/main')) return 1;
+function inferChargeStep(value, target, context) {
+  const s = String([value, target, context].filter(Boolean).join(' ')).toLowerCase();
+  if (s.includes('haltère') || s.includes('dumbbell') || s.includes('×2') || s.includes('x2') || s.includes('/main')) return 1;
+  if (s.includes('élévation') || s.includes('oiseau') || s.includes('curl')) return 1;
+  if (s.includes('poulie') || s.includes('câble') || s.includes('cable')) return 2.5;
+  if (s.includes('presse') || s.includes('machine')) return 5;
   if (s.includes('kg')) return 2.5;
   return 1;
 }
@@ -1869,12 +1934,18 @@ function formatChargeNumber(n) {
   return String(rounded).replace('.', ',');
 }
 
-function suggestNextCharge(lastValue, targetValue) {
+function normalizeChargeUnit(original, n) {
+  const s = String(original || '').toLowerCase();
+  const suffix = (s.includes('×2') || s.includes('x2')) ? ' kg×2' : ' kg';
+  return `${formatChargeNumber(n)}${suffix}`;
+}
+
+function suggestNextCharge(lastValue, targetValue, context) {
   const last = parseChargeNumber(lastValue);
   if (last == null) return targetValue ? `Objectif programme : ${targetValue}` : '—';
-  const step = inferChargeStep(lastValue, targetValue);
+  const step = inferChargeStep(lastValue, targetValue, context);
   const suggested = last + step;
-  return `Tente ${formatChargeNumber(suggested)} kg`;
+  return `Tente ${normalizeChargeUnit(lastValue || targetValue, suggested)}`;
 }
 
 function renderChargeInsight(histKey) {
@@ -1883,6 +1954,7 @@ function renderChargeInsight(histKey) {
   const insightEl = document.querySelector(`[data-charge-insight="${histKey}"]`);
   if (!lastEl || !suggestEl || !insightEl) return;
   const target = insightEl.dataset.targetCharge || '';
+  const context = insightEl.dataset.chargeContext || '';
   let hist = [];
   try { hist = JSON.parse(localStorage.getItem(histKey) || '[]'); } catch(e) {}
   const latest = hist[hist.length - 1];
@@ -1892,7 +1964,7 @@ function renderChargeInsight(histKey) {
     return;
   }
   lastEl.textContent = `${latest.v} · ${formatDate(latest.d)}`;
-  suggestEl.textContent = suggestNextCharge(latest.v, target);
+  suggestEl.textContent = suggestNextCharge(latest.v, target, context);
 }
 
 function renderChargeHistory(histKey) {
@@ -1964,6 +2036,23 @@ function bindCharges() {
       }, 1500);
 
       renderChargeHistory(histKey);
+    });
+  });
+
+
+  document.querySelectorAll('[data-use-last]').forEach(btn => {
+    btn.addEventListener('click', e => {
+      e.stopPropagation();
+      const key = btn.dataset.useLast;
+      const histKey = btn.dataset.hist;
+      const input = document.querySelector(`[data-charge="${key}"]`);
+      let hist = [];
+      try { hist = JSON.parse(localStorage.getItem(histKey) || '[]'); } catch(e) {}
+      const latest = hist[hist.length - 1];
+      if (input && latest && latest.v) {
+        input.value = latest.v;
+        input.focus();
+      }
     });
   });
 
@@ -2085,6 +2174,7 @@ const timerOverlay = document.getElementById('timer-overlay');
 const timerLabel = document.getElementById('timer-label');
 const timerValue = document.getElementById('timer-value');
 const timerExtend = document.getElementById('timer-extend');
+const timerReduce = document.getElementById('timer-reduce');
 const timerClose = document.getElementById('timer-close');
 
 function formatMS(totalSec) {
@@ -2161,6 +2251,15 @@ function triggerBuzz() {
   } catch(e) {}
 }
 
+
+
+timerReduce.addEventListener('click', () => {
+  if (!timerInterval) return;
+  const minEnd = Date.now() + 5 * 1000;
+  timerEndTime = Math.max(minEnd, timerEndTime - 30 * 1000);
+  timerOverlay.classList.remove('ending', 'done');
+  updateTimerDisplay();
+});
 timerExtend.addEventListener('click', () => {
   if (timerInterval) {
     // still running → add 30s
@@ -2183,11 +2282,22 @@ timerClose.addEventListener('click', () => {
 
 const exportBtn = document.getElementById('btn-export');
 const importBtn = document.getElementById('btn-import');
+const compactBtn = document.getElementById('btn-compact');
 const resetDataBtn = document.getElementById('btn-reset-data');
 const importFile = document.getElementById('import-file');
 if (exportBtn) exportBtn.addEventListener('click', exportTrainingData);
 if (importBtn && importFile) importBtn.addEventListener('click', () => importFile.click());
 if (importFile) importFile.addEventListener('change', e => importTrainingData(e.target.files[0]));
+
+function setCompactMode(active) {
+  document.body.classList.toggle('compact-mode', active);
+  if (compactBtn) compactBtn.classList.toggle('active', active);
+  try { localStorage.setItem('compactMode', active ? '1' : '0'); } catch(e) {}
+}
+if (compactBtn) {
+  compactBtn.addEventListener('click', () => setCompactMode(!document.body.classList.contains('compact-mode')));
+}
+try { setCompactMode(localStorage.getItem('compactMode') === '1'); } catch(e) {}
 if (resetDataBtn) resetDataBtn.addEventListener('click', resetTrainingData);
 
 // ═══ NAVIGATION ═══
