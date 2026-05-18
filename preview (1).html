@@ -1,0 +1,2229 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover, user-scalable=yes">
+<meta name="apple-mobile-web-app-capable" content="yes">
+<meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
+<meta name="apple-mobile-web-app-title" content="Training">
+<meta name="theme-color" content="#0d0d0d">
+<title>Programme</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Bebas+Neue&family=Inter:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+<style>
+  :root, :root[data-theme="dark"] {
+    --bg: #0a0a0a;
+    --surface: #141414;
+    --surface-2: #1c1c1c;
+    --border: #222;
+    --text: #f0f0f0;
+    --text-2: #999;
+    --text-3: #555;
+    --text-4: #333;
+    --warn-bg: rgba(245, 168, 74, 0.08);
+    --warn-border: rgba(245, 168, 74, 0.2);
+    --warn-text: #f5a84a;
+    --alt-bg: rgba(100, 170, 255, 0.05);
+    --alt-border: rgba(100, 170, 255, 0.15);
+    --alt-icon: #64aaff;
+    --accent: #c03a2b;
+    --safe-top: env(safe-area-inset-top, 0px);
+    --safe-bottom: env(safe-area-inset-bottom, 0px);
+  }
+
+  :root[data-theme="light"] {
+    --bg: #f5f4f1;
+    --surface: #ffffff;
+    --surface-2: #edece7;
+    --border: #d8d6cf;
+    --text: #1a1a1a;
+    --text-2: #55514a;
+    --text-3: #8a857c;
+    --text-4: #b5b0a6;
+    --warn-bg: rgba(200, 110, 20, 0.08);
+    --warn-border: rgba(200, 110, 20, 0.25);
+    --warn-text: #a8540d;
+    --alt-bg: rgba(40, 100, 180, 0.05);
+    --alt-border: rgba(40, 100, 180, 0.2);
+    --alt-icon: #2d6bb3;
+  }
+
+  * { margin: 0; padding: 0; box-sizing: border-box; -webkit-tap-highlight-color: transparent; }
+
+  html, body {
+    background: var(--bg);
+    color: var(--text);
+    font-family: 'Inter', -apple-system, BlinkMacSystemFont, sans-serif;
+    font-size: 15px;
+    line-height: 1.5;
+    -webkit-font-smoothing: antialiased;
+    overscroll-behavior: none;
+  }
+
+  body {
+    min-height: 100%;
+    -webkit-overflow-scrolling: touch;
+  }
+
+  /* ══ TOP BAR ══ */
+  .topbar {
+    position: sticky;
+    top: 0;
+    background: var(--bg);
+    border-bottom: 1px solid var(--border);
+    padding-top: var(--safe-top);
+    z-index: 10;
+  }
+
+  .topbar-row {
+    height: 52px;
+    display: flex;
+    align-items: center;
+    padding: 0 16px;
+    gap: 12px;
+  }
+
+  .btn-back {
+    width: 36px;
+    height: 36px;
+    border-radius: 50%;
+    background: var(--surface);
+    border: none;
+    color: var(--text-2);
+    cursor: pointer;
+    display: none;
+    align-items: center;
+    justify-content: center;
+    font-size: 18px;
+    flex-shrink: 0;
+  }
+
+  body.view-session .btn-back { display: flex; }
+
+  .topbar-title {
+    font-family: 'Bebas Neue', sans-serif;
+    font-size: 22px;
+    letter-spacing: 0.5px;
+    color: var(--text);
+    flex: 1;
+    overflow: hidden;
+    text-overflow: ellipsis;
+    white-space: nowrap;
+  }
+
+  .topbar-accent {
+    width: 8px;
+    height: 8px;
+    border-radius: 50%;
+    background: var(--accent-color, transparent);
+    flex-shrink: 0;
+    display: none;
+  }
+
+  body.view-session .topbar-accent { display: block; }
+
+  /* ══ MAIN ══ */
+  main {
+    padding-bottom: calc(24px + var(--safe-bottom));
+    transition: padding-bottom 0.3s;
+  }
+
+  body.timer-active main {
+    padding-bottom: calc(110px + var(--safe-bottom));
+  }
+
+  .view { display: none; }
+  .view.active { display: block; }
+
+  /* ══ HOME VIEW ══ */
+  .home-hero {
+    padding: 24px 20px 20px;
+  }
+
+  .home-version {
+    text-align: center;
+    padding: 32px 20px 20px;
+    font-size: 11px;
+    color: var(--text-4);
+    letter-spacing: 1.5px;
+    text-transform: uppercase;
+  }
+
+  .home-hero h1 {
+    font-family: 'Bebas Neue', sans-serif;
+    font-size: 56px;
+    line-height: 0.9;
+    letter-spacing: 0.5px;
+    color: var(--text);
+  }
+
+  .home-hero h1 em {
+    font-style: normal;
+    color: var(--accent);
+    display: block;
+  }
+
+  .home-hero p {
+    font-size: 12px;
+    letter-spacing: 2px;
+    text-transform: uppercase;
+    color: var(--text-3);
+    margin-top: 10px;
+  }
+
+  .home-sessions {
+    padding: 12px 12px 24px;
+    display: flex;
+    flex-direction: column;
+    gap: 8px;
+  }
+
+  .home-tools {
+    padding: 0 12px 18px;
+    display: grid;
+    grid-template-columns: repeat(3, 1fr);
+    gap: 8px;
+  }
+
+  .home-tool-btn, .session-tool-btn {
+    border: 1px solid var(--border);
+    background: var(--surface);
+    color: var(--text-2);
+    border-radius: 12px;
+    padding: 11px 10px;
+    font-family: inherit;
+    font-size: 12px;
+    font-weight: 700;
+    letter-spacing: 0.6px;
+    text-transform: uppercase;
+    cursor: pointer;
+    -webkit-appearance: none;
+  }
+
+  .home-tool-btn:active, .session-tool-btn:active { background: var(--surface-2); }
+  .home-tool-btn.danger { color: #d9534f; }
+
+  .app-hint {
+    margin: 0 12px 14px;
+    padding: 12px 14px;
+    border: 1px solid var(--border);
+    border-radius: 14px;
+    background: var(--surface);
+    color: var(--text-3);
+    font-size: 12px;
+    line-height: 1.45;
+  }
+
+  @media (max-width: 420px) {
+    .home-tools { grid-template-columns: 1fr; }
+    .home-hero h1 { font-size: 50px; }
+    .session-card { padding: 16px 16px 14px; }
+    .ex-head { padding: 13px 14px; }
+  }
+
+  .session-card {
+    background: var(--surface);
+    border: 1px solid var(--border);
+    border-radius: 16px;
+    padding: 17px 18px 15px;
+    cursor: pointer;
+    transition: background 0.12s, transform 0.12s;
+    position: relative;
+    overflow: hidden;
+  }
+
+  .session-card:active {
+    background: var(--surface-2);
+    transform: scale(0.995);
+  }
+
+  .session-card::before {
+    content: '';
+    position: absolute;
+    left: 0; top: 0; bottom: 0;
+    width: 3px;
+    background: var(--accent-color, var(--accent));
+  }
+
+  .session-card-name {
+    font-family: 'Bebas Neue', sans-serif;
+    font-size: 26px;
+    letter-spacing: 0.5px;
+    line-height: 1;
+    color: var(--text);
+    margin-bottom: 6px;
+  }
+
+  .session-card-meta {
+    font-size: 12px;
+    color: var(--text-3);
+    display: flex;
+    flex-wrap: wrap;
+    gap: 4px 10px;
+  }
+
+  .session-card-meta span {
+    white-space: nowrap;
+  }
+
+  .session-card-arrow {
+    position: absolute;
+    right: 18px;
+    top: 50%;
+    transform: translateY(-50%);
+    color: var(--text-4);
+    font-size: 22px;
+  }
+
+  /* ══ SESSION VIEW ══ */
+  .session-hero {
+    padding: 20px 20px 24px;
+    border-bottom: 1px solid var(--border);
+    position: relative;
+    overflow: hidden;
+  }
+
+  .session-hero::after {
+    content: '';
+    position: absolute;
+    left: 0; right: 0; bottom: 0;
+    height: 2px;
+    background: var(--accent-color);
+  }
+
+  .session-hero h1 {
+    font-family: 'Bebas Neue', sans-serif;
+    font-size: 42px;
+    letter-spacing: 0.5px;
+    line-height: 0.95;
+    color: var(--text);
+  }
+
+  .session-pills {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 6px;
+    margin-top: 14px;
+  }
+
+  .session-pill {
+    font-size: 11px;
+    color: var(--text-2);
+    background: var(--surface);
+    border: 1px solid var(--border);
+    padding: 4px 10px;
+    border-radius: 999px;
+    letter-spacing: 0.3px;
+  }
+
+  .session-pill.primary {
+    color: var(--accent-color);
+    border-color: color-mix(in srgb, var(--accent-color) 40%, transparent);
+    background: color-mix(in srgb, var(--accent-color) 12%, transparent);
+  }
+
+  /* ══ BLOC ══ */
+  .bloc {
+    padding: 28px 20px 0;
+  }
+
+  .bloc-header {
+    margin-bottom: 14px;
+    display: flex;
+    align-items: flex-start;
+    gap: 12px;
+  }
+
+  .bloc-num {
+    font-family: 'Bebas Neue', sans-serif;
+    font-size: 42px;
+    line-height: 0.85;
+    color: var(--accent-color);
+    letter-spacing: 0.5px;
+    flex-shrink: 0;
+  }
+
+  .bloc-title-group {
+    flex: 1;
+    padding-top: 4px;
+    min-width: 0;
+  }
+
+  .bloc-name {
+    font-family: 'Bebas Neue', sans-serif;
+    font-size: 22px;
+    letter-spacing: 0.5px;
+    color: var(--text);
+    line-height: 1.1;
+  }
+
+  .bloc-sub {
+    font-size: 12px;
+    color: var(--text-3);
+    margin-top: 3px;
+  }
+
+  .bloc-duration {
+    display: inline-block;
+    font-size: 11px;
+    color: var(--text-2);
+    background: var(--surface);
+    border: 1px solid var(--border);
+    padding: 3px 8px;
+    border-radius: 6px;
+    margin-top: 6px;
+    font-variant-numeric: tabular-nums;
+  }
+
+  /* ══ EXERCISE CARD ══ */
+  .ex {
+    background: var(--surface);
+    border: 1px solid var(--border);
+    border-radius: 14px;
+    margin-bottom: 10px;
+    overflow: hidden;
+  }
+
+  .ex-head {
+    display: flex;
+    align-items: center;
+    padding: 14px 16px;
+    gap: 12px;
+    cursor: pointer;
+    user-select: none;
+  }
+
+  .ex-head:active { background: var(--surface-2); }
+
+  .ex-num {
+    font-family: 'Bebas Neue', sans-serif;
+    font-size: 20px;
+    color: var(--accent-color);
+    font-weight: 400;
+    min-width: 24px;
+    flex-shrink: 0;
+    letter-spacing: 0.5px;
+  }
+
+  .ex-head-text {
+    flex: 1;
+    min-width: 0;
+  }
+
+  .ex-name {
+    font-size: 15px;
+    font-weight: 600;
+    color: var(--text);
+    line-height: 1.25;
+  }
+
+  .ex-sub {
+    font-size: 11px;
+    color: var(--text-3);
+    margin-top: 2px;
+    line-height: 1.3;
+  }
+
+  .ex-chevron {
+    color: var(--text-4);
+    font-size: 14px;
+    transition: transform 0.2s;
+    flex-shrink: 0;
+  }
+
+  .ex.open .ex-chevron { transform: rotate(90deg); }
+
+  /* Stats — always visible. Flex-based so the last row always fills the width */
+  .ex-stats {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 1px;
+    background: var(--border);
+    border-top: 1px solid var(--border);
+  }
+
+  .stat {
+    background: var(--surface);
+    padding: 10px 8px 11px;
+    text-align: center;
+    flex: 1 1 0;
+    min-width: 0;
+  }
+
+  /* 5 stats: 3 on top row, 2 on bottom. Force 33% on top 3, 50% on bottom 2 */
+  .ex-stats.cols-5 .stat { flex-basis: calc(33.333% - 1px); }
+  .ex-stats.cols-5 .stat:nth-child(n+4) { flex-basis: calc(50% - 1px); }
+
+  /* 6 stats: 3+3 */
+  .ex-stats.cols-6 .stat { flex-basis: calc(33.333% - 1px); }
+
+  /* 4 stats: 2+2 on narrow screens, 4 on wider */
+  .ex-stats.cols-4 .stat { flex-basis: calc(25% - 1px); }
+
+  /* 3 stats: 3 columns */
+  .ex-stats.cols-3 .stat { flex-basis: calc(33.333% - 1px); }
+
+  /* 2 stats: half-half */
+  .ex-stats.cols-2 .stat { flex-basis: calc(50% - 1px); }
+
+  /* 1 stat: full width */
+  .ex-stats.cols-1 .stat { flex-basis: 100%; }
+
+  @media (max-width: 400px) {
+    .ex-stats.cols-4 .stat { flex-basis: calc(50% - 1px); }
+    .ex-stats.cols-5 .stat { flex-basis: calc(33.333% - 1px); }
+    .ex-stats.cols-5 .stat:nth-child(n+4) { flex-basis: calc(50% - 1px); }
+  }
+
+  .stat-label {
+    font-size: 9px;
+    letter-spacing: 1.2px;
+    text-transform: uppercase;
+    color: var(--text-3);
+    margin-bottom: 2px;
+  }
+
+  .stat-value {
+    font-family: 'Bebas Neue', sans-serif;
+    font-size: 20px;
+    line-height: 1;
+    color: var(--text);
+    font-variant-numeric: tabular-nums;
+    letter-spacing: 0.3px;
+  }
+
+  .stat.rest .stat-value { color: var(--accent-color); }
+
+  /* Details — collapsible */
+  .ex-details {
+    display: none;
+    padding: 14px 16px 16px;
+    border-top: 1px solid var(--border);
+    background: var(--surface-2);
+  }
+
+  .ex.open .ex-details { display: block; }
+
+  .detail-label {
+    font-size: 10px;
+    letter-spacing: 1.5px;
+    text-transform: uppercase;
+    color: var(--text-3);
+    font-weight: 600;
+    margin-bottom: 4px;
+  }
+
+  .detail-text {
+    font-size: 13px;
+    color: var(--text-2);
+    line-height: 1.55;
+  }
+
+  .detail-block + .detail-block {
+    margin-top: 14px;
+  }
+
+  .detail-warn {
+    display: flex;
+    gap: 8px;
+    font-size: 12.5px;
+    color: var(--warn-text);
+    line-height: 1.5;
+    padding: 10px 12px;
+    background: var(--warn-bg);
+    border: 1px solid var(--warn-border);
+    border-radius: 8px;
+    margin-top: 12px;
+  }
+
+  .detail-warn::before {
+    content: '⚠';
+    flex-shrink: 0;
+  }
+
+  .detail-alt {
+    display: flex;
+    gap: 8px;
+    font-size: 12.5px;
+    color: var(--text-2);
+    line-height: 1.5;
+    padding: 10px 12px;
+    background: var(--alt-bg);
+    border: 1px solid var(--alt-border);
+    border-radius: 8px;
+    margin-top: 12px;
+  }
+
+  .detail-alt::before {
+    content: '↻';
+    flex-shrink: 0;
+    color: var(--alt-icon);
+    font-size: 14px;
+  }
+
+  .detail-alt strong {
+    color: var(--text);
+    font-weight: 600;
+    display: block;
+    margin-bottom: 2px;
+  }
+
+  /* ══ SUPERSET ══ */
+  .superset {
+    margin-bottom: 10px;
+    background: var(--surface);
+    border: 1px solid var(--accent-color);
+    border-radius: 12px;
+    overflow: hidden;
+  }
+
+  .superset-banner {
+    padding: 8px 16px;
+    background: var(--accent-color);
+    color: #fff;
+    font-size: 11px;
+    font-weight: 700;
+    letter-spacing: 2px;
+    text-transform: uppercase;
+    text-align: center;
+  }
+
+  .superset .ex {
+    border: none;
+    border-radius: 0;
+    margin-bottom: 0;
+    border-bottom: 1px solid var(--border);
+    background: var(--surface);
+  }
+
+  .superset .ex:last-of-type {
+    border-bottom: none;
+  }
+
+  .superset-footer {
+    padding: 10px 16px;
+    font-size: 12px;
+    color: var(--text-2);
+    border-top: 1px solid var(--border);
+    background: var(--surface-2);
+    text-align: center;
+  }
+
+  /* ══ HYROX SPECIFIC ══ */
+  .hyrox-round {
+    background: var(--surface);
+    border: 1px solid var(--border);
+    border-radius: 12px;
+    padding: 14px 16px;
+    margin-bottom: 10px;
+    display: grid;
+    grid-template-columns: 36px 1fr;
+    gap: 12px;
+  }
+
+  .round-num {
+    font-family: 'Bebas Neue', sans-serif;
+    font-size: 28px;
+    color: var(--accent-color);
+    line-height: 1;
+    align-self: start;
+  }
+
+  .round-body {
+    display: flex;
+    flex-direction: column;
+    gap: 10px;
+  }
+
+  .round-part {
+    display: flex;
+    align-items: flex-start;
+    gap: 10px;
+  }
+
+  .round-part-icon {
+    font-size: 18px;
+    flex-shrink: 0;
+    line-height: 1;
+    margin-top: 2px;
+  }
+
+  .round-part-info { flex: 1; min-width: 0; }
+
+  .round-part-label {
+    font-size: 11px;
+    letter-spacing: 1px;
+    text-transform: uppercase;
+    color: var(--text-3);
+    font-weight: 600;
+  }
+
+  .round-part-val {
+    font-size: 14px;
+    color: var(--text);
+    font-weight: 500;
+    margin-top: 1px;
+  }
+
+  .round-part-sub {
+    font-size: 12px;
+    color: var(--text-3);
+    margin-top: 3px;
+    line-height: 1.4;
+  }
+
+  .hyrox-note {
+    font-size: 12px;
+    color: var(--text-3);
+    line-height: 1.5;
+    padding: 12px 14px;
+    background: var(--surface);
+    border: 1px solid var(--border);
+    border-radius: 10px;
+    margin: 8px 0 12px;
+  }
+
+  .amrap-item {
+    display: grid;
+    grid-template-columns: 32px 1fr;
+    gap: 10px;
+    padding: 12px 14px;
+    background: var(--surface);
+    border: 1px solid var(--border);
+    border-radius: 10px;
+    margin-bottom: 8px;
+  }
+
+  .amrap-item + .amrap-item { margin-top: 0; }
+
+  .amrap-icon {
+    font-size: 18px;
+    line-height: 1.1;
+  }
+
+  .amrap-label {
+    font-size: 10px;
+    letter-spacing: 1px;
+    text-transform: uppercase;
+    color: var(--text-3);
+    font-weight: 600;
+  }
+
+  .amrap-val {
+    font-size: 14px;
+    color: var(--text);
+    font-weight: 500;
+    margin-top: 1px;
+  }
+
+  .amrap-sub {
+    font-size: 12px;
+    color: var(--text-3);
+    margin-top: 2px;
+  }
+
+  .amrap-note {
+    font-size: 13px;
+    color: var(--accent-color);
+    font-weight: 500;
+    margin-top: 8px;
+    padding: 10px 12px;
+    background: color-mix(in srgb, var(--accent-color) 8%, transparent);
+    border-radius: 8px;
+    text-align: center;
+  }
+
+  /* ══ THEME TOGGLE ══ */
+  .btn-theme {
+    width: 36px;
+    height: 36px;
+    border-radius: 50%;
+    background: var(--surface);
+    border: none;
+    color: var(--text-2);
+    cursor: pointer;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-size: 16px;
+    flex-shrink: 0;
+  }
+
+  .btn-theme:active { background: var(--surface-2); }
+
+  /* ══ BLOC NAV (sticky below topbar) ══ */
+  .bloc-nav {
+    position: sticky;
+    top: calc(52px + var(--safe-top));
+    z-index: 5;
+    background: var(--bg);
+    border-bottom: 1px solid var(--border);
+    padding: 8px 12px;
+    display: flex;
+    gap: 6px;
+    overflow-x: auto;
+    scrollbar-width: none;
+    -webkit-overflow-scrolling: touch;
+  }
+
+  .bloc-nav::-webkit-scrollbar { display: none; }
+
+  .bloc-nav-btn {
+    flex-shrink: 0;
+    min-width: 44px;
+    height: 40px;
+    padding: 0 12px;
+    background: var(--surface);
+    border: 1px solid var(--border);
+    border-radius: 10px;
+    color: var(--text-2);
+    font-family: 'Bebas Neue', sans-serif;
+    font-size: 16px;
+    letter-spacing: 0.5px;
+    cursor: pointer;
+    display: flex;
+    align-items: center;
+    gap: 6px;
+    white-space: nowrap;
+  }
+
+  .bloc-nav-btn .num {
+    color: var(--accent-color);
+    font-size: 18px;
+  }
+
+  .bloc-nav-btn.active {
+    background: var(--accent-color);
+    border-color: var(--accent-color);
+    color: #fff;
+  }
+
+  .bloc-nav-btn.active .num {
+    color: #fff;
+  }
+
+  .bloc {
+    scroll-margin-top: calc(52px + 56px + var(--safe-top));
+  }
+
+  /* ══ NOTES ══ */
+  .ex-note-indicator {
+    display: none;
+    width: 6px;
+    height: 6px;
+    border-radius: 50%;
+    background: var(--accent-color);
+    flex-shrink: 0;
+    margin-right: 2px;
+  }
+
+  .ex.has-note .ex-note-indicator { display: block; }
+
+  .ex-note {
+    border-top: 1px solid var(--border);
+    background: var(--surface-2);
+    padding: 12px 16px;
+  }
+
+  .ex-note-label {
+    font-size: 10px;
+    letter-spacing: 1.5px;
+    text-transform: uppercase;
+    color: var(--text-3);
+    font-weight: 600;
+    margin-bottom: 6px;
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+  }
+
+  .ex-note-clear {
+    background: none;
+    border: none;
+    color: var(--text-3);
+    font-size: 11px;
+    cursor: pointer;
+    letter-spacing: 0;
+    text-transform: none;
+    font-weight: 400;
+  }
+
+  .ex-note-clear:active { color: var(--text); }
+
+  .ex-note textarea {
+    width: 100%;
+    background: var(--bg);
+    border: 1px solid var(--border);
+    border-radius: 8px;
+    color: var(--text);
+    font-family: inherit;
+    font-size: 13px;
+    line-height: 1.5;
+    padding: 10px 12px;
+    resize: vertical;
+    min-height: 60px;
+    outline: none;
+    -webkit-appearance: none;
+  }
+
+  .ex-note textarea:focus {
+    border-color: var(--accent-color);
+  }
+
+  /* ══ REST TIMER BUTTON (inline in stats row) ══ */
+  .stat.rest {
+    cursor: pointer;
+    position: relative;
+    transition: background 0.12s;
+  }
+
+  .stat.rest:active { background: var(--surface-2); }
+
+  .stat.rest::after {
+    content: '▶';
+    position: absolute;
+    top: 4px;
+    right: 6px;
+    font-size: 8px;
+    color: var(--accent-color);
+    opacity: 0.6;
+  }
+
+  /* ══ CHARGE TRACKER ══ */
+  .ex-charge {
+    border-top: 1px solid var(--border);
+    background: var(--surface-2);
+    padding: 12px 16px;
+  }
+
+  .ex-charge-row {
+    display: flex;
+    align-items: center;
+    gap: 10px;
+  }
+
+  .ex-charge-label {
+    font-size: 10px;
+    letter-spacing: 1.5px;
+    text-transform: uppercase;
+    color: var(--text-3);
+    font-weight: 600;
+    flex-shrink: 0;
+  }
+
+  .ex-charge-input {
+    flex: 1;
+    background: var(--bg);
+    border: 1px solid var(--border);
+    border-radius: 8px;
+    color: var(--text);
+    font-family: 'Bebas Neue', sans-serif;
+    font-size: 18px;
+    letter-spacing: 0.5px;
+    padding: 6px 12px;
+    outline: none;
+    -webkit-appearance: none;
+    text-align: center;
+    min-width: 0;
+  }
+
+  .ex-charge-input:focus { border-color: var(--accent-color); }
+
+  .ex-charge-input::placeholder {
+    color: var(--text-4);
+    font-family: inherit;
+  }
+
+  .ex-charge-save {
+    background: var(--accent-color);
+    border: none;
+    border-radius: 8px;
+    color: #fff;
+    font-size: 11px;
+    font-weight: 600;
+    letter-spacing: 1px;
+    padding: 8px 14px;
+    text-transform: uppercase;
+    cursor: pointer;
+    flex-shrink: 0;
+  }
+
+  .ex-charge-save:active { opacity: 0.7; }
+
+  .ex-charge-save.saved {
+    background: var(--surface);
+    color: var(--text-3);
+    border: 1px solid var(--border);
+  }
+
+  .ex-charge-history {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 6px;
+    margin-top: 8px;
+  }
+
+  .ex-charge-history:empty { display: none; }
+
+
+  .charge-insight {
+    display: grid;
+    grid-template-columns: 1fr;
+    gap: 6px;
+    margin-bottom: 10px;
+    padding: 10px 12px;
+    border: 1px solid var(--border);
+    border-radius: 10px;
+    background: var(--bg);
+  }
+
+  .charge-insight-row {
+    display: flex;
+    justify-content: space-between;
+    align-items: baseline;
+    gap: 10px;
+    font-size: 12px;
+    color: var(--text-3);
+  }
+
+  .charge-insight-label {
+    text-transform: uppercase;
+    letter-spacing: 1px;
+    font-size: 9px;
+    font-weight: 700;
+    flex-shrink: 0;
+  }
+
+  .charge-insight-value {
+    color: var(--text-2);
+    text-align: right;
+    font-weight: 600;
+  }
+
+  .charge-insight-value.suggestion {
+    color: var(--accent-color);
+  }
+
+  .history-chip {
+    font-size: 11px;
+    color: var(--text-3);
+    background: var(--surface);
+    border: 1px solid var(--border);
+    padding: 3px 8px;
+    border-radius: 6px;
+    font-variant-numeric: tabular-nums;
+    cursor: pointer;
+    transition: border-color 0.12s, background 0.12s;
+    user-select: none;
+    -webkit-user-select: none;
+    position: relative;
+  }
+
+  .history-chip:active {
+    background: var(--surface-2);
+  }
+
+  .history-chip.editing {
+    border-color: var(--accent-color);
+    background: color-mix(in srgb, var(--accent-color) 10%, var(--surface));
+  }
+
+  .history-chip.deleting {
+    border-color: #d9534f;
+    background: color-mix(in srgb, #d9534f 15%, var(--surface));
+    color: #d9534f;
+  }
+
+  .history-chip.deleting strong { color: #d9534f; }
+
+  .history-chip strong {
+    color: var(--text-2);
+    font-weight: 600;
+  }
+
+  /* ══ EDIT DIALOG for charge history ══ */
+  .edit-backdrop {
+    position: fixed;
+    inset: 0;
+    background: rgba(0,0,0,0.6);
+    z-index: 100;
+    display: none;
+    align-items: flex-end;
+    justify-content: center;
+    padding: 20px;
+    padding-bottom: calc(20px + var(--safe-bottom));
+  }
+
+  .edit-backdrop.active { display: flex; }
+
+  .edit-panel {
+    background: var(--bg);
+    border: 1px solid var(--border);
+    border-radius: 16px;
+    padding: 20px;
+    width: 100%;
+    max-width: 380px;
+    display: flex;
+    flex-direction: column;
+    gap: 14px;
+  }
+
+  .edit-title {
+    font-family: 'Bebas Neue', sans-serif;
+    font-size: 20px;
+    color: var(--text);
+    letter-spacing: 0.5px;
+  }
+
+  .edit-sub {
+    font-size: 12px;
+    color: var(--text-3);
+    margin-top: -10px;
+  }
+
+  .edit-input {
+    width: 100%;
+    background: var(--surface);
+    border: 1px solid var(--border);
+    border-radius: 10px;
+    color: var(--text);
+    font-family: 'Bebas Neue', sans-serif;
+    font-size: 26px;
+    letter-spacing: 0.5px;
+    padding: 12px 16px;
+    outline: none;
+    -webkit-appearance: none;
+    text-align: center;
+  }
+
+  .edit-input:focus { border-color: var(--accent-color); }
+
+  .edit-actions {
+    display: flex;
+    gap: 8px;
+    margin-top: 4px;
+  }
+
+  .edit-btn {
+    flex: 1;
+    border: 1px solid var(--border);
+    background: var(--surface);
+    color: var(--text);
+    padding: 12px;
+    border-radius: 10px;
+    font-size: 13px;
+    font-weight: 500;
+    cursor: pointer;
+    -webkit-appearance: none;
+    font-family: inherit;
+  }
+
+  .edit-btn.primary {
+    background: var(--accent-color);
+    color: #fff;
+    border-color: var(--accent-color);
+  }
+
+  .edit-btn.danger {
+    color: #d9534f;
+    border-color: color-mix(in srgb, #d9534f 40%, var(--border));
+  }
+
+  .edit-btn:active { opacity: 0.7; }
+
+  .history-chip.latest strong {
+    color: var(--accent-color);
+  }
+
+  /* ══ TIMER OVERLAY ══ */
+  .timer-overlay {
+    position: fixed;
+    bottom: calc(16px + var(--safe-bottom));
+    left: 50%;
+    transform: translateX(-50%) translateY(200%);
+    transition: transform 0.3s cubic-bezier(0.2, 0.9, 0.3, 1), opacity 0.2s, visibility 0s 0.3s;
+    visibility: hidden;
+    opacity: 0;
+    z-index: 50;
+    background: var(--surface);
+    border: 1px solid var(--border);
+    border-radius: 16px;
+    padding: 14px 18px;
+    display: flex;
+    align-items: center;
+    gap: 14px;
+    box-shadow: 0 10px 40px rgba(0,0,0,0.4);
+    min-width: 260px;
+    max-width: calc(100% - 24px);
+    pointer-events: none;
+  }
+
+  .timer-overlay.active {
+    transform: translateX(-50%) translateY(0);
+    visibility: visible;
+    opacity: 1;
+    pointer-events: auto;
+    transition: transform 0.3s cubic-bezier(0.2, 0.9, 0.3, 1), opacity 0.2s, visibility 0s;
+  }
+
+  /* Always hide timer when on home view */
+  body.view-home .timer-overlay {
+    display: none !important;
+  }
+
+  .timer-overlay.ending {
+    animation: pulseBg 0.6s ease-in-out infinite alternate;
+  }
+
+  @keyframes pulseBg {
+    from { box-shadow: 0 10px 40px rgba(0,0,0,0.4); }
+    to { box-shadow: 0 0 0 4px color-mix(in srgb, var(--accent-color) 40%, transparent), 0 10px 40px rgba(0,0,0,0.4); }
+  }
+
+  .timer-overlay.done .timer-value {
+    color: var(--accent-color);
+  }
+
+  .timer-info {
+    flex: 1;
+    min-width: 0;
+  }
+
+  .timer-label {
+    font-size: 10px;
+    letter-spacing: 1.5px;
+    text-transform: uppercase;
+    color: var(--text-3);
+    font-weight: 600;
+    line-height: 1;
+    margin-bottom: 4px;
+  }
+
+  .timer-value {
+    font-family: 'Bebas Neue', sans-serif;
+    font-size: 36px;
+    line-height: 0.9;
+    color: var(--text);
+    font-variant-numeric: tabular-nums;
+    letter-spacing: 1px;
+  }
+
+  .timer-close {
+    background: var(--surface-2);
+    border: none;
+    color: var(--text-2);
+    font-size: 16px;
+    width: 32px;
+    height: 32px;
+    border-radius: 50%;
+    cursor: pointer;
+    flex-shrink: 0;
+  }
+
+  .timer-close:active { background: var(--border); }
+
+  .timer-extend {
+    background: var(--accent-color);
+    border: none;
+    color: #fff;
+    font-size: 11px;
+    font-weight: 600;
+    letter-spacing: 0.5px;
+    padding: 8px 12px;
+    border-radius: 8px;
+    cursor: pointer;
+    flex-shrink: 0;
+  }
+
+  .timer-extend:active { opacity: 0.75; }
+
+  /* ══ Responsive tweaks ══ */
+  @media (min-width: 600px) {
+    .home-hero h1 { font-size: 72px; }
+    .session-hero h1 { font-size: 56px; }
+    main { max-width: 720px; margin: 0 auto; }
+  }
+</style>
+</head>
+<body class="view-home">
+
+<header class="topbar">
+  <div class="topbar-row">
+    <button class="btn-back" id="btn-back" aria-label="Retour">←</button>
+    <div class="topbar-title" id="topbar-title">Programme</div>
+    <div class="topbar-accent" id="topbar-accent"></div>
+    <button class="btn-theme" id="btn-theme" aria-label="Changer de thème">☾</button>
+  </div>
+</header>
+
+<main id="main">
+  <section class="view active" id="view-home">
+    <div class="home-hero">
+      <h1>MON<br><em>PROGRAMME</em></h1>
+      <p>4 séances · 60 min chrono</p>
+    </div>
+    <div class="home-sessions" id="home-sessions"></div>
+    <div class="home-tools">
+      <button class="home-tool-btn" id="btn-export">Exporter</button>
+      <button class="home-tool-btn" id="btn-import">Importer</button>
+      <button class="home-tool-btn danger" id="btn-reset-data">Réinitialiser</button>
+    </div>
+    <input type="file" id="import-file" accept="application/json" hidden>
+    <div class="home-version">v1.7 · 18 mai 2026</div>
+  </section>
+
+  <section class="view" id="view-session">
+    <div id="session-content"></div>
+  </section>
+</main>
+
+<div class="timer-overlay" id="timer-overlay">
+  <div class="timer-info">
+    <div class="timer-label" id="timer-label">Repos</div>
+    <div class="timer-value" id="timer-value">00:00</div>
+  </div>
+  <button class="timer-extend" id="timer-extend">+30s</button>
+  <button class="timer-close" id="timer-close" aria-label="Fermer">✕</button>
+</div>
+
+<div class="edit-backdrop" id="edit-backdrop">
+  <div class="edit-panel">
+    <div class="edit-title">Modifier la charge</div>
+    <div class="edit-sub" id="edit-sub"></div>
+    <input type="text" inputmode="decimal" class="edit-input" id="edit-input">
+    <div class="edit-actions">
+      <button class="edit-btn danger" id="edit-delete">Supprimer</button>
+      <button class="edit-btn" id="edit-cancel">Annuler</button>
+      <button class="edit-btn primary" id="edit-save">Enregistrer</button>
+    </div>
+  </div>
+</div>
+
+<script id="payload" type="application/json">{"order": ["pecs", "dos", "bas", "hyrox"], "meta": {"pecs": {"label": "PECS · ÉPAULES", "short": "Pecs", "accent": "#c03a2b", "icon": "🔴"}, "dos": {"label": "DOS · BICEPS", "short": "Dos", "accent": "#c9932e", "icon": "🟡"}, "bas": {"label": "BAS DU CORPS", "short": "Jambes", "accent": "#3d6b45", "icon": "🟢"}, "hyrox": {"label": "HYROX PARC", "short": "Hyrox", "accent": "#d96820", "icon": "🟠"}}, "sessions": {"pecs": {"title": "Pecs · Épaules · Biceps", "pills": ["⏱ ~60 min chrono", "Niveau avancé · ~70 kg", "Force + Hypertrophie", "Matériel regroupé par station"], "blocs": [{"chip": "Bloc 01", "name": "Barre + Rack", "sub": "Force · Pecs + Épaules", "duration": "~22 min · repos 2'30–3'", "icon": "🏋️", "exercises": [{"name": "Développé Couché Barre", "sub": "Barre libre · Rack · Pectoraux moyens + Deltoïdes antérieurs", "execution": "Allongé, pieds à plat au sol, fessiers en contact avec le banc. Prise légèrement plus large que les épaules. Descends la barre vers le bas des pecs (ligne des tétons) en contrôlant 2 sec, touche légèrement, pousse en expirant. Coudes à ~75° du corps — pas à 90° (risque coiffe des rotateurs) ni collés.", "avoid": "Ne rebondis pas la barre sur la poitrine — ça sort les pecs du travail et risque de blesser les côtes.", "alt": {"label": "Alternative si rack occupé", "text": "Développé couché haltères : meilleure amplitude, moins de risque si tu t'entraînes seul. Charge ~30–40 kg par haltère. Ou pompes lestées (gilet) 4×6–8."}, "stats": {"Séries": "4", "Reps": "5–6", "Charge": "55–65 kg", "Tempo": "2-0-1", "Repos": "3 min"}}, {"name": "Développé Militaire Barre", "sub": "Barre libre · Debout · Deltoïdes antérieurs + Médians", "execution": "Debout, prise légèrement plus large que les épaules. Barre au niveau du cou/menton en bas. Pousse verticalement au-dessus de la tête en rentrant légèrement la tête pour laisser passer la barre, puis reporte la tête en avant une fois passée. Gaîne abdominal tout au long — ne cambre pas les lombaires.", "avoid": "Ne cambre pas le dos pour compenser — si tu dois le faire, la charge est trop lourde.", "alt": {"label": "Alternative si barre occupée", "text": "Développé militaire haltères assis (dos droit, sans dossier) : ~20–28 kg par haltère. Plus de stabilisation requise, excellent pour les 3 chefs du deltoïde."}, "stats": {"Séries": "4", "Reps": "6–8", "Charge": "40–50 kg", "Repos": "2'30"}}], "supersets": []}, {"chip": "Bloc 02", "name": "Haltères", "sub": "Épaules · Biceps", "duration": "~18 min · repos 75 sec", "icon": "💪", "exercises": [], "supersets": [{"exercises": [{"name": "Élévations Latérales", "sub": "Haltères · Deltoïdes médians", "execution": "Haltères légers, légère flexion coude. Monte jusqu'à hauteur des épaules, pouce légèrement vers le bas (comme si tu versais un verre). Contrôle la descente en 3 sec.", "avoid": "Pas d'élan — réduis la charge si tu dois te pencher pour monter.", "alt": {"label": "Alternative", "text": "Élévations latérales câble basse (1 bras) : tension constante même en bas. ~7–10 kg par côté."}, "stats": {"Reps": "15", "Charge": "8–12 kg"}}, {"name": "Oiseau Penché", "sub": "Haltères · Deltoïdes postérieurs", "execution": "Buste penché à 45–60°, bras légèrement fléchis. Ouvre les bras en rotation externe en montant. Deltoïde postérieur souvent sous-développé — essentiel pour l'équilibre épaule.", "avoid": "Le mouvement s'arrête à hauteur des épaules — pas au-dessus.", "alt": {"label": "Alternative", "text": "Face pull corde poulie (hauteur yeux) : mêmes muscles avec tension constante. 15–20 reps, ~15–20 kg."}, "stats": {"Reps": "15", "Charge": "10–14 kg"}}], "rest": "Repos entre les rounds : 75 sec"}, {"exercises": [{"name": "Curl Haltères Alterné", "sub": "Haltères · Debout · Chef long biceps", "execution": "Monte un bras à la fois. Supination progressive (tourne la paume vers le ciel en montant). Coude fixe contre le corps. Pause 1 sec en haut.", "avoid": "Pas d'élan du buste — réduis la charge si tu balances.", "alt": {"label": "Alternative", "text": "Curl barre EZ debout ~30–35 kg si haltères tous occupés."}, "stats": {"Reps": "10", "Charge": "12–16 kg"}}, {"name": "Curl Marteau", "sub": "Haltères · Prise neutre · Brachial", "execution": "Pouce vers le haut tout au long du mouvement. Reps lentes, contraction 1 sec en haut. Cible le brachial et le long supinateur — donne l'épaisseur au bras.", "avoid": "Ne retourne pas la paume en chemin — prise neutre stricte.", "alt": {"label": "Alternative", "text": "Curl marteau corde poulie basse : tension constante. ~15–20 kg câble."}, "stats": {"Reps": "10", "Charge": "14–18 kg"}}], "rest": "Repos entre les rounds : 75 sec"}]}, {"chip": "Bloc 03", "name": "Câbles", "sub": "Pecs · Biceps · Tension constante", "duration": "~10 min · repos 60–75 sec", "icon": "🔗", "exercises": [{"name": "Câbles Croisés — Écartés Pecs", "sub": "Poulie haute · Adduction horizontale · Étirement maximum", "execution": "Poulies en position haute. Penché légèrement en avant, bras tendus en arc, ramène les mains vers le centre et légèrement vers le bas. Croise légèrement les mains en fin de mouvement pour maximiser la contraction. Bras toujours légèrement fléchis — ne verrouille jamais les coudes. Contrôle le retour en 3 secondes pour profiter de l'étirement.", "avoid": "Ne tire pas avec les bras fléchis — tu transformes ça en développé debout. L'arc de cercle bras tendus est la clé.", "alt": {"label": "Alternative si poulies occupées", "text": "Écartés haltères couché banc plat : ~14–18 kg par haltère, même mouvement en arc. 3×12. Ou développé décliné haltères pour les pecs inférieurs."}, "stats": {"Séries": "3", "Reps": "12–15", "Charge": "10–16 kg", "Repos": "75 sec"}}, {"name": "Curl Poulie Basse EZ", "sub": "Câble · Barre EZ · Tension constante · Finition biceps", "execution": "Avantage du câble : tension constante sur tout l'arc, même en bas. Reste bien droit, coudes fixes sur les côtés. Reps lentes — l'objectif est la congestion maximale. Les biceps ont déjà bien travaillé sur le superset haltères — reste sur une charge raisonnable et soigne le ressenti.", "avoid": "Ne recule pas les pieds pour te donner de l'élan — ça vide l'exercice de son intérêt.", "alt": {"label": "Alternative si poulie occupée", "text": "Curl haltères incliné sur banc 45° : bras qui pendent derrière toi en étirement maximal. Charge légère (~10–12 kg), reps lentes. Excellent pour la finition."}, "stats": {"Séries": "2", "Reps": "15", "Charge": "15–20 kg", "Repos": "60 sec"}}], "supersets": []}, {"chip": "Bloc 04", "name": "Barres Parallèles", "sub": "Finition pecs inférieurs", "duration": "~5 min · repos 60 sec", "icon": "⚫", "exercises": [{"name": "Dips Pectoraux", "sub": "Barres parallèles · Pecs inférieurs · Poids de corps", "execution": "Penche le buste légèrement en avant (15–30°) pour cibler les pectoraux inférieurs — si tu restes droit, tu travailles surtout les triceps. Descends jusqu'à ce que les épaules soient sous les coudes, remonte sans verrouiller les coudes. Excellent exercice de finition car il étire bien les pecs en position basse — les muscles sont déjà bien fatigués à ce stade.", "avoid": "Ne descends pas trop bas si tu ressens une gêne à l'épaule antérieure — arrête-toi quand les bras sont parallèles au sol.", "alt": {"label": "Alternative si barres non dispo", "text": "Développé décliné haltères sur banc décliné (~20–26 kg par haltère) : cible pareillement les pecs inférieurs. Ou pompes pieds surélevés sur banc 3×15."}, "stats": {"Séries": "3", "Reps": "10–15", "Charge": "Poids de corps", "Repos": "60 sec"}}], "supersets": []}]}, "dos": {"title": "Dos · Biceps", "pills": ["⏱ 60 min chrono", "Niveau avancé", "~70 kg corps", "Barres · Câbles · Traction"], "blocs": [{"chip": "Bloc 01", "name": "Force", "duration": "~22 min · repos 2 min", "exercises": [{"name": "Tractions — Tempo 3-1-1", "sub": "Barre de traction · Prise pronation (mains vers le sol)", "execution": "Prise un peu plus large que les épaules. Initie le mouvement en rentrant les omoplates avant de tirer. Descends en 3 secondes, pause 1 sec bras quasi tendus (garde une légère flexion), remonte en 1 sec. Regarde légèrement vers le haut en montant.", "avoid": "Ne laisse pas les épaules remonter vers les oreilles en haut du mouvement — tiens les omoplates basses et serrées.", "alt": {"label": "Alternative si barre indisponible", "text": "Tractions australiennes (barre Smith ou barre basse ~1m) : corps incliné sous la barre, talons au sol, tire la poitrine vers la barre. Même tempo 3-1-1."}, "stats": {"Séries": "4", "Reps": "6–8", "Charge": "Poids de corps", "Tempo": "3-1-1", "Repos": "2 min"}}, {"name": "Rowing Barre — Yates Row", "sub": "Barre libre · Prise pronation (mains vers le sol)", "execution": "Buste incliné à 70–80° (légèrement plus droit qu'un rowing classique). Tire la barre vers le bas du ventre / nombril, coudes collés au corps. Dos plat, cuisses gaînées. Contrôle la descente — pas de lâcher.", "avoid": "Ne laisse pas le bas du dos s'arrondir sous la charge. Si ça arrondit, descends le poids.", "alt": {"label": "Alternative si barre occupée", "text": "Rowing 1 bras haltère appuyé sur banc : genou et main d'appui sur le banc, tire l'haltère vers la hanche. Avantage : amplitude plus grande et isolation parfaite de chaque côté. Même charge par bras."}, "stats": {"Séries": "4", "Reps": "6–8", "Charge": "60–70 kg", "Repos": "2 min"}}], "supersets": []}, {"chip": "Bloc 02", "name": "Hypertrophie", "duration": "~13 min · repos 60 sec", "exercises": [{"name": "Rowing Poulie Basse", "sub": "Câble · Poignée neutre (paumes face à face)", "execution": "Assis, dos droit (pas de balancement). Tire la poignée vers le bas du sternum, fais une pause d'1 sec en contractant les rhomboïdes, puis relâche lentement. Ne te penche pas en arrière pour compenser — ça transfère la charge sur les lombaires.", "avoid": "Évite de laisser les épaules partir en avant en fin d'extension — ça sur-sollicite l'articulation.", "alt": {"label": "Alternative si poulie occupée", "text": "Rowing 1 bras haltère genou sur banc : même mouvement de tirage, poignet neutre, pause squeeze en haut. 10–12 reps par côté. Charge équivalente par bras (~25–30 kg)."}, "stats": {"Séries": "3", "Reps": "10–12", "Charge": "50–60 kg", "Repos": "60 sec"}}, {"name": "Tirage Vertical Prise Neutre", "sub": "Poulie haute ou machine · Poignée serrée neutre", "execution": "Buste très légèrement incliné en arrière. Descends la barre vers le haut du buste (jamais derrière la nuque). Coudes qui viennent vers les hanches. Cherche l'étirement maximal du grand dorsal en haut — sens le muscle s'allonger avant de retirer.", "avoid": "Ne tire pas derrière la nuque — gros risque cervical. La barre s'arrête au niveau du menton / clavicules.", "alt": {"label": "Alternative si machine occupée", "text": "Tractions prise serrée neutre à la barre (si des anneaux ou poignées neutres sont disponibles) — ou tractions prise supination (prise en dessous), qui cible le même angle et intègre davantage les biceps."}, "stats": {"Séries": "3", "Reps": "10–12", "Charge": "55–65 kg", "Repos": "60 sec"}}, {"name": "Pull-over Poulie Haute", "sub": "Câble · Corde ou barre droite · Bras tendus", "execution": "Debout, légèrement penché en avant, bras quasi tendus (micro-flexion du coude). L'axe de rotation est l'épaule uniquement — les coudes ne fléchissent pas pendant le mouvement. Descends la corde jusqu'aux hanches, remonte lentement en sentant l'étirement du dorsal. Exercice d'isolation pure.", "avoid": "Si tu fléchis les coudes, tu transformes le mouvement en pushdown — la charge doit rester légère pour garder la tension sur le dorsal.", "alt": {"label": "Alternative si poulie occupée", "text": "Pull-over haltère allongé sur banc : 1 haltère tenu à deux mains, descends les bras derrière la tête (étirement maximal du dorsal), remonte bras quasi tendus. ~15–20 kg. Très efficace en étirement."}, "stats": {"Séries": "3", "Reps": "12–15", "Charge": "20–25 kg", "Repos": "60 sec"}}], "supersets": []}, {"chip": "Bloc 03", "name": "Finition Dos", "duration": "~4 min · repos 45 sec", "exercises": [{"name": "Face Pull Corde", "sub": "Câble · Hauteur des yeux · Corde double", "execution": "Poulie à hauteur des yeux, prise les pouces vers toi. Tire vers le visage en gardant les coudes à hauteur des épaules ou plus haut. Ouvre les bras en fin de mouvement (rotation externe maximale) — c'est là que les rhomboïdes et la coiffe travaillent vraiment. Pause 1 sec, relâche contrôlé.", "avoid": "Ne tire pas avec les coudes vers le bas — c'est devenu un tirage horizontal classique, tu perds l'effet rotation externe.", "alt": {"label": "Alternative si poulie occupée", "text": "Oiseau haltères debout penché (butterfly inversé) : buste penché à 45°, haltères légers (~6–10 kg), bras légèrement fléchis, ouvre les bras en arc en rotation externe. Même muscles, même intensité — 15–20 reps."}, "stats": {"Séries": "3", "Reps": "15–20", "Charge": "15–20 kg", "Repos": "45 sec"}}], "supersets": []}, {"chip": "Bloc 04", "name": "Biceps", "duration": "~10 min", "exercises": [{"name": "Curl Poulie Basse EZ", "sub": "Câble · Barre EZ · Finition", "execution": "Avantage du câble : tension constante sur tout l'arc du mouvement, même en bas (contrairement aux haltères). Reste bien droit, coudes fixes sur les côtés. Reps lentes et contrôlées — l'objectif ici est la congestion maximale en fin de séance, pas la charge.", "avoid": "Ne recule pas les pieds pour te donner de l'élan — ça vide l'exercice de son intérêt.", "alt": {"label": "Alternative si poulie occupée", "text": "Curl haltères incliné sur banc (~45°) : assis sur banc incliné, bras qui pendent derrière toi — ça met le biceps en étirement maximal dès le départ. Charge légère (~10–12 kg), reps lentes. Excellent pour la finition."}, "stats": {"Séries": "2", "Reps": "15", "Charge": "20–25 kg", "Repos": "45 sec"}}], "supersets": [{"exercises": [{"name": "Curl Haltères Alterné", "sub": "Haltères · Debout", "execution": "Monte un bras à la fois. Effectue une supination progressive (tourne la paume vers le ciel en montant). Coude fixe contre le corps — ne le projette pas en avant.", "avoid": "Pas d'élan du buste pour compenser.", "alt": {"label": "Alternative", "text": "Curl barre EZ debout : même rep range, charge ~30–35 kg. Moins d'isolation par côté mais utile si haltères libres occupés."}, "stats": {"Reps": "10", "Charge": "12–16 kg"}}, {"name": "Curl Marteau", "sub": "Haltères · Prise neutre", "execution": "Pouce vers le haut tout au long du mouvement, pas de rotation. Mouvement lent et contrôlé. Tiens la contraction 1 sec en haut. Cible le brachial et le long supinateur — donne l'épaisseur.", "avoid": "Ne retourne pas la paume en chemin — garde la prise neutre.", "alt": {"label": "Alternative", "text": "Curl marteau à la corde poulie basse : tension constante sur tout l'arc, excellent si haltères libres sont tous pris. ~15–20 kg câble, même rep range."}, "stats": {"Reps": "10", "Charge": "14–18 kg"}}], "rest": "Repos entre les rounds : 75 sec"}]}]}, "bas": {"title": "Bas du corps", "pills": ["⏱ 60 min chrono", "Niveau avancé", "Force + Hypertrophie", "🦵 Genoux sensibles"], "blocs": [{"chip": "Bloc 01", "name": "Force", "duration": "~22 min · repos 2'30–3'", "exercises": [{"name": "Squat Barre — Back Squat", "sub": "Barre libre · Rack · Profondeur contrôlée", "execution": "Pieds largeur d'épaules, légèrement ouverts (15–30°). Barre posée sur les trapèzes moyens (low bar) ou hauts (high bar — genoux plus sollicités). Descends en poussant les genoux dans l'axe des orteils, buste légèrement incliné, dos gaîné. Descend jusqu'à la parallèle ou juste en dessous selon le confort.", "avoid": "Ne laisse pas les genoux s'effondrer vers l'intérieur (valgus) sous la charge — c'est le premier facteur de blessure.", "alt": {"label": "Alternative si rack occupé ou douleur", "text": "Squat goblet avec kettlebell ou haltère (~20–30 kg) : tenu contre la poitrine, favorise un buste droit et réduit la pression sur les genoux. Ou presse à cuisses pieds hauts (voir exo 3) comme remplacement direct."}, "stats": {"Séries": "4", "Reps": "5–6", "Charge": "80–100 kg", "Repos": "3 min"}}, {"name": "Romanian Deadlift", "sub": "Barre libre · Ischio-jambiers + Fessiers", "execution": "Debout, barre en pronation dans les mains. Descends la barre le long des jambes en poussant les hanches vers l'arrière (hip hinge), jambes quasi tendues (légère flexion genou). Sens l'étirement maximal des ischios avant de remonter en contractant les fessiers. Dos strictement plat tout au long.", "avoid": "Ne laisse pas le bas du dos s'arrondir en bas du mouvement — arrête-toi quand tu sens la limite de ton étirement ischio.", "alt": {"label": "Alternative si barre occupée", "text": "Romanian deadlift haltères : exactement le même mouvement, 2 haltères (~25–35 kg chacun). Amplitude souvent meilleure car les haltères passent à l'extérieur des jambes. Même charges et reps."}, "stats": {"Séries": "4", "Reps": "6–8", "Charge": "70–90 kg", "Repos": "2'30"}}], "supersets": []}, {"chip": "Bloc 02", "name": "Hypertrophie", "duration": "~18 min · repos 90 sec", "exercises": [{"name": "Presse à Cuisses — Pieds Hauts", "sub": "Machine guidée · Fessiers + Ischios prioritaires", "execution": "Place les pieds en haut de la plateforme (largeur d'épaules). Cette position haute réduit la flexion du genou et transfère le travail vers les fessiers et ischios. Descends jusqu'à 90° de flexion max — les lombaires ne doivent pas décoller du dossier. Remonte sans verrouiller les genoux en haut.", "avoid": "Ne décolle pas les fessiers du siège en fin de descente — ça transfère la charge sur les lombaires.", "alt": {"label": "Alternative si machine occupée", "text": "Squat bulgare haltères (exo 4 ci-dessous peut être avancé) ou Squat goblet à la kettlebell 4×12 (~25–30 kg) : buste droit, profondeur confortable. Moins de charge mais stimulus hypertrophique similaire."}, "stats": {"Séries": "3", "Reps": "10–12", "Charge": "120–160 kg", "Repos": "90 sec"}}, {"name": "Leg Curl Couché", "sub": "Machine · Ischio-jambiers · Isolation", "execution": "Allongé ventre sur la machine. Le coussin doit être au niveau des chevilles (pas du mollet). Fléchis en ramenant les talons vers les fesses, pause 1 sec en contraction maximale, redescends en 3 secondes. Garde les hanches en contact avec la machine — ne les soulève pas pour aider.", "avoid": "Ne soulève pas les hanches pour compenser — ça sort les ischios du travail et compresse les lombaires.", "alt": {"label": "Alternative si machine occupée", "text": "Nordic curl au sol (genou à terre, partenaire ou barre fixe qui bloque les chevilles) : descends en freinant avec les ischios, remonte en poussant avec les mains. Très intense — 3×6–8 suffit. Ou good morning barre légère (~30–40 kg) 3×12."}, "stats": {"Séries": "3", "Reps": "10–12", "Charge": "35–50 kg", "Repos": "90 sec"}}, {"name": "Fentes Bulgares Haltères", "sub": "Haltères · Pied arrière surélevé · Unilatéral", "execution": "Pied arrière posé sur un banc (~genou fléchi à 90°). Pied avant avancé suffisamment pour que le genou avant ne dépasse pas la pointe du pied en descendant. Descends verticalement, buste droit. Remonte en poussant sur le talon avant — sens le fessier et le quadri travailler.", "avoid": "Ne laisse pas le genou avant s'effondrer vers l'intérieur — garde le genou dans l'axe du 2e orteil tout au long du mouvement.", "alt": {"label": "Alternative si douleur ou déséquilibre", "text": "Fente avant marchée haltères (~12–16 kg/main) : même stimulus, plus de contrôle sur la trajectoire du genou. Ou hip thrust à la barre pour fessiers (voir bloc finition). 3×12 pas/jambe."}, "stats": {"Séries": "3", "Reps": "10/jambe", "Charge": "16–22 kg×2", "Repos": "90 sec"}}], "supersets": []}, {"chip": "Bloc 03", "name": "Finition", "duration": "~10 min · repos 45–60 sec", "exercises": [{"name": "Leg Extension — Amplitude Réduite", "sub": "Machine · Quadriceps · Charge légère", "execution": "Charge légère — l'objectif est la congestion, pas la force. Travaille en amplitude partielle : de 90° à environ 45° de flexion (pas jusqu'à extension complète). Cela évite la zone de tension maximale sur le tendon rotulien. Reps lentes, contraction de 1 sec à chaque rep.", "avoid": "Ne charge pas lourd sur cet exercice avec des genoux sensibles — c'est un exercice de finition, pas de force.", "alt": {"label": "Alternative si douleur ou machine indisponible", "text": "Wall sit isométrique : dos au mur, cuisses parallèles au sol, 3×30–45 sec. Ou terminal knee extension avec élastique : debout, élastique derrière le genou, petites extensions finales à 20°. Parfait pour les genoux sensibles."}, "stats": {"Séries": "3", "Reps": "15", "Charge": "25–35 kg", "Amplitude": "Partielle", "Repos": "60 sec"}}, {"name": "Mollets Debout", "sub": "Machine ou barre sur trapèzes · Gastrocnémiens", "execution": "Avant-pieds sur une marche ou plateforme. Descends talons vers le bas pour un étirement maximal (2 sec), remonte sur la pointe des pieds en 1 sec, pause 1 sec en haut avec contraction. Les mollets sont des muscles résistants — ils ont besoin d'amplitude complète et de volume pour progresser.", "avoid": "Ne fais pas des mini-reps avec juste le talon qui monte légèrement — l'amplitude complète est ce qui crée l'hypertrophie sur les mollets.", "alt": {"label": "Alternative si machine occupée", "text": "Mollets à la presse à cuisses : pieds en bas de la plateforme, pousse sur la pointe des pieds sans déverrouiller la sécurité. Ou mollets debout 1 jambe avec haltère (~20 kg) pour plus d'intensité et d'équilibre."}, "stats": {"Séries": "4", "Reps": "15–20", "Charge": "60–80 kg", "Tempo": "2-1-1", "Repos": "45 sec"}}], "supersets": []}]}, "hyrox": {"title": "Hyrox · Parc", "pills": ["⏱ 60 min", "🌳 Sans matériel · Parc", "Débutant · 1ère prépa", "Cardio + Force fonctionnelle"], "blocs": [{"chip": "Bloc 01", "name": "Simulation Hyrox", "sub": "4 rounds · Course + Station", "duration": "~28 min", "icon": "🏁", "exercises": [], "supersets": [], "sim_title": "⚡ 4 Rounds — Boucle 400m → Retour base camp → Station Toutes les stations se font à ton point fixe sur la pelouse · Allure course : tu dois pouvoir parler", "rounds": [{"num": "1", "run_icon": "🏃", "run_label": "Course", "run_val": "400 m", "st_icon": "💥", "st_label": "Station 1 — Pompes explosives", "st_val": "10 reps", "st_sub": "Pousse assez fort pour décoller les mains du sol · claque des mains si possible · simulation poussée explosive Hyrox"}, {"num": "2", "run_icon": "🏃", "run_label": "Course", "run_val": "400 m", "st_icon": "🔥", "st_label": "Station 2 — Mountain climbers", "st_val": "40 reps (20/jambe)", "st_sub": "Rythme rapide, hanches basses, épaules au-dessus des mains · simulation ski erg cadence"}, {"num": "3", "run_icon": "🏃", "run_label": "Course", "run_val": "400 m", "st_icon": "⚡", "st_label": "Station 3 — Sprint 50m aller-retour", "st_val": "3 allers-retours", "st_sub": "Depuis le point fixe · effort 90% · simulation des changements de rythme Hyrox"}, {"num": "4", "run_icon": "🏃", "run_label": "Course", "run_val": "400 m", "st_icon": "🦘", "st_label": "Station 4 — Sauts en longueur enchaînés", "st_val": "8 sauts", "st_sub": "Saute le plus loin possible, enchaîne sans pause entre chaque saut · travail puissance + coordination"}], "sim_footer": "Total : 1600m de course + 4 stations à ton point fixe Entre les rounds : 90 sec max de marche — reste près de ton point fixe"}, {"chip": "Bloc 02", "name": "Renforcement Fonctionnel", "sub": "Zones clés Hyrox · Sur la pelouse · Point fixe", "duration": "~15 min · repos 60 sec", "icon": "💪", "exercises": [{"name": "Pompes — Tempo 2-1-1", "sub": "Poids de corps · Pectoraux + Triceps + Gainage", "execution": "Corps droit de la tête aux talons, mains légèrement plus larges que les épaules. Descends en 2 sec, pause 1 sec en bas (coudes à ~75°), remonte en 1 sec. Gaîne l'abdomen — si le bas du dos se creuse, pose les genoux. La qualité prime sur la quantité.", "avoid": "Ne laisse pas les hanches s'affaisser — ton corps doit former une planche rigide.", "stats": {"Séries": "3", "Reps": "12–15", "Tempo": "2-1-1", "Repos": "60 sec"}}, {"name": "Glute Bridge — Unilatéral", "sub": "Sol · Fessiers + Ischios · Pied opposé en l'air", "execution": "Allongé sur le dos, un pied à plat, l'autre jambe tendue en l'air. Pousse sur le talon, monte les hanches jusqu'à alignement épaule-genou-cheville, contraction fessier 2 sec en haut. Redescends lentement. Travail unilatéral = correction des déséquilibres très fréquents chez les coureurs.", "avoid": "Ne laisse pas les hanches basculer de côté quand tu montes — maintiens le bassin horizontal.", "stats": {"Séries": "3", "Reps": "12/côté", "Pause": "2 sec en haut", "Repos": "60 sec"}}, {"name": "Planche + Shoulder Taps", "sub": "Sol · Gainage global · Stabilité", "execution": "Position planche sur les mains. Alterne en touchant l'épaule opposée avec la main, sans laisser les hanches bouger. Place les pieds légèrement plus larges que les épaules pour plus de stabilité. Respire normalement — le but est de maintenir l'effort sous tension continue, comme en condition Hyrox.", "avoid": "Ne laisse pas les hanches monter en l'air ou descendre — reste parfaitement horizontal.", "stats": {"Séries": "3", "Taps": "20/côté", "Repos": "60 sec"}}], "supersets": []}, {"chip": "Bloc 03", "name": "AMRAP Finition", "sub": "As Many Rounds As Possible · 5 min · À ton point fixe", "duration": "~5 min", "icon": "🔁", "exercises": [], "supersets": [], "amrap": {"header": "🔁 AMRAP 5 min — Enchaîne en boucle Pas de repos · Réduis l'intensité si besoin mais ne t'arrête pas", "movements": [{"icon": "💥", "label": "Mouvement A", "val": "5 Burpees", "sub": "Saut en extension complète"}, {"icon": "🦵", "label": "Mouvement B", "val": "10 Squat jumps", "sub": "Bras tendus en haut"}, {"icon": "🏃", "label": "Mouvement C", "val": "200 m sprint", "sub": "Effort 80% — pas à fond"}], "footer": "Note le nombre de rounds complets — c'est ton score à battre la prochaine fois 🎯 Objectif débutant : 3–4 rounds"}}]}}}</script>
+<script>
+const PAYLOAD = JSON.parse(document.getElementById('payload').textContent);
+const { order, meta, sessions } = PAYLOAD;
+
+// ═══ RENDER HOME ═══
+function renderHome() {
+  const container = document.getElementById('home-sessions');
+  container.innerHTML = order.map(key => {
+    const s = sessions[key];
+    const m = meta[key];
+    // Count exercises for meta
+    let exCount = 0;
+    s.blocs.forEach(b => {
+      exCount += (b.exercises || []).length;
+      (b.supersets || []).forEach(ss => exCount += ss.exercises.length);
+      if (b.rounds) exCount += b.rounds.length;
+      if (b.amrap) exCount += (b.amrap.movements || []).length;
+    });
+    const blocCount = s.blocs.length;
+    return `
+      <div class="session-card" data-session="${key}" style="--accent-color:${m.accent}">
+        <div class="session-card-name">${escape(s.title)}</div>
+        <div class="session-card-meta">
+          <span>⏱ 60 min</span>
+          <span>· ${blocCount} blocs</span>
+          <span>· ${exCount} exercices</span>
+        </div>
+        <span class="session-card-arrow">›</span>
+      </div>
+    `;
+  }).join('');
+
+  container.querySelectorAll('.session-card').forEach(c => {
+    c.addEventListener('click', () => openSession(c.dataset.session));
+  });
+}
+
+// ═══ RENDER SESSION ═══
+let currentSessionKey = null;
+
+function openSession(key, updateHistory = true) {
+  currentSessionKey = key;
+  const s = sessions[key];
+  const m = meta[key];
+  if (!s || !m) return;
+  if (updateHistory) {
+    history.pushState({ view: 'session', key }, '', `#${key}`);
+  }
+  document.body.classList.remove('view-home');
+  document.body.classList.add('view-session');
+  document.body.style.setProperty('--accent-color', m.accent);
+  document.getElementById('topbar-accent').style.background = m.accent;
+  document.getElementById('topbar-title').textContent = s.title;
+  document.getElementById('view-home').classList.remove('active');
+  document.getElementById('view-session').classList.add('active');
+
+  const pills = (s.pills || []).map((p, i) => 
+    `<span class="session-pill${i === 0 ? ' primary' : ''}">${escape(p)}</span>`
+  ).join('');
+
+  // Bloc nav buttons
+  const blocNav = s.blocs.map((b, idx) => {
+    const num = String(idx + 1).padStart(2, '0');
+    const name = b.name || '';
+    return `<button class="bloc-nav-btn" data-bloc="${idx}"><span class="num">${num}</span>${name ? escape(name) : ''}</button>`;
+  }).join('');
+
+  const blocs = s.blocs.map((b, idx) => renderBloc(b, idx + 1, m.accent, key)).join('');
+
+  document.getElementById('session-content').innerHTML = `
+    <div class="session-hero" style="--accent-color:${m.accent}">
+      <h1>${escape(s.title)}</h1>
+      <div class="session-pills">${pills}</div>
+    </div>
+    <nav class="bloc-nav" id="bloc-nav">${blocNav}</nav>
+    <div id="bloc-list">${blocs}</div>
+  `;
+
+  // Bind exercise toggles
+  document.querySelectorAll('.ex-head').forEach(h => {
+    h.addEventListener('click', (e) => {
+      // don't toggle if clicking inside textarea or clear button
+      if (e.target.tagName === 'TEXTAREA' || e.target.classList.contains('ex-note-clear')) return;
+      h.closest('.ex').classList.toggle('open');
+    });
+  });
+
+  // Bind bloc nav
+  document.querySelectorAll('.bloc-nav-btn').forEach(btn => {
+    btn.addEventListener('click', () => {
+      const idx = parseInt(btn.dataset.bloc);
+      const target = document.getElementById(`bloc-${idx}`);
+      if (target) {
+        target.scrollIntoView({ behavior: 'smooth', block: 'start' });
+      }
+    });
+  });
+
+  // Bind notes
+  bindNotes();
+  restoreNotes();
+  bindCharges();
+  restoreCharges();
+  bindRestTimers();
+  trackBlocScroll();
+
+  // Scroll to top
+  window.scrollTo(0, 0);
+}
+
+// Track which bloc is currently visible
+let _blocScrollHandler = null;
+
+function trackBlocScroll() {
+  const blocs = document.querySelectorAll('.bloc');
+  const navBtns = document.querySelectorAll('.bloc-nav-btn');
+  const navEl = document.getElementById('bloc-nav');
+  let ticking = false;
+  let lastActiveIdx = -1;
+
+  const update = () => {
+    ticking = false;
+    if (!navEl) return;
+    const navBottom = navEl.getBoundingClientRect().bottom;
+    let activeIdx = 0;
+    blocs.forEach((b, i) => {
+      const rect = b.getBoundingClientRect();
+      if (rect.top <= navBottom + 40) activeIdx = i;
+    });
+
+    if (activeIdx !== lastActiveIdx) {
+      navBtns.forEach((btn, i) => {
+        btn.classList.toggle('active', i === activeIdx);
+      });
+      lastActiveIdx = activeIdx;
+
+      const activeBtn = navBtns[activeIdx];
+      if (activeBtn && navEl) {
+        const btnRect = activeBtn.getBoundingClientRect();
+        const navRect = navEl.getBoundingClientRect();
+        if (btnRect.left < navRect.left + 10 || btnRect.right > navRect.right - 10) {
+          const targetLeft = activeBtn.offsetLeft - navEl.clientWidth / 2 + activeBtn.offsetWidth / 2;
+          navEl.scrollTo({ left: targetLeft, behavior: 'smooth' });
+        }
+      }
+    }
+  };
+
+  const onScroll = () => {
+    if (!ticking) {
+      ticking = true;
+      requestAnimationFrame(update);
+    }
+  };
+
+  // Properly remove previous listener
+  if (_blocScrollHandler) {
+    window.removeEventListener('scroll', _blocScrollHandler);
+  }
+  _blocScrollHandler = onScroll;
+  window.addEventListener('scroll', onScroll, { passive: true });
+  lastActiveIdx = -1;
+  update();
+}
+
+function renderBloc(b, num, accent, sessionKey) {
+  const blocIdx = num - 1;
+  const chip = b.chip || `Bloc 0${num}`;
+  const name = b.name || '';
+  const sub = b.sub || '';
+  const dur = b.duration || '';
+
+  let body = '';
+
+  // Regular exercises
+  (b.exercises || []).forEach((ex, i) => {
+    body += renderEx(ex, i + 1, false, sessionKey, blocIdx, i);
+  });
+
+  // Supersets
+  (b.supersets || []).forEach((ss, idx) => {
+    const exHtml = ss.exercises.map((ex, i) => 
+      renderEx(ex, String.fromCharCode(65 + i), true, sessionKey, blocIdx, `ss${idx}-${i}`)
+    ).join('');
+    const rest = ss.rest ? `<div class="superset-footer">${escape(ss.rest)}</div>` : '';
+    body += `
+      <div class="superset">
+        <div class="superset-banner">⚡ Superset</div>
+        ${exHtml}
+        ${rest}
+      </div>
+    `;
+  });
+
+  // Hyrox rounds
+  if (b.rounds && b.rounds.length) {
+    if (b.sim_title) {
+      body += `<div class="hyrox-note">${escape(b.sim_title)}</div>`;
+    }
+    b.rounds.forEach(r => {
+      body += `
+        <div class="hyrox-round">
+          <div class="round-num">${escape(r.num)}</div>
+          <div class="round-body">
+            ${r.run_val ? `
+              <div class="round-part">
+                <span class="round-part-icon">${r.run_icon || '🏃'}</span>
+                <div class="round-part-info">
+                  <div class="round-part-label">${escape(r.run_label || 'Course')}</div>
+                  <div class="round-part-val">${escape(r.run_val)}</div>
+                </div>
+              </div>
+            ` : ''}
+            ${r.st_label ? `
+              <div class="round-part">
+                <span class="round-part-icon">${r.st_icon || '💪'}</span>
+                <div class="round-part-info">
+                  <div class="round-part-label">${escape(r.st_label)}</div>
+                  <div class="round-part-val">${escape(r.st_val)}</div>
+                  ${r.st_sub ? `<div class="round-part-sub">${escape(r.st_sub)}</div>` : ''}
+                </div>
+              </div>
+            ` : ''}
+          </div>
+        </div>
+      `;
+    });
+    if (b.sim_footer) {
+      body += `<div class="hyrox-note">${escape(b.sim_footer)}</div>`;
+    }
+  }
+
+  // AMRAP
+  if (b.amrap) {
+    if (b.amrap.header) {
+      body += `<div class="hyrox-note">${escape(b.amrap.header)}</div>`;
+    }
+    (b.amrap.movements || []).forEach(mv => {
+      body += `
+        <div class="amrap-item">
+          <div class="amrap-icon">${mv.icon || '•'}</div>
+          <div>
+            <div class="amrap-label">${escape(mv.label)}</div>
+            <div class="amrap-val">${escape(mv.val)}</div>
+            ${mv.sub ? `<div class="amrap-sub">${escape(mv.sub)}</div>` : ''}
+          </div>
+        </div>
+      `;
+    });
+    if (b.amrap.footer) {
+      body += `<div class="amrap-note">${escape(b.amrap.footer)}</div>`;
+    }
+  }
+
+  return `
+    <section class="bloc" id="bloc-${blocIdx}">
+      <div class="bloc-header">
+        <div class="bloc-num">0${num}</div>
+        <div class="bloc-title-group">
+          <div class="bloc-name">${escape(name)}</div>
+          ${sub ? `<div class="bloc-sub">${escape(sub)}</div>` : ''}
+          ${dur ? `<div class="bloc-duration">${escape(dur)}</div>` : ''}
+        </div>
+      </div>
+      ${body}
+    </section>
+  `;
+}
+
+// Parse rest duration (seconds) from "2 min", "90 sec", "2'30", "3 min" etc.
+function parseRestSeconds(restStr) {
+  if (!restStr) return 0;
+  const s = String(restStr).toLowerCase();
+  // Try "X'YY" (e.g. 2'30)
+  let m = s.match(/(\d+)\s*['′]\s*(\d+)/);
+  if (m) return parseInt(m[1]) * 60 + parseInt(m[2]);
+  // "X min YY sec"
+  m = s.match(/(\d+)\s*min\s*(\d+)\s*sec/);
+  if (m) return parseInt(m[1]) * 60 + parseInt(m[2]);
+  // Range first: "45-60 sec" or "60–75 sec" → take lower bound
+  m = s.match(/(\d+)\s*[\-–]\s*\d+\s*sec/);
+  if (m) return parseInt(m[1]);
+  m = s.match(/(\d+)\s*[\-–]\s*\d+\s*min/);
+  if (m) return parseInt(m[1]) * 60;
+  // "X min"
+  m = s.match(/(\d+(?:[.,]\d+)?)\s*min/);
+  if (m) {
+    const v = parseFloat(m[1].replace(',', '.'));
+    return Math.round(v * 60);
+  }
+  // "XX sec"
+  m = s.match(/(\d+)\s*sec/);
+  if (m) return parseInt(m[1]);
+  // First number fallback, assume minutes if < 20
+  m = s.match(/(\d+)/);
+  if (m) {
+    const n = parseInt(m[1]);
+    return n < 20 ? n * 60 : n;
+  }
+  return 0;
+}
+
+function renderEx(ex, num, inSuperset, sessionKey, blocIdx, exIdx) {
+  const stats = ex.stats || {};
+  const statsOrder = ['Séries', 'Reps', 'Charge', 'Tempo', 'Amplitude', 'Taps', 'Pause', 'Repos'];
+  const sortedKeys = Object.keys(stats).sort((a, b) => {
+    const ai = statsOrder.indexOf(a);
+    const bi = statsOrder.indexOf(b);
+    return (ai === -1 ? 99 : ai) - (bi === -1 ? 99 : bi);
+  });
+
+  const statsHtml = sortedKeys.map(k => {
+    const isRest = k === 'Repos';
+    const val = String(stats[k]).replace(/Poids de corps/i, 'Poids corps');
+    const restAttr = isRest ? ` data-rest-seconds="${parseRestSeconds(val)}" data-rest-label="${escape(ex.name)}"` : '';
+    return `
+      <div class="stat${isRest ? ' rest' : ''}"${restAttr}>
+        <div class="stat-label">${escape(k)}</div>
+        <div class="stat-value">${escape(val)}</div>
+      </div>
+    `;
+  }).join('');
+
+  let details = '';
+  if (ex.execution) {
+    details += `<div class="detail-block"><div class="detail-label">Exécution</div><div class="detail-text">${escape(ex.execution)}</div></div>`;
+  }
+  if (ex.avoid) {
+    details += `<div class="detail-warn">${escape(ex.avoid)}</div>`;
+  }
+  if (ex.alt) {
+    details += `<div class="detail-alt"><div><strong>${escape(ex.alt.label)}</strong>${escape(ex.alt.text)}</div></div>`;
+  }
+
+  const noteKey = `note:${sessionKey}:${blocIdx}:${exIdx}`;
+  const chargeKey = `charge:${sessionKey}:${blocIdx}:${exIdx}`;
+  const chargeHistKey = `chargeHist:${sessionKey}:${blocIdx}:${exIdx}`;
+
+  // Only show charge tracker if the exercise has a "Charge" stat (skip pure bodyweight)
+  const hasCharge = stats['Charge'] && !/poids.{0,5}corps/i.test(stats['Charge']);
+
+  const chargeBlock = hasCharge ? `
+    <div class="ex-charge">
+      <div class="charge-insight" data-charge-insight="${chargeHistKey}" data-target-charge="${escape(stats['Charge'])}">
+        <div class="charge-insight-row">
+          <span class="charge-insight-label">Dernière</span>
+          <span class="charge-insight-value" data-last-charge="${chargeHistKey}">—</span>
+        </div>
+        <div class="charge-insight-row">
+          <span class="charge-insight-label">Suggestion</span>
+          <span class="charge-insight-value suggestion" data-suggest-charge="${chargeHistKey}">Objectif programme : ${escape(stats['Charge'])}</span>
+        </div>
+      </div>
+      <div class="ex-charge-row">
+        <div class="ex-charge-label">Charge</div>
+        <input type="text" inputmode="decimal" class="ex-charge-input" placeholder="${escape(stats['Charge'])}" data-charge="${chargeKey}" data-hist="${chargeHistKey}">
+        <button class="ex-charge-save" data-charge-save="${chargeKey}" data-hist="${chargeHistKey}">Valider</button>
+      </div>
+      <div class="ex-charge-history" data-charge-hist-display="${chargeHistKey}"></div>
+    </div>
+  ` : '';
+
+  return `
+    <div class="ex" data-note-key="${noteKey}">
+      <div class="ex-head">
+        <div class="ex-num">${escape(String(num))}</div>
+        <div class="ex-head-text">
+          <div class="ex-name">${escape(ex.name)}</div>
+          ${ex.sub ? `<div class="ex-sub">${escape(ex.sub)}</div>` : ''}
+        </div>
+        <div class="ex-note-indicator"></div>
+        <div class="ex-chevron">›</div>
+      </div>
+      <div class="ex-stats cols-${sortedKeys.length}">${statsHtml}</div>
+      ${details ? `<div class="ex-details">${details}</div>` : ''}
+      ${chargeBlock}
+      <div class="ex-note">
+        <div class="ex-note-label">
+          <span>Ma note</span>
+          <button class="ex-note-clear" data-clear="${noteKey}">Effacer</button>
+        </div>
+        <textarea placeholder="Sensations, ressenti, \u00e0 retenir\u2026" data-note="${noteKey}"></textarea>
+      </div>
+    </div>
+  `;
+}
+
+// ═══ NOTES ═══
+function bindNotes() {
+  document.querySelectorAll('textarea[data-note]').forEach(ta => {
+    ta.addEventListener('input', () => {
+      const key = ta.dataset.note;
+      const ex = ta.closest('.ex');
+      if (ta.value.trim()) {
+        try { localStorage.setItem(key, ta.value); } catch(e) {}
+        ex.classList.add('has-note');
+      } else {
+        try { localStorage.removeItem(key); } catch(e) {}
+        ex.classList.remove('has-note');
+      }
+    });
+    // prevent taps in textarea from toggling the ex
+    ta.addEventListener('click', e => e.stopPropagation());
+  });
+
+  document.querySelectorAll('.ex-note-clear').forEach(btn => {
+    btn.addEventListener('click', e => {
+      e.stopPropagation();
+      const key = btn.dataset.clear;
+      const ta = document.querySelector(`textarea[data-note="${key}"]`);
+      if (ta) {
+        ta.value = '';
+        try { localStorage.removeItem(key); } catch(e) {}
+        ta.closest('.ex').classList.remove('has-note');
+      }
+    });
+  });
+}
+
+function restoreNotes() {
+  document.querySelectorAll('textarea[data-note]').forEach(ta => {
+    try {
+      const v = localStorage.getItem(ta.dataset.note);
+      if (v) {
+        ta.value = v;
+        ta.closest('.ex').classList.add('has-note');
+      }
+    } catch(e) {}
+  });
+}
+
+
+// ═══ EXPORT / IMPORT / RESET ═══
+function getTrainingStorageData() {
+  const data = {};
+  try {
+    for (let i = 0; i < localStorage.length; i++) {
+      const key = localStorage.key(i);
+      if (/^(note:|charge:|chargeHist:|theme$)/.test(key)) {
+        data[key] = localStorage.getItem(key);
+      }
+    }
+  } catch(e) {}
+  return data;
+}
+
+function exportTrainingData() {
+  const payload = {
+    app: 'training-programme',
+    version: '1.7',
+    exportedAt: new Date().toISOString(),
+    data: getTrainingStorageData()
+  };
+  const blob = new Blob([JSON.stringify(payload, null, 2)], { type: 'application/json' });
+  const url = URL.createObjectURL(blob);
+  const a = document.createElement('a');
+  a.href = url;
+  a.download = `sauvegarde-programme-${new Date().toISOString().slice(0,10)}.json`;
+  document.body.appendChild(a);
+  a.click();
+  a.remove();
+  URL.revokeObjectURL(url);
+}
+
+function importTrainingData(file) {
+  if (!file) return;
+  const reader = new FileReader();
+  reader.onload = () => {
+    try {
+      const payload = JSON.parse(reader.result);
+      const data = payload.data || payload;
+      Object.keys(data).forEach(key => {
+        if (/^(note:|charge:|chargeHist:|theme$)/.test(key)) {
+          localStorage.setItem(key, data[key]);
+        }
+      });
+      alert('Données importées.');
+      location.reload();
+    } catch(e) {
+      alert('Import impossible : fichier JSON invalide.');
+    }
+  };
+  reader.readAsText(file);
+}
+
+function resetTrainingData() {
+  if (!confirm('Supprimer toutes les notes et charges enregistrées ?')) return;
+  try {
+    Object.keys(localStorage).forEach(key => {
+      if (/^(note:|charge:|chargeHist:)/.test(key)) {
+        localStorage.removeItem(key);
+      }
+    });
+  } catch(e) {}
+  location.reload();
+}
+
+// ═══ CHARGE TRACKER ═══
+function formatDate(d) {
+  const now = new Date();
+  const then = new Date(d);
+  if (isNaN(then.getTime())) return '';
+  const days = Math.max(0, Math.floor((now - then) / (1000 * 60 * 60 * 24)));
+  if (days === 0) return "aujourd'hui";
+  if (days === 1) return 'hier';
+  if (days < 7) return `il y a ${days}j`;
+  if (days < 30) return `il y a ${Math.floor(days / 7)}sem`;
+  return then.toLocaleDateString('fr-FR', { day: 'numeric', month: 'short' });
+}
+
+
+function parseChargeNumber(value) {
+  if (!value) return null;
+  const s = String(value).replace(',', '.');
+  const matches = s.match(/\d+(?:\.\d+)?/g);
+  if (!matches || !matches.length) return null;
+  // If format is "16-22" or "16–22", use the highest number as target.
+  return parseFloat(matches[matches.length - 1]);
+}
+
+function inferChargeStep(value, target) {
+  const s = String(value || target || '').toLowerCase();
+  if (s.includes('haltère') || s.includes('×2') || s.includes('x2') || s.includes('/main')) return 1;
+  if (s.includes('kg')) return 2.5;
+  return 1;
+}
+
+function formatChargeNumber(n) {
+  if (!Number.isFinite(n)) return '';
+  const rounded = Math.round(n * 10) / 10;
+  return String(rounded).replace('.', ',');
+}
+
+function suggestNextCharge(lastValue, targetValue) {
+  const last = parseChargeNumber(lastValue);
+  if (last == null) return targetValue ? `Objectif programme : ${targetValue}` : '—';
+  const step = inferChargeStep(lastValue, targetValue);
+  const suggested = last + step;
+  return `Tente ${formatChargeNumber(suggested)} kg`;
+}
+
+function renderChargeInsight(histKey) {
+  const lastEl = document.querySelector(`[data-last-charge="${histKey}"]`);
+  const suggestEl = document.querySelector(`[data-suggest-charge="${histKey}"]`);
+  const insightEl = document.querySelector(`[data-charge-insight="${histKey}"]`);
+  if (!lastEl || !suggestEl || !insightEl) return;
+  const target = insightEl.dataset.targetCharge || '';
+  let hist = [];
+  try { hist = JSON.parse(localStorage.getItem(histKey) || '[]'); } catch(e) {}
+  const latest = hist[hist.length - 1];
+  if (!latest) {
+    lastEl.textContent = 'Aucune charge enregistrée';
+    suggestEl.textContent = target ? `Objectif programme : ${target}` : '—';
+    return;
+  }
+  lastEl.textContent = `${latest.v} · ${formatDate(latest.d)}`;
+  suggestEl.textContent = suggestNextCharge(latest.v, target);
+}
+
+function renderChargeHistory(histKey) {
+  renderChargeInsight(histKey);
+  const displayEl = document.querySelector(`[data-charge-hist-display="${histKey}"]`);
+  if (!displayEl) return;
+  let hist = [];
+  try { hist = JSON.parse(localStorage.getItem(histKey) || '[]'); } catch(e) {}
+  if (!hist.length) {
+    displayEl.innerHTML = '';
+    return;
+  }
+  // Show up to 3 most recent; reversed means index 0 in display = last item in hist
+  const total = hist.length;
+  const recent = hist.slice(-3).reverse();
+  displayEl.innerHTML = recent.map((h, i) => {
+    const realIdx = total - 1 - i;
+    return `<span class="history-chip" data-hist-key="${histKey}" data-idx="${realIdx}"${i === 0 ? ' data-latest="1"' : ''}><strong>${escape(h.v)}</strong> · ${escape(formatDate(h.d))}</span>`;
+  }).join('');
+
+  // Apply latest style via JS since we need to know both state+role
+  displayEl.querySelectorAll('.history-chip').forEach(chip => {
+    if (chip.dataset.latest === '1') {
+      chip.classList.add('latest');
+    }
+  });
+
+  // Bind click to edit
+  displayEl.querySelectorAll('.history-chip').forEach(chip => {
+    chip.addEventListener('click', e => {
+      e.stopPropagation();
+      openChargeEdit(chip.dataset.histKey, parseInt(chip.dataset.idx));
+    });
+  });
+}
+
+function bindCharges() {
+  document.querySelectorAll('[data-charge-save]').forEach(btn => {
+    btn.addEventListener('click', e => {
+      e.stopPropagation();
+      const key = btn.dataset.chargeSave;
+      const histKey = btn.dataset.hist;
+      const input = document.querySelector(`[data-charge="${key}"]`);
+      if (!input) return;
+      const val = input.value.trim();
+      if (!val) return;
+
+      // Save current value
+      try { localStorage.setItem(key, val); } catch(e) {}
+
+      // Append to history — avoid duplicate if same value & same day
+      let hist = [];
+      try { hist = JSON.parse(localStorage.getItem(histKey) || '[]'); } catch(e) {}
+      const today = new Date().toISOString().slice(0, 10);
+      const lastEntry = hist[hist.length - 1];
+      if (!lastEntry || lastEntry.v !== val || lastEntry.d.slice(0, 10) !== today) {
+        hist.push({ v: val, d: new Date().toISOString() });
+        // Keep last 20
+        if (hist.length > 20) hist = hist.slice(-20);
+        try { localStorage.setItem(histKey, JSON.stringify(hist)); } catch(e) {}
+      }
+
+      // Visual feedback
+      btn.classList.add('saved');
+      btn.textContent = 'Enregistré';
+      setTimeout(() => {
+        btn.classList.remove('saved');
+        btn.textContent = 'Valider';
+      }, 1500);
+
+      renderChargeHistory(histKey);
+    });
+  });
+
+  // Prevent taps inside input from collapsing the exercise
+  document.querySelectorAll('.ex-charge-input').forEach(input => {
+    input.addEventListener('click', e => e.stopPropagation());
+  });
+}
+
+function restoreCharges() {
+  document.querySelectorAll('[data-charge]').forEach(input => {
+    try {
+      const v = localStorage.getItem(input.dataset.charge);
+      if (v) input.value = v;
+    } catch(e) {}
+    renderChargeHistory(input.dataset.hist);
+  });
+}
+
+// ═══ CHARGE EDIT MODAL ═══
+const editBackdrop = document.getElementById('edit-backdrop');
+const editInput = document.getElementById('edit-input');
+const editSub = document.getElementById('edit-sub');
+const editSave = document.getElementById('edit-save');
+const editCancel = document.getElementById('edit-cancel');
+const editDelete = document.getElementById('edit-delete');
+let currentEdit = null; // { histKey, idx }
+
+function openChargeEdit(histKey, idx) {
+  let hist = [];
+  try { hist = JSON.parse(localStorage.getItem(histKey) || '[]'); } catch(e) {}
+  if (!hist[idx]) return;
+  const entry = hist[idx];
+  currentEdit = { histKey, idx };
+  editInput.value = entry.v;
+  editSub.textContent = formatDate(entry.d);
+  editBackdrop.classList.add('active');
+  // focus after transition
+  setTimeout(() => editInput.focus(), 50);
+}
+
+function closeChargeEdit() {
+  editBackdrop.classList.remove('active');
+  currentEdit = null;
+  editInput.blur();
+}
+
+editSave.addEventListener('click', () => {
+  if (!currentEdit) return;
+  const newVal = editInput.value.trim();
+  if (!newVal) return;
+  const { histKey, idx } = currentEdit;
+  let hist = [];
+  try { hist = JSON.parse(localStorage.getItem(histKey) || '[]'); } catch(e) {}
+  if (hist[idx]) {
+    hist[idx].v = newVal;
+    try { localStorage.setItem(histKey, JSON.stringify(hist)); } catch(e) {}
+    // If editing the most recent entry, also update the current-charge storage
+    if (idx === hist.length - 1) {
+      const chargeKey = histKey.replace('chargeHist:', 'charge:');
+      try { localStorage.setItem(chargeKey, newVal); } catch(e) {}
+      const input = document.querySelector(`[data-charge="${chargeKey}"]`);
+      if (input) input.value = newVal;
+    }
+    renderChargeHistory(histKey);
+  }
+  closeChargeEdit();
+});
+
+editDelete.addEventListener('click', () => {
+  if (!currentEdit) return;
+  const { histKey, idx } = currentEdit;
+  let hist = [];
+  try { hist = JSON.parse(localStorage.getItem(histKey) || '[]'); } catch(e) {}
+  if (hist[idx] !== undefined) {
+    const wasLatest = idx === hist.length - 1;
+    hist.splice(idx, 1);
+    try {
+      if (hist.length) {
+        localStorage.setItem(histKey, JSON.stringify(hist));
+      } else {
+        localStorage.removeItem(histKey);
+      }
+    } catch(e) {}
+    // If we deleted the latest, sync the current-charge value with the new latest (or clear)
+    if (wasLatest) {
+      const chargeKey = histKey.replace('chargeHist:', 'charge:');
+      const input = document.querySelector(`[data-charge="${chargeKey}"]`);
+      if (hist.length) {
+        const newLatest = hist[hist.length - 1].v;
+        try { localStorage.setItem(chargeKey, newLatest); } catch(e) {}
+        if (input) input.value = newLatest;
+      } else {
+        try { localStorage.removeItem(chargeKey); } catch(e) {}
+        if (input) input.value = '';
+      }
+    }
+    renderChargeHistory(histKey);
+  }
+  closeChargeEdit();
+});
+
+editCancel.addEventListener('click', closeChargeEdit);
+
+editBackdrop.addEventListener('click', e => {
+  if (e.target === editBackdrop) closeChargeEdit();
+});
+
+editInput.addEventListener('keydown', e => {
+  if (e.key === 'Enter') { e.preventDefault(); editSave.click(); }
+  if (e.key === 'Escape') closeChargeEdit();
+});
+
+// ═══ REST TIMER ═══
+let timerInterval = null;
+let timerEndTime = 0;
+let timerTotalSeconds = 0;
+const timerOverlay = document.getElementById('timer-overlay');
+const timerLabel = document.getElementById('timer-label');
+const timerValue = document.getElementById('timer-value');
+const timerExtend = document.getElementById('timer-extend');
+const timerClose = document.getElementById('timer-close');
+
+function formatMS(totalSec) {
+  if (totalSec < 0) totalSec = 0;
+  const m = Math.floor(totalSec / 60);
+  const s = totalSec % 60;
+  return `${String(m).padStart(2, '0')}:${String(s).padStart(2, '0')}`;
+}
+
+function bindRestTimers() {
+  document.querySelectorAll('.stat.rest').forEach(stat => {
+    stat.addEventListener('click', e => {
+      e.stopPropagation();
+      const seconds = parseInt(stat.dataset.restSeconds || '0');
+      const label = stat.dataset.restLabel || 'Repos';
+      if (seconds > 0) startRestTimer(seconds, label);
+    });
+  });
+}
+
+function startRestTimer(seconds, label) {
+  if (timerInterval) clearInterval(timerInterval);
+  timerOverlay.classList.remove('done', 'ending');
+  timerOverlay.classList.add('active');
+  document.body.classList.add('timer-active');
+  timerLabel.textContent = label.length > 28 ? label.slice(0, 26) + '…' : label;
+  timerTotalSeconds = seconds;
+  timerEndTime = Date.now() + seconds * 1000;
+  updateTimerDisplay();
+
+  timerInterval = setInterval(() => {
+    const remaining = Math.ceil((timerEndTime - Date.now()) / 1000);
+    if (remaining <= 0) {
+      clearInterval(timerInterval);
+      timerInterval = null;
+      timerValue.textContent = '00:00';
+      timerOverlay.classList.remove('ending');
+      timerOverlay.classList.add('done');
+      triggerBuzz();
+    } else if (remaining <= 5) {
+      timerOverlay.classList.add('ending');
+      timerValue.textContent = formatMS(remaining);
+    } else {
+      timerValue.textContent = formatMS(remaining);
+    }
+  }, 250);
+}
+
+function updateTimerDisplay() {
+  const remaining = Math.ceil((timerEndTime - Date.now()) / 1000);
+  timerValue.textContent = formatMS(remaining);
+}
+
+function triggerBuzz() {
+  // iOS Safari doesn't support Vibration API but we can try
+  if (navigator.vibrate) navigator.vibrate([200, 100, 200, 100, 400]);
+
+  // Audio beep
+  try {
+    const ctx = new (window.AudioContext || window.webkitAudioContext)();
+    const now = ctx.currentTime;
+    [0, 0.25, 0.5].forEach(delay => {
+      const osc = ctx.createOscillator();
+      const gain = ctx.createGain();
+      osc.connect(gain);
+      gain.connect(ctx.destination);
+      osc.frequency.value = 880;
+      gain.gain.setValueAtTime(0, now + delay);
+      gain.gain.linearRampToValueAtTime(0.3, now + delay + 0.02);
+      gain.gain.linearRampToValueAtTime(0, now + delay + 0.18);
+      osc.start(now + delay);
+      osc.stop(now + delay + 0.2);
+    });
+  } catch(e) {}
+}
+
+timerExtend.addEventListener('click', () => {
+  if (timerInterval) {
+    // still running → add 30s
+    timerEndTime += 30 * 1000;
+    timerOverlay.classList.remove('ending', 'done');
+    updateTimerDisplay();
+  } else {
+    // done → restart with 30s
+    startRestTimer(30, timerLabel.textContent);
+  }
+});
+
+timerClose.addEventListener('click', () => {
+  if (timerInterval) clearInterval(timerInterval);
+  timerInterval = null;
+  timerOverlay.classList.remove('active', 'ending', 'done');
+  document.body.classList.remove('timer-active');
+});
+
+
+const exportBtn = document.getElementById('btn-export');
+const importBtn = document.getElementById('btn-import');
+const resetDataBtn = document.getElementById('btn-reset-data');
+const importFile = document.getElementById('import-file');
+if (exportBtn) exportBtn.addEventListener('click', exportTrainingData);
+if (importBtn && importFile) importBtn.addEventListener('click', () => importFile.click());
+if (importFile) importFile.addEventListener('change', e => importTrainingData(e.target.files[0]));
+if (resetDataBtn) resetDataBtn.addEventListener('click', resetTrainingData);
+
+// ═══ NAVIGATION ═══
+function goHome(updateHistory = true) {
+  document.body.classList.add('view-home');
+  document.body.classList.remove('view-session');
+  document.body.style.removeProperty('--accent-color');
+  document.getElementById('topbar-title').textContent = 'Programme';
+  document.getElementById('view-session').classList.remove('active');
+  document.getElementById('view-home').classList.add('active');
+  window.scrollTo(0, 0);
+  // Close timer on navigation back
+  if (timerInterval) clearInterval(timerInterval);
+  timerInterval = null;
+  timerOverlay.classList.remove('active', 'ending', 'done');
+  document.body.classList.remove('timer-active');
+  if (updateHistory) history.pushState({ view: 'home' }, '', window.location.pathname + window.location.search);
+}
+
+document.getElementById('btn-back').addEventListener('click', goHome);
+
+// Browser/iOS back navigation
+window.addEventListener('popstate', e => {
+  const state = e.state || { view: 'home' };
+  if (state.view === 'session' && state.key && sessions[state.key]) {
+    openSession(state.key, false);
+  } else if (document.body.classList.contains('view-session')) {
+    goHome(false);
+  }
+});
+
+// ═══ HELPERS ═══
+function escape(s) {
+  if (s == null) return '';
+  return String(s)
+    .replace(/&/g, '&amp;')
+    .replace(/</g, '&lt;')
+    .replace(/>/g, '&gt;')
+    .replace(/"/g, '&quot;')
+    .replace(/'/g, '&#39;');
+}
+
+// ═══ THEME ═══
+const themeBtn = document.getElementById('btn-theme');
+function setTheme(t) {
+  document.documentElement.setAttribute('data-theme', t);
+  themeBtn.textContent = t === 'dark' ? '☾' : '☀';
+  try { localStorage.setItem('theme', t); } catch(e) {}
+  // Update status bar meta
+  const meta = document.querySelector('meta[name="theme-color"]');
+  if (meta) meta.setAttribute('content', t === 'dark' ? '#0a0a0a' : '#f5f4f1');
+}
+themeBtn.addEventListener('click', () => {
+  const current = document.documentElement.getAttribute('data-theme') || 'dark';
+  setTheme(current === 'dark' ? 'light' : 'dark');
+});
+// Restore saved theme
+try {
+  const saved = localStorage.getItem('theme');
+  if (saved) setTheme(saved);
+  else setTheme('dark');
+} catch(e) { setTheme('dark'); }
+
+// ═══ INIT ═══
+history.replaceState({ view: 'home' }, '', window.location.pathname + window.location.search);
+renderHome();
+
+const initialKey = window.location.hash.replace('#', '');
+if (initialKey && sessions[initialKey]) {
+  openSession(initialKey, false);
+}
+</script>
+</body>
+</html>
