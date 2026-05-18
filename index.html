@@ -179,11 +179,54 @@
     gap: 8px;
   }
 
+  .home-tools {
+    padding: 0 12px 18px;
+    display: grid;
+    grid-template-columns: repeat(3, 1fr);
+    gap: 8px;
+  }
+
+  .home-tool-btn, .session-tool-btn {
+    border: 1px solid var(--border);
+    background: var(--surface);
+    color: var(--text-2);
+    border-radius: 12px;
+    padding: 11px 10px;
+    font-family: inherit;
+    font-size: 12px;
+    font-weight: 700;
+    letter-spacing: 0.6px;
+    text-transform: uppercase;
+    cursor: pointer;
+    -webkit-appearance: none;
+  }
+
+  .home-tool-btn:active, .session-tool-btn:active { background: var(--surface-2); }
+  .home-tool-btn.danger { color: #d9534f; }
+
+  .app-hint {
+    margin: 0 12px 14px;
+    padding: 12px 14px;
+    border: 1px solid var(--border);
+    border-radius: 14px;
+    background: var(--surface);
+    color: var(--text-3);
+    font-size: 12px;
+    line-height: 1.45;
+  }
+
+  @media (max-width: 420px) {
+    .home-tools { grid-template-columns: 1fr; }
+    .home-hero h1 { font-size: 50px; }
+    .session-card { padding: 16px 16px 14px; }
+    .ex-head { padding: 13px 14px; }
+  }
+
   .session-card {
     background: var(--surface);
     border: 1px solid var(--border);
-    border-radius: 14px;
-    padding: 18px 18px 16px;
+    border-radius: 16px;
+    padding: 17px 18px 15px;
     cursor: pointer;
     transition: background 0.12s, transform 0.12s;
     position: relative;
@@ -337,7 +380,7 @@
   .ex {
     background: var(--surface);
     border: 1px solid var(--border);
-    border-radius: 12px;
+    border-radius: 14px;
     margin-bottom: 10px;
     overflow: hidden;
   }
@@ -923,6 +966,45 @@
 
   .ex-charge-history:empty { display: none; }
 
+
+  .charge-insight {
+    display: grid;
+    grid-template-columns: 1fr;
+    gap: 6px;
+    margin-bottom: 10px;
+    padding: 10px 12px;
+    border: 1px solid var(--border);
+    border-radius: 10px;
+    background: var(--bg);
+  }
+
+  .charge-insight-row {
+    display: flex;
+    justify-content: space-between;
+    align-items: baseline;
+    gap: 10px;
+    font-size: 12px;
+    color: var(--text-3);
+  }
+
+  .charge-insight-label {
+    text-transform: uppercase;
+    letter-spacing: 1px;
+    font-size: 9px;
+    font-weight: 700;
+    flex-shrink: 0;
+  }
+
+  .charge-insight-value {
+    color: var(--text-2);
+    text-align: right;
+    font-weight: 600;
+  }
+
+  .charge-insight-value.suggestion {
+    color: var(--accent-color);
+  }
+
   .history-chip {
     font-size: 11px;
     color: var(--text-3);
@@ -1162,257 +1244,6 @@
     .session-hero h1 { font-size: 56px; }
     main { max-width: 720px; margin: 0 auto; }
   }
-
-
-  /* ══ USER FEATURES: PROGRESS, HISTORY, EXPORT ══ */
-  .home-tools {
-    padding: 0 12px 12px;
-    display: grid;
-    grid-template-columns: repeat(3, 1fr);
-    gap: 8px;
-  }
-
-  .home-tool-btn,
-  .session-tool-btn {
-    background: var(--surface);
-    border: 1px solid var(--border);
-    color: var(--text-2);
-    border-radius: 10px;
-    padding: 10px 8px;
-    font-family: inherit;
-    font-size: 11px;
-    font-weight: 600;
-    letter-spacing: 0.8px;
-    text-transform: uppercase;
-    cursor: pointer;
-    -webkit-appearance: none;
-  }
-
-  .home-tool-btn:active,
-  .session-tool-btn:active { background: var(--surface-2); }
-
-  .home-history {
-    padding: 4px 12px 10px;
-  }
-
-  .home-history-title {
-    font-size: 10px;
-    letter-spacing: 1.5px;
-    text-transform: uppercase;
-    color: var(--text-3);
-    font-weight: 700;
-    margin: 0 4px 8px;
-  }
-
-  .history-empty {
-    color: var(--text-4);
-    font-size: 12px;
-    padding: 12px 14px;
-    border: 1px dashed var(--border);
-    border-radius: 12px;
-    text-align: center;
-  }
-
-  .history-item {
-    background: var(--surface);
-    border: 1px solid var(--border);
-    border-radius: 12px;
-    padding: 12px 14px;
-    margin-bottom: 8px;
-  }
-
-  .history-item-top {
-    display: flex;
-    justify-content: space-between;
-    gap: 10px;
-    align-items: flex-start;
-  }
-
-  .history-item-title {
-    font-size: 14px;
-    font-weight: 700;
-    color: var(--text);
-  }
-
-  .history-item-date {
-    font-size: 11px;
-    color: var(--text-3);
-    white-space: nowrap;
-  }
-
-  .history-item-meta {
-    font-size: 12px;
-    color: var(--text-2);
-    margin-top: 4px;
-  }
-
-  .session-progress {
-    padding: 14px 20px 16px;
-    border-bottom: 1px solid var(--border);
-    background: var(--bg);
-  }
-
-  .progress-row {
-    display: flex;
-    justify-content: space-between;
-    align-items: center;
-    gap: 12px;
-    margin-bottom: 8px;
-  }
-
-  .progress-label {
-    font-size: 10px;
-    letter-spacing: 1.5px;
-    text-transform: uppercase;
-    color: var(--text-3);
-    font-weight: 700;
-  }
-
-  .progress-count {
-    font-family: 'Bebas Neue', sans-serif;
-    font-size: 20px;
-    line-height: 1;
-    color: var(--accent-color);
-    letter-spacing: 0.5px;
-  }
-
-  .progress-track {
-    height: 7px;
-    border-radius: 999px;
-    background: var(--surface-2);
-    overflow: hidden;
-    border: 1px solid var(--border);
-  }
-
-  .progress-fill {
-    width: 0%;
-    height: 100%;
-    background: var(--accent-color);
-    border-radius: 999px;
-    transition: width 0.2s ease;
-  }
-
-  .session-tools {
-    display: grid;
-    grid-template-columns: 1fr 1fr;
-    gap: 8px;
-    margin-top: 12px;
-  }
-
-  .session-tool-btn.primary {
-    background: var(--accent-color);
-    border-color: var(--accent-color);
-    color: #fff;
-  }
-
-  .ex.done {
-    border-color: color-mix(in srgb, var(--accent-color) 45%, var(--border));
-  }
-
-  .ex.done .ex-name {
-    color: var(--text-2);
-  }
-
-  .ex-check-wrap {
-    flex-shrink: 0;
-    display: flex;
-    align-items: center;
-    justify-content: center;
-  }
-
-  .ex-check {
-    width: 24px;
-    height: 24px;
-    border-radius: 7px;
-    border: 1px solid var(--border);
-    background: var(--bg);
-    color: var(--accent-color);
-    cursor: pointer;
-    accent-color: var(--accent-color);
-  }
-
-  .finish-backdrop {
-    position: fixed;
-    inset: 0;
-    background: rgba(0,0,0,0.65);
-    z-index: 120;
-    display: none;
-    align-items: flex-end;
-    justify-content: center;
-    padding: 20px;
-    padding-bottom: calc(20px + var(--safe-bottom));
-  }
-
-  .finish-backdrop.active { display: flex; }
-
-  .finish-panel {
-    width: 100%;
-    max-width: 420px;
-    background: var(--bg);
-    border: 1px solid var(--border);
-    border-radius: 16px;
-    padding: 20px;
-  }
-
-  .finish-title {
-    font-family: 'Bebas Neue', sans-serif;
-    font-size: 28px;
-    color: var(--text);
-    letter-spacing: 0.5px;
-    line-height: 1;
-  }
-
-  .finish-summary {
-    margin-top: 12px;
-    color: var(--text-2);
-    font-size: 13px;
-    line-height: 1.6;
-  }
-
-  .finish-textarea {
-    width: 100%;
-    min-height: 80px;
-    resize: vertical;
-    background: var(--surface);
-    color: var(--text);
-    border: 1px solid var(--border);
-    border-radius: 10px;
-    padding: 10px 12px;
-    margin-top: 12px;
-    font-family: inherit;
-    font-size: 13px;
-    outline: none;
-  }
-
-  .finish-actions {
-    display: flex;
-    gap: 8px;
-    margin-top: 14px;
-  }
-
-  .finish-btn {
-    flex: 1;
-    border: 1px solid var(--border);
-    background: var(--surface);
-    color: var(--text);
-    border-radius: 10px;
-    padding: 12px;
-    font-family: inherit;
-    font-size: 13px;
-    font-weight: 600;
-    cursor: pointer;
-  }
-
-  .finish-btn.primary {
-    background: var(--accent-color);
-    color: #fff;
-    border-color: var(--accent-color);
-  }
-
-  @media (max-width: 420px) {
-    .home-tools { grid-template-columns: 1fr; }
-  }
-
 </style>
 </head>
 <body class="view-home">
@@ -1436,11 +1267,10 @@
     <div class="home-tools">
       <button class="home-tool-btn" id="btn-export">Exporter</button>
       <button class="home-tool-btn" id="btn-import">Importer</button>
-      <button class="home-tool-btn" id="btn-reset-data">Réinitialiser</button>
+      <button class="home-tool-btn danger" id="btn-reset-data">Réinitialiser</button>
     </div>
-    <div class="home-history" id="home-history"></div>
     <input type="file" id="import-file" accept="application/json" hidden>
-    <div class="home-version">v1.6 · 18 mai 2026</div>
+    <div class="home-version">v1.7 · 18 mai 2026</div>
   </section>
 
   <section class="view" id="view-session">
@@ -1466,18 +1296,6 @@
       <button class="edit-btn danger" id="edit-delete">Supprimer</button>
       <button class="edit-btn" id="edit-cancel">Annuler</button>
       <button class="edit-btn primary" id="edit-save">Enregistrer</button>
-    </div>
-  </div>
-</div>
-
-<div class="finish-backdrop" id="finish-backdrop">
-  <div class="finish-panel">
-    <div class="finish-title">Séance terminée</div>
-    <div class="finish-summary" id="finish-summary"></div>
-    <textarea class="finish-textarea" id="finish-note" placeholder="Ressenti global, énergie, douleurs, points à retenir…"></textarea>
-    <div class="finish-actions">
-      <button class="finish-btn" id="finish-cancel">Annuler</button>
-      <button class="finish-btn primary" id="finish-save">Enregistrer</button>
     </div>
   </div>
 </div>
@@ -1518,7 +1336,6 @@ function renderHome() {
   container.querySelectorAll('.session-card').forEach(c => {
     c.addEventListener('click', () => openSession(c.dataset.session));
   });
-  renderRecentHistory();
 }
 
 // ═══ RENDER SESSION ═══
@@ -1558,17 +1375,6 @@ function openSession(key, updateHistory = true) {
       <h1>${escape(s.title)}</h1>
       <div class="session-pills">${pills}</div>
     </div>
-    <div class="session-progress">
-      <div class="progress-row">
-        <div class="progress-label">Progression de la séance</div>
-        <div class="progress-count" id="progress-count">0/0</div>
-      </div>
-      <div class="progress-track"><div class="progress-fill" id="progress-fill"></div></div>
-      <div class="session-tools">
-        <button class="session-tool-btn" id="btn-reset-session">Réinitialiser</button>
-        <button class="session-tool-btn primary" id="btn-finish-session">Terminer</button>
-      </div>
-    </div>
     <nav class="bloc-nav" id="bloc-nav">${blocNav}</nav>
     <div id="bloc-list">${blocs}</div>
   `;
@@ -1576,8 +1382,8 @@ function openSession(key, updateHistory = true) {
   // Bind exercise toggles
   document.querySelectorAll('.ex-head').forEach(h => {
     h.addEventListener('click', (e) => {
-      // don't toggle when interacting with form controls
-      if (e.target.closest('textarea, input, button, .ex-check-wrap')) return;
+      // don't toggle if clicking inside textarea or clear button
+      if (e.target.tagName === 'TEXTAREA' || e.target.classList.contains('ex-note-clear')) return;
       h.closest('.ex').classList.toggle('open');
     });
   });
@@ -1599,9 +1405,6 @@ function openSession(key, updateHistory = true) {
   bindCharges();
   restoreCharges();
   bindRestTimers();
-  bindDoneChecks();
-  restoreDoneChecks();
-  bindSessionTools();
   trackBlocScroll();
 
   // Scroll to top
@@ -1835,13 +1638,22 @@ function renderEx(ex, num, inSuperset, sessionKey, blocIdx, exIdx) {
   const noteKey = `note:${sessionKey}:${blocIdx}:${exIdx}`;
   const chargeKey = `charge:${sessionKey}:${blocIdx}:${exIdx}`;
   const chargeHistKey = `chargeHist:${sessionKey}:${blocIdx}:${exIdx}`;
-  const doneKey = `done:${sessionKey}:${blocIdx}:${exIdx}`;
 
   // Only show charge tracker if the exercise has a "Charge" stat (skip pure bodyweight)
   const hasCharge = stats['Charge'] && !/poids.{0,5}corps/i.test(stats['Charge']);
 
   const chargeBlock = hasCharge ? `
     <div class="ex-charge">
+      <div class="charge-insight" data-charge-insight="${chargeHistKey}" data-target-charge="${escape(stats['Charge'])}">
+        <div class="charge-insight-row">
+          <span class="charge-insight-label">Dernière</span>
+          <span class="charge-insight-value" data-last-charge="${chargeHistKey}">—</span>
+        </div>
+        <div class="charge-insight-row">
+          <span class="charge-insight-label">Suggestion</span>
+          <span class="charge-insight-value suggestion" data-suggest-charge="${chargeHistKey}">Objectif programme : ${escape(stats['Charge'])}</span>
+        </div>
+      </div>
       <div class="ex-charge-row">
         <div class="ex-charge-label">Charge</div>
         <input type="text" inputmode="decimal" class="ex-charge-input" placeholder="${escape(stats['Charge'])}" data-charge="${chargeKey}" data-hist="${chargeHistKey}">
@@ -1852,11 +1664,8 @@ function renderEx(ex, num, inSuperset, sessionKey, blocIdx, exIdx) {
   ` : '';
 
   return `
-    <div class="ex" data-note-key="${noteKey}" data-done-key="${doneKey}">
+    <div class="ex" data-note-key="${noteKey}">
       <div class="ex-head">
-        <label class="ex-check-wrap" aria-label="Marquer comme fait">
-          <input type="checkbox" class="ex-check" data-done="${doneKey}">
-        </label>
         <div class="ex-num">${escape(String(num))}</div>
         <div class="ex-head-text">
           <div class="ex-name">${escape(ex.name)}</div>
@@ -1924,170 +1733,13 @@ function restoreNotes() {
 }
 
 
-
-// ═══ SESSION PROGRESS / DONE CHECKS ═══
-function bindDoneChecks() {
-  document.querySelectorAll('.ex-check').forEach(cb => {
-    cb.addEventListener('click', e => e.stopPropagation());
-    cb.addEventListener('change', () => {
-      const key = cb.dataset.done;
-      const ex = cb.closest('.ex');
-      try {
-        if (cb.checked) localStorage.setItem(key, '1');
-        else localStorage.removeItem(key);
-      } catch(e) {}
-      if (ex) ex.classList.toggle('done', cb.checked);
-      updateSessionProgress();
-    });
-  });
-}
-
-function restoreDoneChecks() {
-  document.querySelectorAll('.ex-check').forEach(cb => {
-    let checked = false;
-    try { checked = localStorage.getItem(cb.dataset.done) === '1'; } catch(e) {}
-    cb.checked = checked;
-    const ex = cb.closest('.ex');
-    if (ex) ex.classList.toggle('done', checked);
-  });
-  updateSessionProgress();
-}
-
-function updateSessionProgress() {
-  const boxes = Array.from(document.querySelectorAll('.ex-check'));
-  const total = boxes.length;
-  const done = boxes.filter(cb => cb.checked).length;
-  const pct = total ? Math.round((done / total) * 100) : 0;
-  const countEl = document.getElementById('progress-count');
-  const fillEl = document.getElementById('progress-fill');
-  if (countEl) countEl.textContent = `${done}/${total}`;
-  if (fillEl) fillEl.style.width = `${pct}%`;
-}
-
-function bindSessionTools() {
-  const resetBtn = document.getElementById('btn-reset-session');
-  const finishBtn = document.getElementById('btn-finish-session');
-  if (resetBtn) {
-    resetBtn.addEventListener('click', () => {
-      if (!confirm('Réinitialiser les cases cochées de cette séance ?')) return;
-      document.querySelectorAll('.ex-check').forEach(cb => {
-        cb.checked = false;
-        try { localStorage.removeItem(cb.dataset.done); } catch(e) {}
-        const ex = cb.closest('.ex');
-        if (ex) ex.classList.remove('done');
-      });
-      updateSessionProgress();
-    });
-  }
-  if (finishBtn) finishBtn.addEventListener('click', openFinishDialog);
-}
-
-function collectSessionData() {
-  const boxes = Array.from(document.querySelectorAll('.ex-check'));
-  const total = boxes.length;
-  const done = boxes.filter(cb => cb.checked).length;
-  const charges = [];
-  document.querySelectorAll('[data-charge]').forEach(input => {
-    const val = input.value.trim();
-    if (!val) return;
-    const ex = input.closest('.ex');
-    const name = ex ? ex.querySelector('.ex-name')?.textContent.trim() : 'Exercice';
-    charges.push({ name, value: val });
-  });
-  const notes = [];
-  document.querySelectorAll('textarea[data-note]').forEach(ta => {
-    const val = ta.value.trim();
-    if (!val) return;
-    const ex = ta.closest('.ex');
-    const name = ex ? ex.querySelector('.ex-name')?.textContent.trim() : 'Exercice';
-    notes.push({ name, value: val });
-  });
-  return { total, done, charges, notes };
-}
-
-function openFinishDialog() {
-  const backdrop = document.getElementById('finish-backdrop');
-  const summary = document.getElementById('finish-summary');
-  const note = document.getElementById('finish-note');
-  if (!backdrop || !summary || !note) return;
-  const s = sessions[currentSessionKey];
-  const data = collectSessionData();
-  summary.innerHTML = `
-    <strong>${escape(s.title)}</strong><br>
-    Exercices faits : ${data.done}/${data.total}<br>
-    Charges renseignées : ${data.charges.length}<br>
-    Notes d'exercices : ${data.notes.length}
-  `;
-  note.value = '';
-  backdrop.classList.add('active');
-  setTimeout(() => note.focus(), 50);
-}
-
-function closeFinishDialog() {
-  const backdrop = document.getElementById('finish-backdrop');
-  if (backdrop) backdrop.classList.remove('active');
-}
-
-function saveFinishedSession() {
-  const note = document.getElementById('finish-note');
-  const data = collectSessionData();
-  const s = sessions[currentSessionKey];
-  const entry = {
-    id: Date.now(),
-    date: new Date().toISOString(),
-    sessionKey: currentSessionKey,
-    title: s ? s.title : currentSessionKey,
-    done: data.done,
-    total: data.total,
-    charges: data.charges.slice(0, 20),
-    notesCount: data.notes.length,
-    globalNote: note ? note.value.trim() : ''
-  };
-  let hist = [];
-  try { hist = JSON.parse(localStorage.getItem('sessionHistory') || '[]'); } catch(e) {}
-  hist.push(entry);
-  hist = hist.slice(-30);
-  try { localStorage.setItem('sessionHistory', JSON.stringify(hist)); } catch(e) {}
-  closeFinishDialog();
-  renderRecentHistory();
-  alert('Séance enregistrée dans l’historique.');
-}
-
-function renderRecentHistory() {
-  const container = document.getElementById('home-history');
-  if (!container) return;
-  let hist = [];
-  try { hist = JSON.parse(localStorage.getItem('sessionHistory') || '[]'); } catch(e) {}
-  const recent = hist.slice(-5).reverse();
-  if (!recent.length) {
-    container.innerHTML = `
-      <div class="home-history-title">Historique récent</div>
-      <div class="history-empty">Aucune séance enregistrée pour le moment.</div>
-    `;
-    return;
-  }
-  container.innerHTML = `
-    <div class="home-history-title">Historique récent</div>
-    ${recent.map(h => `
-      <div class="history-item">
-        <div class="history-item-top">
-          <div class="history-item-title">${escape(h.title)}</div>
-          <div class="history-item-date">${escape(formatDate(h.date))}</div>
-        </div>
-        <div class="history-item-meta">${h.done}/${h.total} exercices · ${h.charges?.length || 0} charges · ${h.notesCount || 0} notes</div>
-        ${h.globalNote ? `<div class="history-item-meta">“${escape(h.globalNote)}”</div>` : ''}
-      </div>
-    `).join('')}
-  `;
-}
-
 // ═══ EXPORT / IMPORT / RESET ═══
 function getTrainingStorageData() {
   const data = {};
   try {
     for (let i = 0; i < localStorage.length; i++) {
       const key = localStorage.key(i);
-      if (/^(note:|charge:|chargeHist:|done:|sessionHistory$|theme$)/.test(key)) {
+      if (/^(note:|charge:|chargeHist:|theme$)/.test(key)) {
         data[key] = localStorage.getItem(key);
       }
     }
@@ -2098,7 +1750,7 @@ function getTrainingStorageData() {
 function exportTrainingData() {
   const payload = {
     app: 'training-programme',
-    version: '1.6',
+    version: '1.7',
     exportedAt: new Date().toISOString(),
     data: getTrainingStorageData()
   };
@@ -2121,7 +1773,7 @@ function importTrainingData(file) {
       const payload = JSON.parse(reader.result);
       const data = payload.data || payload;
       Object.keys(data).forEach(key => {
-        if (/^(note:|charge:|chargeHist:|done:|sessionHistory$|theme$)/.test(key)) {
+        if (/^(note:|charge:|chargeHist:|theme$)/.test(key)) {
           localStorage.setItem(key, data[key]);
         }
       });
@@ -2135,10 +1787,10 @@ function importTrainingData(file) {
 }
 
 function resetTrainingData() {
-  if (!confirm('Supprimer toutes les notes, charges, cases cochées et historiques ?')) return;
+  if (!confirm('Supprimer toutes les notes et charges enregistrées ?')) return;
   try {
     Object.keys(localStorage).forEach(key => {
-      if (/^(note:|charge:|chargeHist:|done:|sessionHistory$)/.test(key)) {
+      if (/^(note:|charge:|chargeHist:)/.test(key)) {
         localStorage.removeItem(key);
       }
     });
@@ -2159,7 +1811,57 @@ function formatDate(d) {
   return then.toLocaleDateString('fr-FR', { day: 'numeric', month: 'short' });
 }
 
+
+function parseChargeNumber(value) {
+  if (!value) return null;
+  const s = String(value).replace(',', '.');
+  const matches = s.match(/\d+(?:\.\d+)?/g);
+  if (!matches || !matches.length) return null;
+  // If format is "16-22" or "16–22", use the highest number as target.
+  return parseFloat(matches[matches.length - 1]);
+}
+
+function inferChargeStep(value, target) {
+  const s = String(value || target || '').toLowerCase();
+  if (s.includes('haltère') || s.includes('×2') || s.includes('x2') || s.includes('/main')) return 1;
+  if (s.includes('kg')) return 2.5;
+  return 1;
+}
+
+function formatChargeNumber(n) {
+  if (!Number.isFinite(n)) return '';
+  const rounded = Math.round(n * 10) / 10;
+  return String(rounded).replace('.', ',');
+}
+
+function suggestNextCharge(lastValue, targetValue) {
+  const last = parseChargeNumber(lastValue);
+  if (last == null) return targetValue ? `Objectif programme : ${targetValue}` : '—';
+  const step = inferChargeStep(lastValue, targetValue);
+  const suggested = last + step;
+  return `Tente ${formatChargeNumber(suggested)} kg`;
+}
+
+function renderChargeInsight(histKey) {
+  const lastEl = document.querySelector(`[data-last-charge="${histKey}"]`);
+  const suggestEl = document.querySelector(`[data-suggest-charge="${histKey}"]`);
+  const insightEl = document.querySelector(`[data-charge-insight="${histKey}"]`);
+  if (!lastEl || !suggestEl || !insightEl) return;
+  const target = insightEl.dataset.targetCharge || '';
+  let hist = [];
+  try { hist = JSON.parse(localStorage.getItem(histKey) || '[]'); } catch(e) {}
+  const latest = hist[hist.length - 1];
+  if (!latest) {
+    lastEl.textContent = 'Aucune charge enregistrée';
+    suggestEl.textContent = target ? `Objectif programme : ${target}` : '—';
+    return;
+  }
+  lastEl.textContent = `${latest.v} · ${formatDate(latest.d)}`;
+  suggestEl.textContent = suggestNextCharge(latest.v, target);
+}
+
 function renderChargeHistory(histKey) {
+  renderChargeInsight(histKey);
   const displayEl = document.querySelector(`[data-charge-hist-display="${histKey}"]`);
   if (!displayEl) return;
   let hist = [];
@@ -2443,18 +2145,6 @@ timerClose.addEventListener('click', () => {
   document.body.classList.remove('timer-active');
 });
 
-
-
-const finishBackdrop = document.getElementById('finish-backdrop');
-const finishCancel = document.getElementById('finish-cancel');
-const finishSave = document.getElementById('finish-save');
-if (finishCancel) finishCancel.addEventListener('click', closeFinishDialog);
-if (finishSave) finishSave.addEventListener('click', saveFinishedSession);
-if (finishBackdrop) {
-  finishBackdrop.addEventListener('click', e => {
-    if (e.target === finishBackdrop) closeFinishDialog();
-  });
-}
 
 const exportBtn = document.getElementById('btn-export');
 const importBtn = document.getElementById('btn-import');
