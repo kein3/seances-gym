@@ -1889,6 +1889,40 @@
     to { opacity: 1; }
   }
 
+  /* Tabata : barre de progression continue (plus de sauts) */
+  .tabata-progress-fill { transition: width 0.25s linear; }
+
+  /* Tabata : tick du compte à rebours à chaque seconde */
+  .tabata-count.tick { animation: countTick 0.35s cubic-bezier(0.32, 0.72, 0, 1); }
+
+  @keyframes countTick {
+    from { transform: scale(1.12); opacity: 0.55; }
+    to { transform: scale(1); opacity: 1; }
+  }
+
+  /* Les 3 dernières secondes : le pulse reprend la main sur le tick */
+  .tabata-count.ending { animation: tabataPulse 0.5s ease-in-out infinite alternate; }
+
+  /* Tabata : label de phase + round qui glissent à chaque changement */
+  .tabata-phase.swap { animation: phaseSwap 0.4s cubic-bezier(0.32, 0.72, 0, 1); }
+  .tabata-round.swap { animation: phaseSwap 0.4s cubic-bezier(0.32, 0.72, 0, 1) 0.06s backwards; }
+
+  @keyframes phaseSwap {
+    from { opacity: 0; transform: translateY(14px); }
+    to { opacity: 1; transform: none; }
+  }
+
+  /* Tabata : pop du ✓ final */
+  .tabata-screen.phase-done .tabata-count {
+    animation: donePop 0.55s cubic-bezier(0.34, 1.56, 0.64, 1);
+  }
+
+  @keyframes donePop {
+    0% { transform: scale(0.4); opacity: 0; }
+    65% { transform: scale(1.12); opacity: 1; }
+    100% { transform: scale(1); }
+  }
+
   /* Micro-transitions sur les contrôles */
   .bloc-nav-btn { transition: background 0.2s ease, color 0.2s ease, border-color 0.2s ease; }
   .ex-head { transition: background 0.15s ease; }
@@ -1932,7 +1966,7 @@
       <button class="home-tool-btn danger" id="btn-reset-data">Réinitialiser</button>
     </div>
     <input type="file" id="import-file" accept="application/json" hidden>
-    <div class="home-version">v3.9 · animations · juin 2026</div>
+    <div class="home-version">v4.0 · animations · juin 2026</div>
   </section>
 
   <section class="view" id="view-session">
@@ -3272,6 +3306,15 @@ function tabataSetPhase(phase) {
   tabataRoundEl.textContent = phase === 'prep'
     ? `${tabataCfg.rounds} rounds à venir`
     : `Round ${tabataRun.round}/${tabataCfg.rounds}`;
+  // Slide-in du label et du round à chaque changement de phase
+  [tabataPhaseEl, tabataRoundEl].forEach(el => el.classList.remove('swap'));
+  void tabataPhaseEl.offsetWidth; // reflow pour relancer l'animation
+  [tabataPhaseEl, tabataRoundEl].forEach(el => el.classList.add('swap'));
+  // Reset de la barre sans animation inverse, puis reprise du glissement continu
+  tabataFillEl.style.transition = 'none';
+  tabataFillEl.style.width = '100%';
+  void tabataFillEl.offsetWidth;
+  tabataFillEl.style.transition = '';
   if (navigator.vibrate) navigator.vibrate(phase === 'work' ? 300 : 150);
   tabataRenderTick();
 }
@@ -3280,7 +3323,13 @@ function tabataRenderTick() {
   if (!tabataRun || tabataRun.phase === 'done') return;
   const msLeft = Math.max(0, tabataRun.endTime - Date.now());
   const remaining = Math.ceil(msLeft / 1000);
-  tabataCountEl.textContent = remaining;
+  const txt = String(remaining);
+  if (tabataCountEl.textContent !== txt) {
+    tabataCountEl.textContent = txt;
+    tabataCountEl.classList.remove('tick');
+    void tabataCountEl.offsetWidth; // reflow pour relancer l'animation à chaque seconde
+    tabataCountEl.classList.add('tick');
+  }
   tabataCountEl.classList.toggle('ending', remaining <= 3 && remaining > 0);
   tabataFillEl.style.width = `${Math.max(0, Math.min(1, msLeft / (tabataRun.dur * 1000))) * 100}%`;
 }
@@ -3318,8 +3367,3451 @@ function tabataFinish() {
   tabataScreen.classList.remove('phase-prep', 'phase-work', 'phase-rest', 'paused');
   tabataScreen.classList.add('phase-done');
   tabataPhaseEl.textContent = TABATA_LABELS.done;
+  [tabataPhaseEl, tabataRoundEl].forEach(el => el.classList.remove('swap'));
+  void tabataPhaseEl.offsetWidth;
+  [tabataPhaseEl, tabataRoundEl].forEach(el => el.classList.add('swap'));
   tabataCountEl.textContent = '✓';
-  tabataCountEl.classList.remove('ending');
+  tabataCountEl.classList.remove('ending', 'tick');
+  tabataFillEl.style.width = '100%';
+  tabataRoundEl.textContent = `${tabataCfg.rounds} rounds · ${formatMS(tabataTotalSeconds())}`;
+  tabataPauseBtn.textContent = 'Refaire';
+  tabataSkipBtn.style.display = 'none';
+  if (navigator.vibrate) navigator.vibrate([300, 150, 300, 150, 500]);
+}
+
+function tabataStop() {
+  if (tabataTimer) clearInterval(tabataTimer);
+  tabataTimer = null;
+  tabataRun = null;
+  tabataScreen.classList.remove('active', 'phase-prep', 'phase-work', 'phase-rest', 'phase-done', 'paused');
+  if (!document.body.classList.contains('view-session')) releaseWakeLock();
+}
+
+document.getElementById('tabata-start').addEventListener('click', () => {
+  saveTabataCfg();
+  tabataConfigEl.classList.remove('active');
+  tabataScreen.classList.add('active');
+  acquireWakeLock();
+  tabataLaunch();
+});
+
+document.getElementById('tabata-cancel').addEventListener('click', () => {
+  tabataConfigEl.classList.remove('active');
+});
+
+tabataConfigEl.addEventListener('click', e => {
+  if (e.target === tabataConfigEl) tabataConfigEl.classList.remove('active');
+});
+
+document.getElementById('tabata-close').addEventListener('click', tabataStop);
+
+tabataPauseBtn.addEventListener('click', () => {
+  if (!tabataRun) return;
+  if (tabataRun.phase === 'done') return tabataLaunch();
+  if (tabataRun.paused) {
+    tabataRun.endTime = Date.now() + tabataRun.pausedLeft;
+    tabataRun.paused = false;
+    tabataPauseBtn.textContent = 'Pause';
+    tabataScreen.classList.remove('paused');
+  } else {
+    tabataRun.pausedLeft = Math.max(0, tabataRun.endTime - Date.now());
+    tabataRun.paused = true;
+    tabataPauseBtn.textContent = 'Reprendre';
+    tabataScreen.classList.add('paused');
+  }
+});
+
+tabataSkipBtn.addEventListener('click', () => {
+  if (!tabataRun || tabataRun.phase === 'done') return;
+  if (tabataRun.paused) tabataPauseBtn.click(); // resume before skipping
+  tabataAdvance();
+});
+
+// ═══ INIT ═══
+try { history.replaceState({ view: 'home' }, '', window.location.pathname + window.location.search); } catch(e) {}
+renderHome();
+
+const initialKey = window.location.hash.replace('#', '');
+if (initialKey && sessions[initialKey]) {
+  openSession(initialKey, false);
+}
+</script>
+</body>
+</html>
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover, user-scalable=yes">
+<meta name="apple-mobile-web-app-capable" content="yes">
+<meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
+<meta name="apple-mobile-web-app-title" content="Training">
+<meta name="theme-color" content="#000000">
+<link rel="apple-touch-icon" sizes="180x180" href="apple-touch-icon.png">
+<link rel="icon" type="image/png" sizes="180x180" href="apple-touch-icon.png">
+<meta name="application-name" content="Training">
+<title>Training</title>
+<style>
+  :root, :root[data-theme="dark"] {
+    --bg: #000000;
+    --surface: #1c1c1e;
+    --surface-2: #2c2c2e;
+    --border: #38383a;
+    --text: #ffffff;
+    --text-2: #98989f;
+    --text-3: #636366;
+    --text-4: #48484a;
+    --warn-bg: rgba(245, 168, 74, 0.08);
+    --warn-border: rgba(245, 168, 74, 0.2);
+    --warn-text: #f5a84a;
+    --alt-bg: rgba(100, 170, 255, 0.05);
+    --alt-border: rgba(100, 170, 255, 0.15);
+    --alt-icon: #64aaff;
+    --accent: #c03a2b;
+    --safe-top: env(safe-area-inset-top, 0px);
+    --safe-bottom: env(safe-area-inset-bottom, 0px);
+  }
+
+  :root[data-theme="light"] {
+    --bg: #f2f2f7;
+    --surface: #ffffff;
+    --surface-2: #e9e9ee;
+    --border: #e2e2e7;
+    --text: #000000;
+    --text-2: #515154;
+    --text-3: #8e8e93;
+    --text-4: #c7c7cc;
+    --warn-bg: rgba(200, 110, 20, 0.08);
+    --warn-border: rgba(200, 110, 20, 0.25);
+    --warn-text: #a8540d;
+    --alt-bg: rgba(40, 100, 180, 0.05);
+    --alt-border: rgba(40, 100, 180, 0.2);
+    --alt-icon: #2d6bb3;
+  }
+
+  * { margin: 0; padding: 0; box-sizing: border-box; -webkit-tap-highlight-color: transparent; }
+
+  html, body {
+    background: var(--bg);
+    color: var(--text);
+    font-family: -apple-system, BlinkMacSystemFont, 'SF Pro Text', 'Segoe UI', sans-serif;
+    font-size: 15px;
+    line-height: 1.5;
+    -webkit-font-smoothing: antialiased;
+    overscroll-behavior: none;
+  }
+
+  body {
+    min-height: 100%;
+    -webkit-overflow-scrolling: touch;
+  }
+
+  /* ══ TOP BAR ══ */
+  .topbar {
+    position: sticky;
+    top: 0;
+    background: var(--bg);
+    border-bottom: 1px solid var(--border);
+    padding-top: var(--safe-top);
+    z-index: 10;
+  }
+
+  .topbar-row {
+    height: 52px;
+    display: flex;
+    align-items: center;
+    padding: 0 16px;
+    gap: 12px;
+  }
+
+  .btn-back {
+    width: 36px;
+    height: 36px;
+    border-radius: 50%;
+    background: var(--surface);
+    border: none;
+    color: var(--text-2);
+    cursor: pointer;
+    display: none;
+    align-items: center;
+    justify-content: center;
+    font-size: 18px;
+    flex-shrink: 0;
+  }
+
+  body.view-session .btn-back { display: flex; }
+
+  .topbar-title {
+    font-family: -apple-system, BlinkMacSystemFont, 'SF Pro Display', 'Segoe UI', sans-serif;
+    font-weight: 800;
+    font-size: 22px;
+    letter-spacing: 0.5px;
+    color: var(--text);
+    flex: 1;
+    overflow: hidden;
+    text-overflow: ellipsis;
+    white-space: nowrap;
+  }
+
+  .topbar-accent {
+    width: 8px;
+    height: 8px;
+    border-radius: 50%;
+    background: var(--accent-color, transparent);
+    flex-shrink: 0;
+    display: none;
+  }
+
+  body.view-session .topbar-accent { display: block; }
+
+  /* ══ MAIN ══ */
+  main {
+    padding-bottom: calc(24px + var(--safe-bottom));
+    transition: padding-bottom 0.3s;
+  }
+
+  body.timer-active main {
+    padding-bottom: calc(110px + var(--safe-bottom));
+  }
+
+  .view { display: none; }
+  .view.active { display: block; }
+
+  /* ══ HOME VIEW ══ */
+  .home-hero {
+    padding: 24px 20px 20px;
+  }
+
+  .home-version {
+    text-align: center;
+    padding: 32px 20px 20px;
+    font-size: 11px;
+    color: var(--text-4);
+    letter-spacing: 1.5px;
+    text-transform: uppercase;
+  }
+
+  .home-hero h1 {
+    font-family: -apple-system, BlinkMacSystemFont, 'SF Pro Display', 'Segoe UI', sans-serif;
+    font-weight: 800;
+    font-size: 56px;
+    line-height: 0.9;
+    letter-spacing: 0.5px;
+    color: var(--text);
+  }
+
+  .home-hero h1 em {
+    font-style: normal;
+    color: var(--accent);
+    display: block;
+  }
+
+  .home-hero p {
+    font-size: 12px;
+    letter-spacing: 2px;
+    text-transform: uppercase;
+    color: var(--text-3);
+    margin-top: 10px;
+  }
+
+  .home-sessions {
+    padding: 12px 12px 24px;
+    display: flex;
+    flex-direction: column;
+    gap: 8px;
+  }
+
+  .home-tools {
+    padding: 0 12px 18px;
+    display: grid;
+    grid-template-columns: repeat(4, 1fr);
+    gap: 8px;
+  }
+
+  .home-tool-btn, .session-tool-btn {
+    border: 1px solid var(--border);
+    background: var(--surface);
+    color: var(--text-2);
+    border-radius: 12px;
+    padding: 11px 10px;
+    font-family: inherit;
+    font-size: 12px;
+    font-weight: 700;
+    letter-spacing: 0.6px;
+    text-transform: uppercase;
+    cursor: pointer;
+    -webkit-appearance: none;
+  }
+
+  .home-tool-btn:active, .session-tool-btn:active { background: var(--surface-2); }
+  .home-tool-btn.danger { color: #d9534f; }
+  .home-tool-btn.active {
+    background: var(--accent);
+    border-color: var(--accent);
+    color: #fff;
+  }
+
+  .app-hint {
+    margin: 0 12px 14px;
+    padding: 12px 14px;
+    border: 1px solid var(--border);
+    border-radius: 14px;
+    background: var(--surface);
+    color: var(--text-3);
+    font-size: 12px;
+    line-height: 1.45;
+  }
+
+  @media (max-width: 420px) {
+    .home-tools { grid-template-columns: repeat(2, 1fr); }
+    .home-hero h1 { font-size: 50px; }
+    .session-card { padding: 16px 16px 14px; }
+    .ex-head { padding: 13px 14px; }
+  }
+
+  .session-card {
+    background: var(--surface);
+    border: 1px solid var(--border);
+    border-radius: 16px;
+    padding: 17px 18px 15px;
+    cursor: pointer;
+    transition: background 0.12s, transform 0.12s;
+    position: relative;
+    overflow: hidden;
+  }
+
+  .session-card:active {
+    background: var(--surface-2);
+    transform: scale(0.995);
+  }
+
+  .session-card::before {
+    content: '';
+    position: absolute;
+    left: 0; top: 0; bottom: 0;
+    width: 3px;
+    background: var(--accent-color, var(--accent));
+  }
+
+  .session-card-name {
+    font-family: -apple-system, BlinkMacSystemFont, 'SF Pro Display', 'Segoe UI', sans-serif;
+    font-weight: 800;
+    font-size: 26px;
+    letter-spacing: 0.5px;
+    line-height: 1;
+    color: var(--text);
+    margin-bottom: 6px;
+  }
+
+  .session-card-meta {
+    font-size: 12px;
+    color: var(--text-3);
+    display: flex;
+    flex-wrap: wrap;
+    gap: 4px 10px;
+  }
+
+  .session-card-meta span {
+    white-space: nowrap;
+  }
+
+  .session-card-arrow {
+    position: absolute;
+    right: 18px;
+    top: 50%;
+    transform: translateY(-50%);
+    color: var(--text-4);
+    font-size: 22px;
+  }
+
+  /* ══ SESSION VIEW ══ */
+  .session-hero {
+    padding: 20px 20px 24px;
+    border-bottom: 1px solid var(--border);
+    position: relative;
+    overflow: hidden;
+  }
+
+  .session-hero::after {
+    content: '';
+    position: absolute;
+    left: 0; right: 0; bottom: 0;
+    height: 2px;
+    background: var(--accent-color);
+  }
+
+  .session-hero h1 {
+    font-family: -apple-system, BlinkMacSystemFont, 'SF Pro Display', 'Segoe UI', sans-serif;
+    font-weight: 800;
+    font-size: 42px;
+    letter-spacing: 0.5px;
+    line-height: 0.95;
+    color: var(--text);
+  }
+
+  .session-pills {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 6px;
+    margin-top: 14px;
+  }
+
+  .session-pill {
+    font-size: 11px;
+    color: var(--text-2);
+    background: var(--surface);
+    border: 1px solid var(--border);
+    padding: 4px 10px;
+    border-radius: 999px;
+    letter-spacing: 0.3px;
+  }
+
+  .session-pill.primary {
+    color: var(--accent-color);
+    border-color: color-mix(in srgb, var(--accent-color) 40%, transparent);
+    background: color-mix(in srgb, var(--accent-color) 12%, transparent);
+  }
+
+  /* ══ BLOC ══ */
+  .bloc {
+    padding: 28px 20px 0;
+  }
+
+  .bloc-header {
+    margin-bottom: 14px;
+    display: flex;
+    align-items: flex-start;
+    gap: 12px;
+  }
+
+  .bloc-num {
+    font-family: -apple-system, BlinkMacSystemFont, 'SF Pro Display', 'Segoe UI', sans-serif;
+    font-weight: 800;
+    font-size: 42px;
+    line-height: 0.85;
+    color: var(--accent-color);
+    letter-spacing: 0.5px;
+    flex-shrink: 0;
+  }
+
+  .bloc-title-group {
+    flex: 1;
+    padding-top: 4px;
+    min-width: 0;
+  }
+
+  .bloc-name {
+    font-family: -apple-system, BlinkMacSystemFont, 'SF Pro Display', 'Segoe UI', sans-serif;
+    font-weight: 800;
+    font-size: 22px;
+    letter-spacing: 0.5px;
+    color: var(--text);
+    line-height: 1.1;
+  }
+
+  .bloc-sub {
+    font-size: 12px;
+    color: var(--text-3);
+    margin-top: 3px;
+  }
+
+  .bloc-duration {
+    display: inline-block;
+    font-size: 11px;
+    color: var(--text-2);
+    background: var(--surface);
+    border: 1px solid var(--border);
+    padding: 3px 8px;
+    border-radius: 6px;
+    margin-top: 6px;
+    font-variant-numeric: tabular-nums;
+  }
+
+  /* ══ EXERCISE CARD ══ */
+  .ex {
+    background: var(--surface);
+    border: 1px solid var(--border);
+    border-radius: 14px;
+    margin-bottom: 10px;
+    overflow: hidden;
+  }
+
+  .ex-head {
+    display: flex;
+    align-items: center;
+    padding: 14px 16px;
+    gap: 12px;
+    cursor: pointer;
+    user-select: none;
+  }
+
+  .ex-head:active { background: var(--surface-2); }
+
+  .ex-num {
+    font-family: -apple-system, BlinkMacSystemFont, 'SF Pro Display', 'Segoe UI', sans-serif;
+    font-weight: 800;
+    font-size: 20px;
+    color: var(--accent-color);
+    font-weight: 400;
+    min-width: 24px;
+    flex-shrink: 0;
+    letter-spacing: 0.5px;
+  }
+
+  .ex-head-text {
+    flex: 1;
+    min-width: 0;
+  }
+
+  .ex-name {
+    font-size: 15px;
+    font-weight: 600;
+    color: var(--text);
+    line-height: 1.25;
+  }
+
+  .ex-sub {
+    font-size: 11px;
+    color: var(--text-3);
+    margin-top: 2px;
+    line-height: 1.3;
+  }
+
+  .ex-chevron {
+    color: var(--text-4);
+    font-size: 14px;
+    transition: transform 0.2s;
+    flex-shrink: 0;
+  }
+
+  .ex.open .ex-chevron { transform: rotate(90deg); }
+
+  /* Stats — always visible. Flex-based so the last row always fills the width */
+  .ex-stats {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 1px;
+    background: var(--border);
+    border-top: 1px solid var(--border);
+  }
+
+  .stat {
+    background: var(--surface);
+    padding: 10px 8px 11px;
+    text-align: center;
+    flex: 1 1 0;
+    min-width: 0;
+  }
+
+  /* 5 stats: 3 on top row, 2 on bottom. Force 33% on top 3, 50% on bottom 2 */
+  .ex-stats.cols-5 .stat { flex-basis: calc(33.333% - 1px); }
+  .ex-stats.cols-5 .stat:nth-child(n+4) { flex-basis: calc(50% - 1px); }
+
+  /* 6 stats: 3+3 */
+  .ex-stats.cols-6 .stat { flex-basis: calc(33.333% - 1px); }
+
+  /* 4 stats: 2+2 on narrow screens, 4 on wider */
+  .ex-stats.cols-4 .stat { flex-basis: calc(25% - 1px); }
+
+  /* 3 stats: 3 columns */
+  .ex-stats.cols-3 .stat { flex-basis: calc(33.333% - 1px); }
+
+  /* 2 stats: half-half */
+  .ex-stats.cols-2 .stat { flex-basis: calc(50% - 1px); }
+
+  /* 1 stat: full width */
+  .ex-stats.cols-1 .stat { flex-basis: 100%; }
+
+  @media (max-width: 400px) {
+    .ex-stats.cols-4 .stat { flex-basis: calc(50% - 1px); }
+    .ex-stats.cols-5 .stat { flex-basis: calc(33.333% - 1px); }
+    .ex-stats.cols-5 .stat:nth-child(n+4) { flex-basis: calc(50% - 1px); }
+  }
+
+  .stat-label {
+    font-size: 9px;
+    letter-spacing: 1.2px;
+    text-transform: uppercase;
+    color: var(--text-3);
+    margin-bottom: 2px;
+  }
+
+  .stat-value {
+    font-family: -apple-system, BlinkMacSystemFont, 'SF Pro Display', 'Segoe UI', sans-serif;
+    font-weight: 800;
+    font-size: 20px;
+    line-height: 1;
+    color: var(--text);
+    font-variant-numeric: tabular-nums;
+    letter-spacing: 0.3px;
+  }
+
+  .stat.rest .stat-value { color: var(--accent-color); }
+
+  /* Details — collapsible, animated via grid-template-rows */
+  .ex-details {
+    display: grid;
+    grid-template-rows: 0fr;
+    opacity: 0;
+    padding: 0 16px;
+    border-top: 0 solid var(--border);
+    background: var(--surface-2);
+    transition: grid-template-rows 0.32s cubic-bezier(0.32, 0.72, 0, 1),
+                opacity 0.25s ease,
+                padding 0.32s cubic-bezier(0.32, 0.72, 0, 1),
+                border-top-width 0.32s ease;
+  }
+
+  .ex-details-inner {
+    overflow: hidden;
+    min-height: 0;
+  }
+
+  .ex.open .ex-details {
+    grid-template-rows: 1fr;
+    opacity: 1;
+    padding: 14px 16px 16px;
+    border-top-width: 1px;
+  }
+
+  .detail-label {
+    font-size: 10px;
+    letter-spacing: 1.5px;
+    text-transform: uppercase;
+    color: var(--text-3);
+    font-weight: 600;
+    margin-bottom: 4px;
+  }
+
+  .detail-text {
+    font-size: 13px;
+    color: var(--text-2);
+    line-height: 1.55;
+  }
+
+  .detail-block + .detail-block {
+    margin-top: 14px;
+  }
+
+  .detail-warn {
+    display: flex;
+    gap: 8px;
+    font-size: 12.5px;
+    color: var(--warn-text);
+    line-height: 1.5;
+    padding: 10px 12px;
+    background: var(--warn-bg);
+    border: 1px solid var(--warn-border);
+    border-radius: 8px;
+    margin-top: 12px;
+  }
+
+  .detail-warn::before {
+    content: '⚠';
+    flex-shrink: 0;
+  }
+
+  .detail-alt {
+    display: flex;
+    gap: 8px;
+    font-size: 12.5px;
+    color: var(--text-2);
+    line-height: 1.5;
+    padding: 10px 12px;
+    background: var(--alt-bg);
+    border: 1px solid var(--alt-border);
+    border-radius: 8px;
+    margin-top: 12px;
+  }
+
+  .detail-alt::before {
+    content: '↻';
+    flex-shrink: 0;
+    color: var(--alt-icon);
+    font-size: 14px;
+  }
+
+  .detail-alt strong {
+    color: var(--text);
+    font-weight: 600;
+    display: block;
+    margin-bottom: 2px;
+  }
+
+  /* ══ SUPERSET ══ */
+  .superset {
+    margin-bottom: 10px;
+    background: var(--surface);
+    border: 1px solid var(--accent-color);
+    border-radius: 12px;
+    overflow: hidden;
+  }
+
+  .superset-banner {
+    padding: 8px 16px;
+    background: var(--accent-color);
+    color: #fff;
+    font-size: 11px;
+    font-weight: 700;
+    letter-spacing: 2px;
+    text-transform: uppercase;
+    text-align: center;
+  }
+
+  .superset-meta {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    gap: 10px;
+    padding: 10px 14px;
+    background: color-mix(in srgb, var(--accent-color) 10%, var(--surface));
+    border-bottom: 1px solid var(--border);
+    font-size: 12px;
+    color: var(--text-2);
+  }
+
+  .superset-rounds {
+    font-family: -apple-system, BlinkMacSystemFont, 'SF Pro Display', 'Segoe UI', sans-serif;
+    font-weight: 800;
+    font-size: 22px;
+    line-height: 1;
+    color: var(--accent-color);
+    letter-spacing: 0.6px;
+    white-space: nowrap;
+  }
+
+  .superset-sequence {
+    text-align: right;
+    font-size: 11px;
+    color: var(--text-3);
+    text-transform: uppercase;
+    letter-spacing: 0.8px;
+  }
+
+  .superset .ex {
+    border: none;
+    border-radius: 0;
+    margin-bottom: 0;
+    border-bottom: 1px solid var(--border);
+    background: var(--surface);
+  }
+
+  .superset .ex:last-of-type {
+    border-bottom: none;
+  }
+
+  .superset-footer {
+    padding: 10px 16px;
+    font-size: 12px;
+    color: var(--text-2);
+    border-top: 1px solid var(--border);
+    background: var(--surface-2);
+    text-align: center;
+  }
+
+
+
+  .superset-rest-card {
+    width: calc(100% - 24px);
+    margin: 10px 12px 12px;
+    padding: 12px 14px;
+    border: 1px solid color-mix(in srgb, var(--accent-color) 55%, var(--border));
+    border-radius: 12px;
+    background: color-mix(in srgb, var(--accent-color) 12%, var(--surface-2));
+    color: var(--text);
+    font-family: inherit;
+    cursor: pointer;
+    display: grid;
+    grid-template-columns: 1fr auto;
+    gap: 4px 12px;
+    align-items: center;
+    text-align: left;
+    -webkit-appearance: none;
+  }
+
+  .superset-rest-card:active {
+    transform: scale(0.99);
+    background: color-mix(in srgb, var(--accent-color) 20%, var(--surface-2));
+  }
+
+  .superset-rest-label {
+    font-size: 10px;
+    letter-spacing: 1.5px;
+    text-transform: uppercase;
+    color: var(--accent-color);
+    font-weight: 700;
+  }
+
+  .superset-rest-value {
+    font-size: 13px;
+    color: var(--text);
+    font-weight: 600;
+    line-height: 1.35;
+  }
+
+  .superset-rest-start {
+    grid-row: 1 / span 2;
+    grid-column: 2;
+    padding: 8px 12px;
+    border-radius: 999px;
+    background: var(--accent-color);
+    color: #fff;
+    font-size: 10px;
+    font-weight: 800;
+    letter-spacing: 0.8px;
+    text-transform: uppercase;
+    white-space: nowrap;
+  }
+
+  /* ══ HYROX SPECIFIC ══ */
+  .hyrox-round {
+    background: var(--surface);
+    border: 1px solid var(--border);
+    border-radius: 12px;
+    padding: 14px 16px;
+    margin-bottom: 10px;
+    display: grid;
+    grid-template-columns: 36px 1fr;
+    gap: 12px;
+  }
+
+  .round-num {
+    font-family: -apple-system, BlinkMacSystemFont, 'SF Pro Display', 'Segoe UI', sans-serif;
+    font-weight: 800;
+    font-size: 28px;
+    color: var(--accent-color);
+    line-height: 1;
+    align-self: start;
+  }
+
+  .round-body {
+    display: flex;
+    flex-direction: column;
+    gap: 10px;
+  }
+
+  .round-part {
+    display: flex;
+    align-items: flex-start;
+    gap: 10px;
+  }
+
+  .round-part-icon {
+    font-size: 18px;
+    flex-shrink: 0;
+    line-height: 1;
+    margin-top: 2px;
+  }
+
+  .round-part-info { flex: 1; min-width: 0; }
+
+  .round-part-label {
+    font-size: 11px;
+    letter-spacing: 1px;
+    text-transform: uppercase;
+    color: var(--text-3);
+    font-weight: 600;
+  }
+
+  .round-part-val {
+    font-size: 14px;
+    color: var(--text);
+    font-weight: 500;
+    margin-top: 1px;
+  }
+
+  .round-part-sub {
+    font-size: 12px;
+    color: var(--text-3);
+    margin-top: 3px;
+    line-height: 1.4;
+  }
+
+  .hyrox-note {
+    font-size: 12px;
+    color: var(--text-3);
+    line-height: 1.5;
+    padding: 12px 14px;
+    background: var(--surface);
+    border: 1px solid var(--border);
+    border-radius: 10px;
+    margin: 8px 0 12px;
+  }
+
+  .amrap-item {
+    display: grid;
+    grid-template-columns: 32px 1fr;
+    gap: 10px;
+    padding: 12px 14px;
+    background: var(--surface);
+    border: 1px solid var(--border);
+    border-radius: 10px;
+    margin-bottom: 8px;
+  }
+
+  .amrap-item + .amrap-item { margin-top: 0; }
+
+  .amrap-icon {
+    font-size: 18px;
+    line-height: 1.1;
+  }
+
+  .amrap-label {
+    font-size: 10px;
+    letter-spacing: 1px;
+    text-transform: uppercase;
+    color: var(--text-3);
+    font-weight: 600;
+  }
+
+  .amrap-val {
+    font-size: 14px;
+    color: var(--text);
+    font-weight: 500;
+    margin-top: 1px;
+  }
+
+  .amrap-sub {
+    font-size: 12px;
+    color: var(--text-3);
+    margin-top: 2px;
+  }
+
+  .amrap-note {
+    font-size: 13px;
+    color: var(--accent-color);
+    font-weight: 500;
+    margin-top: 8px;
+    padding: 10px 12px;
+    background: color-mix(in srgb, var(--accent-color) 8%, transparent);
+    border-radius: 8px;
+    text-align: center;
+  }
+
+  /* ══ THEME TOGGLE ══ */
+  .btn-theme {
+    width: 36px;
+    height: 36px;
+    border-radius: 50%;
+    background: var(--surface);
+    border: none;
+    color: var(--text-2);
+    cursor: pointer;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-size: 16px;
+    flex-shrink: 0;
+  }
+
+  .btn-theme:active { background: var(--surface-2); }
+
+  /* ══ BLOC NAV (sticky below topbar) ══ */
+  .bloc-nav {
+    position: sticky;
+    top: calc(52px + var(--safe-top));
+    z-index: 5;
+    background: var(--bg);
+    border-bottom: 1px solid var(--border);
+    padding: 8px 12px;
+    display: flex;
+    gap: 6px;
+    overflow-x: auto;
+    scrollbar-width: none;
+    -webkit-overflow-scrolling: touch;
+  }
+
+  .bloc-nav::-webkit-scrollbar { display: none; }
+
+  .bloc-nav-btn {
+    flex-shrink: 0;
+    min-width: 44px;
+    height: 40px;
+    padding: 0 12px;
+    background: var(--surface);
+    border: 1px solid var(--border);
+    border-radius: 10px;
+    color: var(--text-2);
+    font-family: -apple-system, BlinkMacSystemFont, 'SF Pro Display', 'Segoe UI', sans-serif;
+    font-weight: 800;
+    font-size: 16px;
+    letter-spacing: 0.5px;
+    cursor: pointer;
+    display: flex;
+    align-items: center;
+    gap: 6px;
+    white-space: nowrap;
+  }
+
+  .bloc-nav-btn .num {
+    color: var(--accent-color);
+    font-size: 18px;
+  }
+
+  .bloc-nav-btn.active {
+    background: var(--accent-color);
+    border-color: var(--accent-color);
+    color: #fff;
+  }
+
+  .bloc-nav-btn.active .num {
+    color: #fff;
+  }
+
+  .bloc {
+    scroll-margin-top: calc(52px + 56px + var(--safe-top));
+  }
+
+  /* ══ NOTES ══ */
+  .ex-note-indicator {
+    display: none;
+    width: 6px;
+    height: 6px;
+    border-radius: 50%;
+    background: var(--accent-color);
+    flex-shrink: 0;
+    margin-right: 2px;
+  }
+
+  .ex.has-note .ex-note-indicator { display: block; }
+
+  .ex-note {
+    border-top: 1px solid var(--border);
+    background: var(--surface-2);
+    padding: 12px 16px;
+  }
+
+  .ex-note-label {
+    font-size: 10px;
+    letter-spacing: 1.5px;
+    text-transform: uppercase;
+    color: var(--text-3);
+    font-weight: 600;
+    margin-bottom: 6px;
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+  }
+
+  .ex-note-clear {
+    background: none;
+    border: none;
+    color: var(--text-3);
+    font-size: 11px;
+    cursor: pointer;
+    letter-spacing: 0;
+    text-transform: none;
+    font-weight: 400;
+  }
+
+  .ex-note-clear:active { color: var(--text); }
+
+  .ex-note textarea {
+    width: 100%;
+    background: var(--bg);
+    border: 1px solid var(--border);
+    border-radius: 8px;
+    color: var(--text);
+    font-family: inherit;
+    font-size: 13px;
+    line-height: 1.5;
+    padding: 10px 12px;
+    resize: vertical;
+    min-height: 60px;
+    outline: none;
+    -webkit-appearance: none;
+  }
+
+  .ex-note textarea:focus {
+    border-color: var(--accent-color);
+  }
+
+  /* ══ REST TIMER BUTTON (inline in stats row) ══ */
+  .stat.rest {
+    cursor: pointer;
+    position: relative;
+    transition: background 0.12s;
+  }
+
+  .stat.rest:active { background: var(--surface-2); }
+
+  .stat.rest::after {
+    content: '▶';
+    position: absolute;
+    top: 4px;
+    right: 6px;
+    font-size: 8px;
+    color: var(--accent-color);
+    opacity: 0.6;
+  }
+
+
+  .stat.rest {
+    border: 1px solid color-mix(in srgb, var(--accent-color) 45%, var(--border));
+    background: color-mix(in srgb, var(--accent-color) 8%, var(--surface));
+  }
+
+  .rest-start-chip {
+    display: inline-block;
+    margin-top: 6px;
+    padding: 4px 8px;
+    border-radius: 999px;
+    background: var(--accent-color);
+    color: #fff;
+    font-size: 9px;
+    font-weight: 700;
+    letter-spacing: 0.7px;
+    text-transform: uppercase;
+    line-height: 1;
+  }
+
+  .superset-footer.timer-ready {
+    cursor: pointer;
+    color: #fff;
+    background: color-mix(in srgb, var(--accent-color) 80%, var(--surface-2));
+    border-top-color: var(--accent-color);
+    font-weight: 600;
+  }
+
+  .superset-footer.timer-ready::after {
+    content: '  ▶';
+    font-size: 10px;
+  }
+
+  /* ══ CHARGE TRACKER ══ */
+  .ex-charge {
+    border-top: 1px solid var(--border);
+    background: var(--surface-2);
+    padding: 12px 16px;
+  }
+
+  .ex-charge-row {
+    display: flex;
+    align-items: center;
+    gap: 10px;
+  }
+
+  .ex-charge-label {
+    font-size: 10px;
+    letter-spacing: 1.5px;
+    text-transform: uppercase;
+    color: var(--text-3);
+    font-weight: 600;
+    flex-shrink: 0;
+  }
+
+  .ex-charge-input {
+    flex: 1;
+    background: var(--bg);
+    border: 1px solid var(--border);
+    border-radius: 8px;
+    color: var(--text);
+    font-family: -apple-system, BlinkMacSystemFont, 'SF Pro Display', 'Segoe UI', sans-serif;
+    font-weight: 800;
+    font-size: 18px;
+    letter-spacing: 0.5px;
+    padding: 6px 12px;
+    outline: none;
+    -webkit-appearance: none;
+    text-align: center;
+    min-width: 0;
+  }
+
+  .ex-charge-input:focus { border-color: var(--accent-color); }
+
+  .ex-charge-input::placeholder {
+    color: var(--text-4);
+    font-family: inherit;
+  }
+
+  .ex-charge-use-last {
+    background: var(--surface);
+    border: 1px solid var(--border);
+    border-radius: 8px;
+    color: var(--text-2);
+    font-size: 11px;
+    font-weight: 700;
+    letter-spacing: 0.6px;
+    padding: 8px 10px;
+    text-transform: uppercase;
+    cursor: pointer;
+    flex-shrink: 0;
+  }
+
+  .ex-charge-use-last:active { background: var(--surface-2); }
+
+  .ex-charge-save {
+    background: var(--accent-color);
+    border: none;
+    border-radius: 8px;
+    color: #fff;
+    font-size: 11px;
+    font-weight: 600;
+    letter-spacing: 1px;
+    padding: 8px 14px;
+    text-transform: uppercase;
+    cursor: pointer;
+    flex-shrink: 0;
+  }
+
+  .ex-charge-save:active { opacity: 0.7; }
+
+  .ex-charge-save.saved {
+    background: var(--surface);
+    color: var(--text-3);
+    border: 1px solid var(--border);
+  }
+
+  .ex-charge-history {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 6px;
+    margin-top: 8px;
+  }
+
+  .ex-charge-history:empty { display: none; }
+
+
+  .charge-insight {
+    display: grid;
+    grid-template-columns: 1fr;
+    gap: 6px;
+    margin-bottom: 10px;
+    padding: 10px 12px;
+    border: 1px solid var(--border);
+    border-radius: 10px;
+    background: var(--bg);
+  }
+
+  .charge-insight-row {
+    display: flex;
+    justify-content: space-between;
+    align-items: baseline;
+    gap: 10px;
+    font-size: 12px;
+    color: var(--text-3);
+  }
+
+  .charge-insight-label {
+    text-transform: uppercase;
+    letter-spacing: 1px;
+    font-size: 9px;
+    font-weight: 700;
+    flex-shrink: 0;
+  }
+
+  .charge-insight-value {
+    color: var(--text-2);
+    text-align: right;
+    font-weight: 600;
+  }
+
+  .charge-insight-value.suggestion {
+    color: var(--accent-color);
+  }
+
+  .history-chip {
+    font-size: 11px;
+    color: var(--text-3);
+    background: var(--surface);
+    border: 1px solid var(--border);
+    padding: 3px 8px;
+    border-radius: 6px;
+    font-variant-numeric: tabular-nums;
+    cursor: pointer;
+    transition: border-color 0.12s, background 0.12s;
+    user-select: none;
+    -webkit-user-select: none;
+    position: relative;
+  }
+
+  .history-chip:active {
+    background: var(--surface-2);
+  }
+
+  .history-chip.editing {
+    border-color: var(--accent-color);
+    background: color-mix(in srgb, var(--accent-color) 10%, var(--surface));
+  }
+
+  .history-chip.deleting {
+    border-color: #d9534f;
+    background: color-mix(in srgb, #d9534f 15%, var(--surface));
+    color: #d9534f;
+  }
+
+  .history-chip.deleting strong { color: #d9534f; }
+
+  .history-chip strong {
+    color: var(--text-2);
+    font-weight: 600;
+  }
+
+  /* ══ EDIT DIALOG for charge history ══ */
+  .edit-backdrop {
+    position: fixed;
+    inset: 0;
+    background: rgba(0,0,0,0.6);
+    z-index: 100;
+    display: none;
+    align-items: flex-end;
+    justify-content: center;
+    padding: 20px;
+    padding-bottom: calc(20px + var(--safe-bottom));
+  }
+
+  .edit-backdrop.active { display: flex; }
+
+  .edit-panel {
+    background: var(--bg);
+    border: 1px solid var(--border);
+    border-radius: 16px;
+    padding: 20px;
+    width: 100%;
+    max-width: 380px;
+    display: flex;
+    flex-direction: column;
+    gap: 14px;
+  }
+
+  .edit-title {
+    font-family: -apple-system, BlinkMacSystemFont, 'SF Pro Display', 'Segoe UI', sans-serif;
+    font-weight: 800;
+    font-size: 20px;
+    color: var(--text);
+    letter-spacing: 0.5px;
+  }
+
+  .edit-sub {
+    font-size: 12px;
+    color: var(--text-3);
+    margin-top: -10px;
+  }
+
+  .edit-input {
+    width: 100%;
+    background: var(--surface);
+    border: 1px solid var(--border);
+    border-radius: 10px;
+    color: var(--text);
+    font-family: -apple-system, BlinkMacSystemFont, 'SF Pro Display', 'Segoe UI', sans-serif;
+    font-weight: 800;
+    font-size: 26px;
+    letter-spacing: 0.5px;
+    padding: 12px 16px;
+    outline: none;
+    -webkit-appearance: none;
+    text-align: center;
+  }
+
+  .edit-input:focus { border-color: var(--accent-color); }
+
+  .edit-actions {
+    display: flex;
+    gap: 8px;
+    margin-top: 4px;
+  }
+
+  .edit-btn {
+    flex: 1;
+    border: 1px solid var(--border);
+    background: var(--surface);
+    color: var(--text);
+    padding: 12px;
+    border-radius: 10px;
+    font-size: 13px;
+    font-weight: 500;
+    cursor: pointer;
+    -webkit-appearance: none;
+    font-family: inherit;
+  }
+
+  .edit-btn.primary {
+    background: var(--accent-color);
+    color: #fff;
+    border-color: var(--accent-color);
+  }
+
+  .edit-btn.danger {
+    color: #d9534f;
+    border-color: color-mix(in srgb, #d9534f 40%, var(--border));
+  }
+
+  .edit-btn:active { opacity: 0.7; }
+
+  .history-chip.latest strong {
+    color: var(--accent-color);
+  }
+
+  /* ══ TIMER OVERLAY ══ */
+  .timer-overlay {
+    position: fixed;
+    bottom: calc(16px + var(--safe-bottom));
+    left: 50%;
+    transform: translateX(-50%) translateY(200%);
+    transition: transform 0.3s cubic-bezier(0.2, 0.9, 0.3, 1), opacity 0.2s, visibility 0s 0.3s;
+    visibility: hidden;
+    opacity: 0;
+    z-index: 50;
+    background: var(--surface);
+    border: 1px solid var(--border);
+    border-radius: 16px;
+    padding: 14px 18px;
+    display: flex;
+    align-items: center;
+    gap: 14px;
+    box-shadow: 0 10px 40px rgba(0,0,0,0.4);
+    min-width: 260px;
+    max-width: calc(100% - 24px);
+    pointer-events: none;
+  }
+
+  .timer-overlay.active {
+    transform: translateX(-50%) translateY(0);
+    visibility: visible;
+    opacity: 1;
+    pointer-events: auto;
+    transition: transform 0.3s cubic-bezier(0.2, 0.9, 0.3, 1), opacity 0.2s, visibility 0s;
+  }
+
+  /* Always hide timer when on home view */
+  body.view-home .timer-overlay {
+    display: none !important;
+  }
+
+  .timer-overlay.ending {
+    animation: pulseBg 0.6s ease-in-out infinite alternate;
+  }
+
+  @keyframes pulseBg {
+    from { box-shadow: 0 10px 40px rgba(0,0,0,0.4); }
+    to { box-shadow: 0 0 0 4px color-mix(in srgb, var(--accent-color) 40%, transparent), 0 10px 40px rgba(0,0,0,0.4); }
+  }
+
+  .timer-overlay.done .timer-value {
+    color: var(--accent-color);
+  }
+
+  .timer-info {
+    flex: 1;
+    min-width: 0;
+  }
+
+  .timer-label {
+    font-size: 10px;
+    letter-spacing: 1.5px;
+    text-transform: uppercase;
+    color: var(--text-3);
+    font-weight: 600;
+    line-height: 1;
+    margin-bottom: 4px;
+  }
+
+  .timer-value {
+    font-family: -apple-system, BlinkMacSystemFont, 'SF Pro Display', 'Segoe UI', sans-serif;
+    font-weight: 800;
+    font-size: 36px;
+    line-height: 0.9;
+    color: var(--text);
+    font-variant-numeric: tabular-nums;
+    letter-spacing: 1px;
+  }
+
+  .timer-close {
+    background: var(--surface-2);
+    border: none;
+    color: var(--text-2);
+    font-size: 16px;
+    width: 32px;
+    height: 32px;
+    border-radius: 50%;
+    cursor: pointer;
+    flex-shrink: 0;
+  }
+
+  .timer-close:active { background: var(--border); }
+
+  .timer-adjust {
+    background: var(--surface-2);
+    border: none;
+    color: var(--text-2);
+    font-size: 12px;
+    font-weight: 700;
+    letter-spacing: 0.4px;
+    padding: 8px 10px;
+    border-radius: 8px;
+    cursor: pointer;
+    flex-shrink: 0;
+  }
+
+  .timer-adjust.primary {
+    background: var(--accent-color);
+    border: none;
+    color: #fff;
+    font-size: 11px;
+    font-weight: 600;
+    letter-spacing: 0.5px;
+    padding: 8px 12px;
+    border-radius: 8px;
+    cursor: pointer;
+    flex-shrink: 0;
+  }
+
+  .timer-adjust:active { opacity: 0.75; }
+
+
+
+  /* ══ COMPACT MODE ══ */
+  body.compact-mode .session-hero { padding: 14px 16px 16px; }
+  body.compact-mode .session-hero h1 { font-size: 34px; }
+  body.compact-mode .session-pills { display: none; }
+  body.compact-mode .bloc { padding-top: 18px; }
+  body.compact-mode .bloc-header { margin-bottom: 10px; }
+  body.compact-mode .bloc-num { font-size: 34px; }
+  body.compact-mode .bloc-name { font-size: 20px; }
+  body.compact-mode .bloc-sub,
+  body.compact-mode .bloc-duration { display: none; }
+  body.compact-mode .ex { border-radius: 10px; margin-bottom: 8px; }
+  body.compact-mode .ex-head { padding: 11px 13px; }
+  body.compact-mode .ex-name { font-size: 14px; }
+  body.compact-mode .ex-sub { display: none; }
+  body.compact-mode .stat { padding: 8px 6px 9px; }
+  body.compact-mode .stat-label { font-size: 8px; }
+  body.compact-mode .stat-value { font-size: 18px; }
+  /* En compact, les détails restent accessibles en développant l'exercice */
+  body.compact-mode .ex:not(.open) .ex-note { display: none; }
+  body.compact-mode .charge-insight { padding: 8px 10px; margin-bottom: 8px; }
+  body.compact-mode .ex-charge { padding: 10px 12px; }
+  body.compact-mode .ex-charge-history { display: none; }
+
+  /* ══ SET TRACKER ══ */
+  .ex-sets {
+    display: flex;
+    align-items: center;
+    gap: 8px;
+    padding: 10px 16px 12px;
+    border-top: 1px solid var(--border);
+    flex-wrap: wrap;
+  }
+
+  .ex-sets-label {
+    font-size: 10px;
+    letter-spacing: 1.5px;
+    text-transform: uppercase;
+    color: var(--text-3);
+    font-weight: 600;
+    flex-shrink: 0;
+    margin-right: 2px;
+  }
+
+  .ex-sets-dots {
+    display: flex;
+    gap: 8px;
+    flex-wrap: wrap;
+  }
+
+  .set-dot {
+    width: 36px;
+    height: 36px;
+    border-radius: 50%;
+    border: 1.5px solid var(--border);
+    background: var(--bg);
+    color: var(--text-3);
+    font-family: inherit;
+    font-size: 13px;
+    font-weight: 600;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    cursor: pointer;
+    user-select: none;
+    -webkit-user-select: none;
+    -webkit-appearance: none;
+    font-variant-numeric: tabular-nums;
+    transition: background 0.12s, border-color 0.12s, color 0.12s, transform 0.12s;
+  }
+
+  .set-dot:active { transform: scale(0.92); }
+
+  .set-dot.done {
+    background: var(--accent-color);
+    border-color: var(--accent-color);
+    color: #fff;
+  }
+
+  .ex-sets-reset {
+    margin-left: auto;
+    width: 30px;
+    height: 30px;
+    border-radius: 50%;
+    background: none;
+    border: none;
+    color: var(--text-4);
+    font-size: 15px;
+    cursor: pointer;
+    flex-shrink: 0;
+    -webkit-appearance: none;
+  }
+
+  .ex-sets-reset:active { color: var(--text-2); }
+
+  .ex.sets-done .ex-num { color: var(--text-4); }
+  .ex.sets-done .ex-name {
+    color: var(--text-3);
+    text-decoration: line-through;
+    text-decoration-color: var(--text-4);
+  }
+
+  .ex-sets.superset-sets {
+    padding: 10px 14px 12px;
+    background: color-mix(in srgb, var(--accent-color) 6%, var(--surface));
+  }
+
+  /* ══ SESSION PROGRESS ══ */
+  .session-progress { margin-top: 14px; }
+  .session-progress.hidden { display: none; }
+
+  .session-progress-track {
+    height: 6px;
+    border-radius: 999px;
+    background: var(--surface-2);
+    border: 1px solid var(--border);
+    overflow: hidden;
+  }
+
+  .session-progress-fill {
+    height: 100%;
+    width: 0%;
+    background: var(--accent-color);
+    border-radius: 999px;
+    transition: width 0.3s ease;
+  }
+
+  .session-progress-text {
+    display: flex;
+    justify-content: space-between;
+    margin-top: 6px;
+    font-size: 11px;
+    color: var(--text-3);
+    font-variant-numeric: tabular-nums;
+  }
+
+  .session-progress-text .done {
+    color: var(--accent-color);
+    font-weight: 600;
+  }
+
+  .session-card-meta .last-done {
+    color: var(--accent-color, var(--accent));
+    font-weight: 600;
+  }
+
+  body.compact-mode .ex-sets { padding: 8px 12px 10px; }
+  body.compact-mode .set-dot { width: 32px; height: 32px; font-size: 12px; }
+  body.compact-mode .session-progress { margin-top: 10px; }
+
+  /* ══ Responsive tweaks ══ */
+  @media (min-width: 600px) {
+    main { max-width: 720px; margin: 0 auto; }
+  }
+
+  /* ══ iOS SKIN — typographie SF, surfaces iOS, barres floutées ══ */
+  .topbar {
+    background: color-mix(in srgb, var(--bg) 80%, transparent);
+    -webkit-backdrop-filter: saturate(180%) blur(20px);
+    backdrop-filter: saturate(180%) blur(20px);
+    border-bottom-color: color-mix(in srgb, var(--border) 55%, transparent);
+  }
+
+  .bloc-nav {
+    background: color-mix(in srgb, var(--bg) 80%, transparent);
+    -webkit-backdrop-filter: saturate(180%) blur(20px);
+    backdrop-filter: saturate(180%) blur(20px);
+  }
+
+  .topbar-title { font-size: 17px; font-weight: 700; letter-spacing: -0.2px; }
+
+  .home-hero h1 { font-size: 34px; line-height: 1.12; letter-spacing: -0.6px; }
+  .home-hero p { letter-spacing: 1.2px; }
+  .session-hero h1 { font-size: 28px; line-height: 1.1; letter-spacing: -0.5px; }
+
+  @media (min-width: 600px) {
+    .home-hero h1 { font-size: 42px; }
+    .session-hero h1 { font-size: 34px; }
+  }
+
+  /* Cartes de séance façon liste de conversations */
+  .session-card {
+    display: flex;
+    align-items: center;
+    gap: 14px;
+    padding: 12px 38px 12px 14px;
+    border-radius: 20px;
+  }
+  .session-card::before { display: none; }
+  .session-card-avatar {
+    width: 46px;
+    height: 46px;
+    border-radius: 50%;
+    background: var(--accent-color, var(--accent));
+    color: #fff;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-size: 19px;
+    font-weight: 700;
+    flex-shrink: 0;
+  }
+  .session-card-body { flex: 1; min-width: 0; }
+  .session-card-name { font-size: 17px; font-weight: 600; letter-spacing: -0.2px; margin-bottom: 3px; }
+  .session-card-meta { font-size: 13px; }
+  @media (max-width: 420px) {
+    .session-card { padding: 12px 36px 12px 12px; }
+  }
+
+  /* Tailles ex-Bebas recalibrées pour SF */
+  .session-card-name,
+  .topbar-title { font-weight: 700; }
+  .bloc-num { font-size: 26px; line-height: 1; letter-spacing: -0.4px; }
+  .bloc-name { font-size: 16px; font-weight: 700; letter-spacing: -0.2px; }
+  .bloc-title-group { padding-top: 2px; }
+  .ex-num { font-size: 15px; font-weight: 700; min-width: 22px; }
+  .stat-value { font-size: 15px; font-weight: 700; letter-spacing: -0.2px; }
+  .superset-rounds { font-size: 15px; font-weight: 800; }
+  .round-num { font-size: 22px; }
+  .bloc-nav-btn { font-size: 13px; font-weight: 600; letter-spacing: -0.1px; border-radius: 12px; }
+  .bloc-nav-btn .num { font-size: 14px; font-weight: 800; }
+  .timer-value { font-size: 32px; letter-spacing: -0.4px; }
+  .edit-title { font-size: 17px; font-weight: 700; }
+  .edit-input { font-size: 22px; font-weight: 700; }
+  .ex-charge-input { font-size: 16px; font-weight: 600; }
+  body.compact-mode .session-hero h1 { font-size: 24px; }
+  body.compact-mode .bloc-num { font-size: 22px; }
+  body.compact-mode .bloc-name { font-size: 15px; }
+  body.compact-mode .stat-value { font-size: 14px; }
+
+  /* Rayons et surfaces plus doux */
+  .ex { border-radius: 16px; }
+  .superset { border-radius: 16px; }
+  .timer-overlay {
+    border-radius: 24px;
+    background: color-mix(in srgb, var(--surface) 86%, transparent);
+    -webkit-backdrop-filter: saturate(180%) blur(20px);
+    backdrop-filter: saturate(180%) blur(20px);
+  }
+  .edit-panel { border-radius: 22px; }
+  .home-tool-btn { border-radius: 14px; }
+
+  /* ══ TABATA ══ */
+  .tabata-row {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    gap: 10px;
+  }
+
+  .tabata-row-label {
+    font-size: 15px;
+    font-weight: 600;
+    color: var(--text);
+  }
+
+  .tabata-stepper {
+    display: flex;
+    align-items: center;
+    background: var(--surface);
+    border: 1px solid var(--border);
+    border-radius: 12px;
+    overflow: hidden;
+  }
+
+  .tabata-step-btn {
+    width: 42px;
+    height: 40px;
+    background: none;
+    border: none;
+    color: var(--accent);
+    font-size: 22px;
+    font-weight: 500;
+    cursor: pointer;
+    -webkit-appearance: none;
+  }
+
+  .tabata-step-btn:active { background: var(--surface-2); }
+
+  .tabata-step-val {
+    min-width: 54px;
+    text-align: center;
+    font-size: 15px;
+    font-weight: 700;
+    font-variant-numeric: tabular-nums;
+    color: var(--text);
+  }
+
+  .tabata-total {
+    text-align: center;
+    font-size: 13px;
+    color: var(--text-3);
+    font-variant-numeric: tabular-nums;
+  }
+
+  .tabata-screen {
+    position: fixed;
+    inset: 0;
+    z-index: 200;
+    display: none;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+    gap: 10px;
+    background: var(--bg);
+    color: #fff;
+    text-align: center;
+    padding: 20px;
+    padding-top: calc(20px + var(--safe-top));
+    padding-bottom: calc(20px + var(--safe-bottom));
+    transition: background 0.35s ease;
+  }
+
+  .tabata-screen.active { display: flex; }
+  .tabata-screen.phase-prep { background: #0a84ff; }
+  .tabata-screen.phase-work { background: #ff375f; }
+  .tabata-screen.phase-rest { background: #30b350; }
+  .tabata-screen.phase-done { background: #1c1c1e; }
+
+  .tabata-close {
+    position: absolute;
+    top: calc(16px + var(--safe-top));
+    right: 16px;
+    width: 38px;
+    height: 38px;
+    border-radius: 50%;
+    background: rgba(255,255,255,0.18);
+    border: none;
+    color: #fff;
+    font-size: 17px;
+    cursor: pointer;
+    -webkit-appearance: none;
+  }
+
+  .tabata-phase {
+    font-size: 15px;
+    font-weight: 700;
+    letter-spacing: 3px;
+    text-transform: uppercase;
+    opacity: 0.85;
+  }
+
+  .tabata-count {
+    font-size: 130px;
+    font-weight: 800;
+    line-height: 1;
+    font-variant-numeric: tabular-nums;
+    letter-spacing: -2px;
+  }
+
+  .tabata-screen.paused .tabata-count { opacity: 0.35; }
+
+  .tabata-count.ending {
+    animation: tabataPulse 0.5s ease-in-out infinite alternate;
+  }
+
+  @keyframes tabataPulse {
+    from { transform: scale(1); }
+    to { transform: scale(1.08); }
+  }
+
+  .tabata-progress {
+    width: min(240px, 70vw);
+    height: 6px;
+    border-radius: 999px;
+    background: rgba(255,255,255,0.25);
+    overflow: hidden;
+    margin-top: 6px;
+  }
+
+  .tabata-progress-fill {
+    height: 100%;
+    width: 100%;
+    background: #fff;
+    border-radius: 999px;
+  }
+
+  .tabata-round {
+    font-size: 15px;
+    font-weight: 600;
+    opacity: 0.85;
+    font-variant-numeric: tabular-nums;
+  }
+
+  .tabata-controls {
+    display: flex;
+    gap: 12px;
+    margin-top: 26px;
+  }
+
+  .tabata-btn {
+    padding: 13px 28px;
+    border-radius: 999px;
+    background: rgba(255,255,255,0.18);
+    border: none;
+    color: #fff;
+    font-family: inherit;
+    font-size: 15px;
+    font-weight: 700;
+    cursor: pointer;
+    -webkit-appearance: none;
+  }
+
+  .tabata-btn:active { background: rgba(255,255,255,0.3); }
+
+  /* ══ ANIMATIONS — fluidité type iOS ══ */
+  /* Navigation home ↔ séance : push depuis la droite, retour depuis la gauche */
+  #view-home.active { animation: viewBack 0.3s cubic-bezier(0.32, 0.72, 0, 1); }
+  #view-session.active { animation: viewPush 0.32s cubic-bezier(0.32, 0.72, 0, 1); }
+
+  @keyframes viewPush {
+    from { opacity: 0; transform: translateX(26px); }
+    to { opacity: 1; transform: none; }
+  }
+
+  @keyframes viewBack {
+    from { opacity: 0; transform: translateX(-16px); }
+    to { opacity: 1; transform: none; }
+  }
+
+  /* Cartes de l'accueil : apparition en cascade */
+  .home-sessions .session-card {
+    animation: cardIn 0.38s cubic-bezier(0.32, 0.72, 0, 1) backwards;
+  }
+  .home-sessions .session-card:nth-child(1) { animation-delay: 0.02s; }
+  .home-sessions .session-card:nth-child(2) { animation-delay: 0.06s; }
+  .home-sessions .session-card:nth-child(3) { animation-delay: 0.10s; }
+  .home-sessions .session-card:nth-child(4) { animation-delay: 0.14s; }
+  .home-sessions .session-card:nth-child(5) { animation-delay: 0.18s; }
+  .home-sessions .session-card:nth-child(6) { animation-delay: 0.22s; }
+
+  @keyframes cardIn {
+    from { opacity: 0; transform: translateY(12px); }
+    to { opacity: 1; transform: none; }
+  }
+
+  /* Pastille de série cochée : pop avec rebond */
+  .set-dot.pop {
+    animation: dotPop 0.32s cubic-bezier(0.34, 1.56, 0.64, 1);
+  }
+
+  @keyframes dotPop {
+    0% { transform: scale(0.6); }
+    60% { transform: scale(1.15); }
+    100% { transform: scale(1); }
+  }
+
+  /* Panneaux (édition charge, config tabata) : montée en sheet iOS */
+  .edit-backdrop.active { animation: backdropIn 0.25s ease; }
+  .edit-backdrop.active .edit-panel { animation: sheetUp 0.36s cubic-bezier(0.32, 0.72, 0, 1); }
+
+  @keyframes backdropIn {
+    from { background: rgba(0,0,0,0); }
+    to { background: rgba(0,0,0,0.6); }
+  }
+
+  @keyframes sheetUp {
+    from { opacity: 0; transform: translateY(44px); }
+    to { opacity: 1; transform: none; }
+  }
+
+  /* Écran tabata : fondu d'entrée */
+  .tabata-screen.active { animation: tabataIn 0.3s ease; }
+
+  @keyframes tabataIn {
+    from { opacity: 0; }
+    to { opacity: 1; }
+  }
+
+  /* Tabata : barre de progression continue (plus de sauts) */
+  .tabata-progress-fill { transition: width 0.25s linear; }
+
+  /* Tabata : tick du compte à rebours à chaque seconde */
+  .tabata-count.tick { animation: countTick 0.35s cubic-bezier(0.32, 0.72, 0, 1); }
+
+  @keyframes countTick {
+    from { transform: scale(1.12); opacity: 0.55; }
+    to { transform: scale(1); opacity: 1; }
+  }
+
+  /* Les 3 dernières secondes : le pulse reprend la main sur le tick */
+  .tabata-count.ending { animation: tabataPulse 0.5s ease-in-out infinite alternate; }
+
+  /* Tabata : label de phase + round qui glissent à chaque changement */
+  .tabata-phase.swap { animation: phaseSwap 0.4s cubic-bezier(0.32, 0.72, 0, 1); }
+  .tabata-round.swap { animation: phaseSwap 0.4s cubic-bezier(0.32, 0.72, 0, 1) 0.06s backwards; }
+
+  @keyframes phaseSwap {
+    from { opacity: 0; transform: translateY(14px); }
+    to { opacity: 1; transform: none; }
+  }
+
+  /* Tabata : pop du ✓ final */
+  .tabata-screen.phase-done .tabata-count {
+    animation: donePop 0.55s cubic-bezier(0.34, 1.56, 0.64, 1);
+  }
+
+  @keyframes donePop {
+    0% { transform: scale(0.4); opacity: 0; }
+    65% { transform: scale(1.12); opacity: 1; }
+    100% { transform: scale(1); }
+  }
+
+  /* Micro-transitions sur les contrôles */
+  .bloc-nav-btn { transition: background 0.2s ease, color 0.2s ease, border-color 0.2s ease; }
+  .ex-head { transition: background 0.15s ease; }
+  .ex-chevron { transition: transform 0.3s cubic-bezier(0.32, 0.72, 0, 1); }
+  .home-tool-btn { transition: background 0.15s ease, color 0.15s ease; }
+  .tabata-btn, .tabata-step-btn { transition: background 0.15s ease; }
+  .timer-adjust, .timer-close { transition: opacity 0.15s ease, background 0.15s ease; }
+
+  /* Accessibilité : réduire les animations si demandé par le système */
+  @media (prefers-reduced-motion: reduce) {
+    *, *::before, *::after {
+      animation-duration: 0.01ms !important;
+      animation-iteration-count: 1 !important;
+      transition-duration: 0.01ms !important;
+    }
+  }
+</style>
+</head>
+<body class="view-home">
+
+<header class="topbar">
+  <div class="topbar-row">
+    <button class="btn-back" id="btn-back" aria-label="Retour">←</button>
+    <div class="topbar-title" id="topbar-title">Programme</div>
+    <div class="topbar-accent" id="topbar-accent"></div>
+    <button class="btn-theme" id="btn-theme" aria-label="Changer de thème">☾</button>
+  </div>
+</header>
+
+<main id="main">
+  <section class="view active" id="view-home">
+    <div class="home-hero">
+      <h1>MON<br><em>PROGRAMME</em></h1>
+      <p>5 séances · tabata · 60 min</p>
+    </div>
+    <div class="home-sessions" id="home-sessions"></div>
+    <div class="home-tools">
+      <button class="home-tool-btn" id="btn-export">Exporter</button>
+      <button class="home-tool-btn" id="btn-import">Importer</button>
+      <button class="home-tool-btn" id="btn-compact">Compact</button>
+      <button class="home-tool-btn danger" id="btn-reset-data">Réinitialiser</button>
+    </div>
+    <input type="file" id="import-file" accept="application/json" hidden>
+    <div class="home-version">v4.0 · animations · juin 2026</div>
+  </section>
+
+  <section class="view" id="view-session">
+    <div id="session-content"></div>
+  </section>
+</main>
+
+<div class="timer-overlay" id="timer-overlay">
+  <div class="timer-info">
+    <div class="timer-label" id="timer-label">Repos</div>
+    <div class="timer-value" id="timer-value">00:00</div>
+  </div>
+  <button class="timer-adjust" id="timer-reduce">-30s</button>
+  <button class="timer-adjust primary" id="timer-extend">+30s</button>
+  <button class="timer-close" id="timer-close" aria-label="Fermer">✕</button>
+</div>
+
+<div class="edit-backdrop" id="tabata-config">
+  <div class="edit-panel">
+    <div class="edit-title">Tabata</div>
+    <div class="edit-sub">Règle tes intervalles, puis lance le chrono.</div>
+    <div class="tabata-row">
+      <span class="tabata-row-label">Préparation</span>
+      <div class="tabata-stepper">
+        <button class="tabata-step-btn" data-tabata-adjust="prep:-5">−</button>
+        <span class="tabata-step-val" data-tabata-field="prep">10s</span>
+        <button class="tabata-step-btn" data-tabata-adjust="prep:5">+</button>
+      </div>
+    </div>
+    <div class="tabata-row">
+      <span class="tabata-row-label">Effort</span>
+      <div class="tabata-stepper">
+        <button class="tabata-step-btn" data-tabata-adjust="work:-5">−</button>
+        <span class="tabata-step-val" data-tabata-field="work">20s</span>
+        <button class="tabata-step-btn" data-tabata-adjust="work:5">+</button>
+      </div>
+    </div>
+    <div class="tabata-row">
+      <span class="tabata-row-label">Repos</span>
+      <div class="tabata-stepper">
+        <button class="tabata-step-btn" data-tabata-adjust="rest:-5">−</button>
+        <span class="tabata-step-val" data-tabata-field="rest">10s</span>
+        <button class="tabata-step-btn" data-tabata-adjust="rest:5">+</button>
+      </div>
+    </div>
+    <div class="tabata-row">
+      <span class="tabata-row-label">Rounds</span>
+      <div class="tabata-stepper">
+        <button class="tabata-step-btn" data-tabata-adjust="rounds:-1">−</button>
+        <span class="tabata-step-val" data-tabata-field="rounds">8</span>
+        <button class="tabata-step-btn" data-tabata-adjust="rounds:1">+</button>
+      </div>
+    </div>
+    <div class="tabata-total" id="tabata-total"></div>
+    <div class="edit-actions">
+      <button class="edit-btn" id="tabata-cancel">Fermer</button>
+      <button class="edit-btn primary" id="tabata-start">Démarrer</button>
+    </div>
+  </div>
+</div>
+
+<div class="tabata-screen" id="tabata-screen">
+  <button class="tabata-close" id="tabata-close" aria-label="Arrêter">✕</button>
+  <div class="tabata-phase" id="tabata-phase">Préparation</div>
+  <div class="tabata-count" id="tabata-count">10</div>
+  <div class="tabata-progress"><div class="tabata-progress-fill" id="tabata-fill"></div></div>
+  <div class="tabata-round" id="tabata-round"></div>
+  <div class="tabata-controls">
+    <button class="tabata-btn" id="tabata-pause">Pause</button>
+    <button class="tabata-btn" id="tabata-skip">Passer</button>
+  </div>
+</div>
+
+<div class="edit-backdrop" id="edit-backdrop">
+  <div class="edit-panel">
+    <div class="edit-title">Modifier la charge</div>
+    <div class="edit-sub" id="edit-sub"></div>
+    <input type="text" inputmode="decimal" class="edit-input" id="edit-input">
+    <div class="edit-actions">
+      <button class="edit-btn danger" id="edit-delete">Supprimer</button>
+      <button class="edit-btn" id="edit-cancel">Annuler</button>
+      <button class="edit-btn primary" id="edit-save">Enregistrer</button>
+    </div>
+  </div>
+</div>
+
+<script id="payload" type="application/json">{"order": ["pecs", "dos", "bas", "calisthenie", "hyrox"], "meta": {"pecs": {"label": "PECS · ÉPAULES", "short": "Pecs", "accent": "#c03a2b", "icon": "🔴"}, "dos": {"label": "DOS · BICEPS", "short": "Dos", "accent": "#c9932e", "icon": "🟡"}, "bas": {"label": "BAS DU CORPS", "short": "Jambes", "accent": "#3d6b45", "icon": "🟢"}, "hyrox": {"label": "HYROX PARC", "short": "Hyrox", "accent": "#d96820", "icon": "🟠"}, "calisthenie": {"label": "CALISTHÉNIE", "short": "Calisthénie", "accent": "#3a6ea5", "icon": "🔵"}}, "sessions": {"pecs": {"title": "Pecs · Épaules · Biceps", "pills": ["⏱ ~60 min chrono", "Niveau avancé · ~70 kg", "Force + Hypertrophie", "Matériel regroupé par station"], "blocs": [{"chip": "Bloc 01", "name": "Barre + Rack", "sub": "Force · Pecs + Épaules", "duration": "~22 min · repos 2'30–3'", "icon": "🏋️", "exercises": [{"name": "Développé Couché Barre", "sub": "Barre libre · Rack · Pectoraux moyens + Deltoïdes antérieurs", "execution": "Allongé, pieds à plat au sol, fessiers en contact avec le banc. Prise légèrement plus large que les épaules. Descends la barre vers le bas des pecs (ligne des tétons) en contrôlant 2 sec, touche légèrement, pousse en expirant. Coudes à ~75° du corps — pas à 90° (risque coiffe des rotateurs) ni collés.", "avoid": "Ne rebondis pas la barre sur la poitrine — ça sort les pecs du travail et risque de blesser les côtes.", "alt": {"label": "Alternative si rack occupé", "text": "Développé couché haltères : meilleure amplitude, moins de risque si tu t'entraînes seul. Charge ~30–40 kg par haltère. Ou pompes lestées (gilet) 4×6–8."}, "stats": {"Séries": "4", "Reps": "5–6", "Charge": "55–65 kg", "Tempo": "2-0-1", "Repos": "3 min"}}, {"name": "Développé Militaire Barre", "sub": "Barre libre · Debout · Deltoïdes antérieurs + Médians", "execution": "Debout, prise légèrement plus large que les épaules. Barre au niveau du cou/menton en bas. Pousse verticalement au-dessus de la tête en rentrant légèrement la tête pour laisser passer la barre, puis reporte la tête en avant une fois passée. Gaîne abdominal tout au long — ne cambre pas les lombaires.", "avoid": "Ne cambre pas le dos pour compenser — si tu dois le faire, la charge est trop lourde.", "alt": {"label": "Alternative si barre occupée", "text": "Développé militaire haltères assis (dos droit, sans dossier) : ~20–28 kg par haltère. Plus de stabilisation requise, excellent pour les 3 chefs du deltoïde."}, "stats": {"Séries": "4", "Reps": "6–8", "Charge": "40–50 kg", "Repos": "2'30"}}], "supersets": []}, {"chip": "Bloc 02", "name": "Haltères", "sub": "Épaules · Biceps", "duration": "~18 min · repos 75 sec", "icon": "💪", "exercises": [], "supersets": [{"exercises": [{"name": "Élévations Latérales", "sub": "Haltères · Deltoïdes médians", "execution": "Haltères légers, légère flexion coude. Monte jusqu'à hauteur des épaules, pouce légèrement vers le bas (comme si tu versais un verre). Contrôle la descente en 3 sec.", "avoid": "Pas d'élan — réduis la charge si tu dois te pencher pour monter.", "alt": {"label": "Alternative", "text": "Élévations latérales câble basse (1 bras) : tension constante même en bas. ~7–10 kg par côté."}, "stats": {"Reps": "15", "Charge": "8–12 kg"}}, {"name": "Oiseau Penché", "sub": "Haltères · Deltoïdes postérieurs", "execution": "Buste penché à 45–60°, bras légèrement fléchis. Ouvre les bras en rotation externe en montant. Deltoïde postérieur souvent sous-développé — essentiel pour l'équilibre épaule.", "avoid": "Le mouvement s'arrête à hauteur des épaules — pas au-dessus.", "alt": {"label": "Alternative", "text": "Face pull corde poulie (hauteur yeux) : mêmes muscles avec tension constante. 15–20 reps, ~15–20 kg."}, "stats": {"Reps": "15", "Charge": "10–14 kg"}}], "rest": "Repos entre les rounds : 75 sec"}, {"exercises": [{"name": "Curl Haltères Alterné", "sub": "Haltères · Debout · Chef long biceps", "execution": "Monte un bras à la fois. Supination progressive (tourne la paume vers le ciel en montant). Coude fixe contre le corps. Pause 1 sec en haut.", "avoid": "Pas d'élan du buste — réduis la charge si tu balances.", "alt": {"label": "Alternative", "text": "Curl barre EZ debout ~30–35 kg si haltères tous occupés."}, "stats": {"Reps": "10", "Charge": "12–16 kg"}}, {"name": "Curl Marteau", "sub": "Haltères · Prise neutre · Brachial", "execution": "Pouce vers le haut tout au long du mouvement. Reps lentes, contraction 1 sec en haut. Cible le brachial et le long supinateur — donne l'épaisseur au bras.", "avoid": "Ne retourne pas la paume en chemin — prise neutre stricte.", "alt": {"label": "Alternative", "text": "Curl marteau corde poulie basse : tension constante. ~15–20 kg câble."}, "stats": {"Reps": "10", "Charge": "14–18 kg"}}], "rest": "Repos entre les rounds : 75 sec"}]}, {"chip": "Bloc 03", "name": "Câbles", "sub": "Pecs · Biceps · Tension constante", "duration": "~10 min · repos 60–75 sec", "icon": "🔗", "exercises": [{"name": "Câbles Croisés — Écartés Pecs", "sub": "Poulie haute · Adduction horizontale · Étirement maximum", "execution": "Poulies en position haute. Penché légèrement en avant, bras tendus en arc, ramène les mains vers le centre et légèrement vers le bas. Croise légèrement les mains en fin de mouvement pour maximiser la contraction. Bras toujours légèrement fléchis — ne verrouille jamais les coudes. Contrôle le retour en 3 secondes pour profiter de l'étirement.", "avoid": "Ne tire pas avec les bras fléchis — tu transformes ça en développé debout. L'arc de cercle bras tendus est la clé.", "alt": {"label": "Alternative si poulies occupées", "text": "Écartés haltères couché banc plat : ~14–18 kg par haltère, même mouvement en arc. 3×12. Ou développé décliné haltères pour les pecs inférieurs."}, "stats": {"Séries": "3", "Reps": "12–15", "Charge": "10–16 kg", "Repos": "75 sec"}}, {"name": "Curl Poulie Basse EZ", "sub": "Câble · Barre EZ · Tension constante · Finition biceps", "execution": "Avantage du câble : tension constante sur tout l'arc, même en bas. Reste bien droit, coudes fixes sur les côtés. Reps lentes — l'objectif est la congestion maximale. Les biceps ont déjà bien travaillé sur le superset haltères — reste sur une charge raisonnable et soigne le ressenti.", "avoid": "Ne recule pas les pieds pour te donner de l'élan — ça vide l'exercice de son intérêt.", "alt": {"label": "Alternative si poulie occupée", "text": "Curl haltères incliné sur banc 45° : bras qui pendent derrière toi en étirement maximal. Charge légère (~10–12 kg), reps lentes. Excellent pour la finition."}, "stats": {"Séries": "2", "Reps": "15", "Charge": "15–20 kg", "Repos": "60 sec"}}], "supersets": []}, {"chip": "Bloc 04", "name": "Barres Parallèles", "sub": "Finition pecs inférieurs", "duration": "~5 min · repos 60 sec", "icon": "⚫", "exercises": [{"name": "Dips Pectoraux", "sub": "Barres parallèles · Pecs inférieurs · Poids de corps", "execution": "Penche le buste légèrement en avant (15–30°) pour cibler les pectoraux inférieurs — si tu restes droit, tu travailles surtout les triceps. Descends jusqu'à ce que les épaules soient sous les coudes, remonte sans verrouiller les coudes. Excellent exercice de finition car il étire bien les pecs en position basse — les muscles sont déjà bien fatigués à ce stade.", "avoid": "Ne descends pas trop bas si tu ressens une gêne à l'épaule antérieure — arrête-toi quand les bras sont parallèles au sol.", "alt": {"label": "Alternative si barres non dispo", "text": "Développé décliné haltères sur banc décliné (~20–26 kg par haltère) : cible pareillement les pecs inférieurs. Ou pompes pieds surélevés sur banc 3×15."}, "stats": {"Séries": "3", "Reps": "10–15", "Charge": "Poids de corps", "Repos": "60 sec"}}], "supersets": []}]}, "dos": {"title": "Dos · Biceps", "pills": ["⏱ 60 min chrono", "Niveau avancé", "~70 kg corps", "Barres · Câbles · Traction"], "blocs": [{"chip": "Bloc 01", "name": "Force", "duration": "~22 min · repos 2 min", "exercises": [{"name": "Tractions — Tempo 3-1-1", "sub": "Barre de traction · Prise pronation (mains vers le sol)", "execution": "Prise un peu plus large que les épaules. Initie le mouvement en rentrant les omoplates avant de tirer. Descends en 3 secondes, pause 1 sec bras quasi tendus (garde une légère flexion), remonte en 1 sec. Regarde légèrement vers le haut en montant.", "avoid": "Ne laisse pas les épaules remonter vers les oreilles en haut du mouvement — tiens les omoplates basses et serrées.", "alt": {"label": "Alternative si barre indisponible", "text": "Tractions australiennes (barre Smith ou barre basse ~1m) : corps incliné sous la barre, talons au sol, tire la poitrine vers la barre. Même tempo 3-1-1."}, "stats": {"Séries": "4", "Reps": "6–8", "Charge": "Poids de corps", "Tempo": "3-1-1", "Repos": "2 min"}}, {"name": "Rowing Barre — Yates Row", "sub": "Barre libre · Prise pronation (mains vers le sol)", "execution": "Buste incliné à 70–80° (légèrement plus droit qu'un rowing classique). Tire la barre vers le bas du ventre / nombril, coudes collés au corps. Dos plat, cuisses gaînées. Contrôle la descente — pas de lâcher.", "avoid": "Ne laisse pas le bas du dos s'arrondir sous la charge. Si ça arrondit, descends le poids.", "alt": {"label": "Alternative si barre occupée", "text": "Rowing 1 bras haltère appuyé sur banc : genou et main d'appui sur le banc, tire l'haltère vers la hanche. Avantage : amplitude plus grande et isolation parfaite de chaque côté. Même charge par bras."}, "stats": {"Séries": "4", "Reps": "6–8", "Charge": "60–70 kg", "Repos": "2 min"}}], "supersets": []}, {"chip": "Bloc 02", "name": "Hypertrophie", "duration": "~13 min · repos 60 sec", "exercises": [{"name": "Rowing Poulie Basse", "sub": "Câble · Poignée neutre (paumes face à face)", "execution": "Assis, dos droit (pas de balancement). Tire la poignée vers le bas du sternum, fais une pause d'1 sec en contractant les rhomboïdes, puis relâche lentement. Ne te penche pas en arrière pour compenser — ça transfère la charge sur les lombaires.", "avoid": "Évite de laisser les épaules partir en avant en fin d'extension — ça sur-sollicite l'articulation.", "alt": {"label": "Alternative si poulie occupée", "text": "Rowing 1 bras haltère genou sur banc : même mouvement de tirage, poignet neutre, pause squeeze en haut. 10–12 reps par côté. Charge équivalente par bras (~25–30 kg)."}, "stats": {"Séries": "3", "Reps": "10–12", "Charge": "50–60 kg", "Repos": "60 sec"}}, {"name": "Tirage Vertical Prise Neutre", "sub": "Poulie haute ou machine · Poignée serrée neutre", "execution": "Buste très légèrement incliné en arrière. Descends la barre vers le haut du buste (jamais derrière la nuque). Coudes qui viennent vers les hanches. Cherche l'étirement maximal du grand dorsal en haut — sens le muscle s'allonger avant de retirer.", "avoid": "Ne tire pas derrière la nuque — gros risque cervical. La barre s'arrête au niveau du menton / clavicules.", "alt": {"label": "Alternative si machine occupée", "text": "Tractions prise serrée neutre à la barre (si des anneaux ou poignées neutres sont disponibles) — ou tractions prise supination (prise en dessous), qui cible le même angle et intègre davantage les biceps."}, "stats": {"Séries": "3", "Reps": "10–12", "Charge": "55–65 kg", "Repos": "60 sec"}}, {"name": "Pull-over Poulie Haute", "sub": "Câble · Corde ou barre droite · Bras tendus", "execution": "Debout, légèrement penché en avant, bras quasi tendus (micro-flexion du coude). L'axe de rotation est l'épaule uniquement — les coudes ne fléchissent pas pendant le mouvement. Descends la corde jusqu'aux hanches, remonte lentement en sentant l'étirement du dorsal. Exercice d'isolation pure.", "avoid": "Si tu fléchis les coudes, tu transformes le mouvement en pushdown — la charge doit rester légère pour garder la tension sur le dorsal.", "alt": {"label": "Alternative si poulie occupée", "text": "Pull-over haltère allongé sur banc : 1 haltère tenu à deux mains, descends les bras derrière la tête (étirement maximal du dorsal), remonte bras quasi tendus. ~15–20 kg. Très efficace en étirement."}, "stats": {"Séries": "3", "Reps": "12–15", "Charge": "20–25 kg", "Repos": "60 sec"}}], "supersets": []}, {"chip": "Bloc 03", "name": "Finition Dos", "duration": "~4 min · repos 45 sec", "exercises": [{"name": "Face Pull Corde", "sub": "Câble · Hauteur des yeux · Corde double", "execution": "Poulie à hauteur des yeux, prise les pouces vers toi. Tire vers le visage en gardant les coudes à hauteur des épaules ou plus haut. Ouvre les bras en fin de mouvement (rotation externe maximale) — c'est là que les rhomboïdes et la coiffe travaillent vraiment. Pause 1 sec, relâche contrôlé.", "avoid": "Ne tire pas avec les coudes vers le bas — c'est devenu un tirage horizontal classique, tu perds l'effet rotation externe.", "alt": {"label": "Alternative si poulie occupée", "text": "Oiseau haltères debout penché (butterfly inversé) : buste penché à 45°, haltères légers (~6–10 kg), bras légèrement fléchis, ouvre les bras en arc en rotation externe. Même muscles, même intensité — 15–20 reps."}, "stats": {"Séries": "3", "Reps": "15–20", "Charge": "15–20 kg", "Repos": "45 sec"}}], "supersets": []}, {"chip": "Bloc 04", "name": "Biceps", "duration": "~10 min", "exercises": [{"name": "Curl Poulie Basse EZ", "sub": "Câble · Barre EZ · Finition", "execution": "Avantage du câble : tension constante sur tout l'arc du mouvement, même en bas (contrairement aux haltères). Reste bien droit, coudes fixes sur les côtés. Reps lentes et contrôlées — l'objectif ici est la congestion maximale en fin de séance, pas la charge.", "avoid": "Ne recule pas les pieds pour te donner de l'élan — ça vide l'exercice de son intérêt.", "alt": {"label": "Alternative si poulie occupée", "text": "Curl haltères incliné sur banc (~45°) : assis sur banc incliné, bras qui pendent derrière toi — ça met le biceps en étirement maximal dès le départ. Charge légère (~10–12 kg), reps lentes. Excellent pour la finition."}, "stats": {"Séries": "2", "Reps": "15", "Charge": "20–25 kg", "Repos": "45 sec"}}], "supersets": [{"exercises": [{"name": "Curl Haltères Alterné", "sub": "Haltères · Debout", "execution": "Monte un bras à la fois. Effectue une supination progressive (tourne la paume vers le ciel en montant). Coude fixe contre le corps — ne le projette pas en avant.", "avoid": "Pas d'élan du buste pour compenser.", "alt": {"label": "Alternative", "text": "Curl barre EZ debout : même rep range, charge ~30–35 kg. Moins d'isolation par côté mais utile si haltères libres occupés."}, "stats": {"Reps": "10", "Charge": "12–16 kg"}}, {"name": "Curl Marteau", "sub": "Haltères · Prise neutre", "execution": "Pouce vers le haut tout au long du mouvement, pas de rotation. Mouvement lent et contrôlé. Tiens la contraction 1 sec en haut. Cible le brachial et le long supinateur — donne l'épaisseur.", "avoid": "Ne retourne pas la paume en chemin — garde la prise neutre.", "alt": {"label": "Alternative", "text": "Curl marteau à la corde poulie basse : tension constante sur tout l'arc, excellent si haltères libres sont tous pris. ~15–20 kg câble, même rep range."}, "stats": {"Reps": "10", "Charge": "14–18 kg"}}], "rest": "Repos entre les rounds : 75 sec"}]}]}, "bas": {"title": "Bas du corps", "pills": ["⏱ 60 min chrono", "Niveau avancé", "Force + Hypertrophie", "🦵 Genoux sensibles"], "blocs": [{"chip": "Bloc 01", "name": "Force", "duration": "~22 min · repos 2'30–3'", "exercises": [{"name": "Squat Barre — Back Squat", "sub": "Barre libre · Rack · Profondeur contrôlée", "execution": "Pieds largeur d'épaules, légèrement ouverts (15–30°). Barre posée sur les trapèzes moyens (low bar) ou hauts (high bar — genoux plus sollicités). Descends en poussant les genoux dans l'axe des orteils, buste légèrement incliné, dos gaîné. Descend jusqu'à la parallèle ou juste en dessous selon le confort.", "avoid": "Ne laisse pas les genoux s'effondrer vers l'intérieur (valgus) sous la charge — c'est le premier facteur de blessure.", "alt": {"label": "Alternative si rack occupé ou douleur", "text": "Squat goblet avec kettlebell ou haltère (~20–30 kg) : tenu contre la poitrine, favorise un buste droit et réduit la pression sur les genoux. Ou presse à cuisses pieds hauts (voir exo 3) comme remplacement direct."}, "stats": {"Séries": "4", "Reps": "5–6", "Charge": "80–100 kg", "Repos": "3 min"}}, {"name": "Romanian Deadlift", "sub": "Barre libre · Ischio-jambiers + Fessiers", "execution": "Debout, barre en pronation dans les mains. Descends la barre le long des jambes en poussant les hanches vers l'arrière (hip hinge), jambes quasi tendues (légère flexion genou). Sens l'étirement maximal des ischios avant de remonter en contractant les fessiers. Dos strictement plat tout au long.", "avoid": "Ne laisse pas le bas du dos s'arrondir en bas du mouvement — arrête-toi quand tu sens la limite de ton étirement ischio.", "alt": {"label": "Alternative si barre occupée", "text": "Romanian deadlift haltères : exactement le même mouvement, 2 haltères (~25–35 kg chacun). Amplitude souvent meilleure car les haltères passent à l'extérieur des jambes. Même charges et reps."}, "stats": {"Séries": "4", "Reps": "6–8", "Charge": "70–90 kg", "Repos": "2'30"}}], "supersets": []}, {"chip": "Bloc 02", "name": "Hypertrophie", "duration": "~18 min · repos 90 sec", "exercises": [{"name": "Presse à Cuisses — Pieds Hauts", "sub": "Machine guidée · Fessiers + Ischios prioritaires", "execution": "Place les pieds en haut de la plateforme (largeur d'épaules). Cette position haute réduit la flexion du genou et transfère le travail vers les fessiers et ischios. Descends jusqu'à 90° de flexion max — les lombaires ne doivent pas décoller du dossier. Remonte sans verrouiller les genoux en haut.", "avoid": "Ne décolle pas les fessiers du siège en fin de descente — ça transfère la charge sur les lombaires.", "alt": {"label": "Alternative si machine occupée", "text": "Squat bulgare haltères (exo 4 ci-dessous peut être avancé) ou Squat goblet à la kettlebell 4×12 (~25–30 kg) : buste droit, profondeur confortable. Moins de charge mais stimulus hypertrophique similaire."}, "stats": {"Séries": "3", "Reps": "10–12", "Charge": "120–160 kg", "Repos": "90 sec"}}, {"name": "Leg Curl Couché", "sub": "Machine · Ischio-jambiers · Isolation", "execution": "Allongé ventre sur la machine. Le coussin doit être au niveau des chevilles (pas du mollet). Fléchis en ramenant les talons vers les fesses, pause 1 sec en contraction maximale, redescends en 3 secondes. Garde les hanches en contact avec la machine — ne les soulève pas pour aider.", "avoid": "Ne soulève pas les hanches pour compenser — ça sort les ischios du travail et compresse les lombaires.", "alt": {"label": "Alternative si machine occupée", "text": "Nordic curl au sol (genou à terre, partenaire ou barre fixe qui bloque les chevilles) : descends en freinant avec les ischios, remonte en poussant avec les mains. Très intense — 3×6–8 suffit. Ou good morning barre légère (~30–40 kg) 3×12."}, "stats": {"Séries": "3", "Reps": "10–12", "Charge": "35–50 kg", "Repos": "90 sec"}}, {"name": "Fentes Bulgares Haltères", "sub": "Haltères · Pied arrière surélevé · Unilatéral", "execution": "Pied arrière posé sur un banc (~genou fléchi à 90°). Pied avant avancé suffisamment pour que le genou avant ne dépasse pas la pointe du pied en descendant. Descends verticalement, buste droit. Remonte en poussant sur le talon avant — sens le fessier et le quadri travailler.", "avoid": "Ne laisse pas le genou avant s'effondrer vers l'intérieur — garde le genou dans l'axe du 2e orteil tout au long du mouvement.", "alt": {"label": "Alternative si douleur ou déséquilibre", "text": "Fente avant marchée haltères (~12–16 kg/main) : même stimulus, plus de contrôle sur la trajectoire du genou. Ou hip thrust à la barre pour fessiers (voir bloc finition). 3×12 pas/jambe."}, "stats": {"Séries": "3", "Reps": "10/jambe", "Charge": "16–22 kg×2", "Repos": "90 sec"}}], "supersets": []}, {"chip": "Bloc 03", "name": "Finition", "duration": "~10 min · repos 45–60 sec", "exercises": [{"name": "Leg Extension — Amplitude Réduite", "sub": "Machine · Quadriceps · Charge légère", "execution": "Charge légère — l'objectif est la congestion, pas la force. Travaille en amplitude partielle : de 90° à environ 45° de flexion (pas jusqu'à extension complète). Cela évite la zone de tension maximale sur le tendon rotulien. Reps lentes, contraction de 1 sec à chaque rep.", "avoid": "Ne charge pas lourd sur cet exercice avec des genoux sensibles — c'est un exercice de finition, pas de force.", "alt": {"label": "Alternative si douleur ou machine indisponible", "text": "Wall sit isométrique : dos au mur, cuisses parallèles au sol, 3×30–45 sec. Ou terminal knee extension avec élastique : debout, élastique derrière le genou, petites extensions finales à 20°. Parfait pour les genoux sensibles."}, "stats": {"Séries": "3", "Reps": "15", "Charge": "25–35 kg", "Amplitude": "Partielle", "Repos": "60 sec"}}, {"name": "Mollets Debout", "sub": "Machine ou barre sur trapèzes · Gastrocnémiens", "execution": "Avant-pieds sur une marche ou plateforme. Descends talons vers le bas pour un étirement maximal (2 sec), remonte sur la pointe des pieds en 1 sec, pause 1 sec en haut avec contraction. Les mollets sont des muscles résistants — ils ont besoin d'amplitude complète et de volume pour progresser.", "avoid": "Ne fais pas des mini-reps avec juste le talon qui monte légèrement — l'amplitude complète est ce qui crée l'hypertrophie sur les mollets.", "alt": {"label": "Alternative si machine occupée", "text": "Mollets à la presse à cuisses : pieds en bas de la plateforme, pousse sur la pointe des pieds sans déverrouiller la sécurité. Ou mollets debout 1 jambe avec haltère (~20 kg) pour plus d'intensité et d'équilibre."}, "stats": {"Séries": "4", "Reps": "15–20", "Charge": "60–80 kg", "Tempo": "2-1-1", "Repos": "45 sec"}}], "supersets": []}]}, "hyrox": {"title": "Hyrox · Parc", "pills": ["⏱ 60 min", "🌳 Sans matériel · Parc", "Débutant · 1ère prépa", "Cardio + Force fonctionnelle"], "blocs": [{"chip": "Bloc 01", "name": "Simulation Hyrox", "sub": "4 rounds · Course + Station", "duration": "~28 min", "icon": "🏁", "exercises": [], "supersets": [], "sim_title": "⚡ 4 Rounds — Boucle 400m → Retour base camp → Station Toutes les stations se font à ton point fixe sur la pelouse · Allure course : tu dois pouvoir parler", "rounds": [{"num": "1", "run_icon": "🏃", "run_label": "Course", "run_val": "400 m", "st_icon": "💥", "st_label": "Station 1 — Pompes explosives", "st_val": "10 reps", "st_sub": "Pousse assez fort pour décoller les mains du sol · claque des mains si possible · simulation poussée explosive Hyrox"}, {"num": "2", "run_icon": "🏃", "run_label": "Course", "run_val": "400 m", "st_icon": "🔥", "st_label": "Station 2 — Mountain climbers", "st_val": "40 reps (20/jambe)", "st_sub": "Rythme rapide, hanches basses, épaules au-dessus des mains · simulation ski erg cadence"}, {"num": "3", "run_icon": "🏃", "run_label": "Course", "run_val": "400 m", "st_icon": "⚡", "st_label": "Station 3 — Sprint 50m aller-retour", "st_val": "3 allers-retours", "st_sub": "Depuis le point fixe · effort 90% · simulation des changements de rythme Hyrox"}, {"num": "4", "run_icon": "🏃", "run_label": "Course", "run_val": "400 m", "st_icon": "🦘", "st_label": "Station 4 — Sauts en longueur enchaînés", "st_val": "8 sauts", "st_sub": "Saute le plus loin possible, enchaîne sans pause entre chaque saut · travail puissance + coordination"}], "sim_footer": "Total : 1600m de course + 4 stations à ton point fixe Entre les rounds : 90 sec max de marche — reste près de ton point fixe"}, {"chip": "Bloc 02", "name": "Renforcement Fonctionnel", "sub": "Zones clés Hyrox · Sur la pelouse · Point fixe", "duration": "~15 min · repos 60 sec", "icon": "💪", "exercises": [{"name": "Pompes — Tempo 2-1-1", "sub": "Poids de corps · Pectoraux + Triceps + Gainage", "execution": "Corps droit de la tête aux talons, mains légèrement plus larges que les épaules. Descends en 2 sec, pause 1 sec en bas (coudes à ~75°), remonte en 1 sec. Gaîne l'abdomen — si le bas du dos se creuse, pose les genoux. La qualité prime sur la quantité.", "avoid": "Ne laisse pas les hanches s'affaisser — ton corps doit former une planche rigide.", "stats": {"Séries": "3", "Reps": "12–15", "Tempo": "2-1-1", "Repos": "60 sec"}}, {"name": "Glute Bridge — Unilatéral", "sub": "Sol · Fessiers + Ischios · Pied opposé en l'air", "execution": "Allongé sur le dos, un pied à plat, l'autre jambe tendue en l'air. Pousse sur le talon, monte les hanches jusqu'à alignement épaule-genou-cheville, contraction fessier 2 sec en haut. Redescends lentement. Travail unilatéral = correction des déséquilibres très fréquents chez les coureurs.", "avoid": "Ne laisse pas les hanches basculer de côté quand tu montes — maintiens le bassin horizontal.", "stats": {"Séries": "3", "Reps": "12/côté", "Pause": "2 sec en haut", "Repos": "60 sec"}}, {"name": "Planche + Shoulder Taps", "sub": "Sol · Gainage global · Stabilité", "execution": "Position planche sur les mains. Alterne en touchant l'épaule opposée avec la main, sans laisser les hanches bouger. Place les pieds légèrement plus larges que les épaules pour plus de stabilité. Respire normalement — le but est de maintenir l'effort sous tension continue, comme en condition Hyrox.", "avoid": "Ne laisse pas les hanches monter en l'air ou descendre — reste parfaitement horizontal.", "stats": {"Séries": "3", "Taps": "20/côté", "Repos": "60 sec"}}], "supersets": []}, {"chip": "Bloc 03", "name": "AMRAP Finition", "sub": "As Many Rounds As Possible · 5 min · À ton point fixe", "duration": "~5 min", "icon": "🔁", "exercises": [], "supersets": [], "amrap": {"header": "🔁 AMRAP 5 min — Enchaîne en boucle Pas de repos · Réduis l'intensité si besoin mais ne t'arrête pas", "movements": [{"icon": "💥", "label": "Mouvement A", "val": "5 Burpees", "sub": "Saut en extension complète"}, {"icon": "🦵", "label": "Mouvement B", "val": "10 Squat jumps", "sub": "Bras tendus en haut"}, {"icon": "🏃", "label": "Mouvement C", "val": "200 m sprint", "sub": "Effort 80% — pas à fond"}], "footer": "Note le nombre de rounds complets — c'est ton score à battre la prochaine fois 🎯 Objectif débutant : 3–4 rounds"}}]}, "calisthenie": {"title": "Calisthénie · Full Body", "pills": ["⏱ ~60 min chrono", "🤸 Poids de corps · Barre + Sol", "Niveau avancé · ~70 kg", "Skills + Force + Gainage"], "blocs": [{"chip": "Bloc 01", "name": "Skills à froid", "sub": "Équilibre + Tirage explosif · Système nerveux frais", "duration": "~20 min · repos 2–3 min", "icon": "🤸", "exercises": [{"name": "Handstand — Travail au mur", "sub": "Poids de corps · Mur · Équilibre + Gainage épaules", "execution": "Travaille à froid quand le système nerveux est frais — l'équilibre est une compétence, pas un effort de force. Monte en appui tendu renversé face au mur (ventre vers le mur, idéal pour aligner le corps) ou dos au mur. Cherche l'alignement poignets-épaules-bassin-chevilles : pousse activement le sol, monte les épaules vers les oreilles (protraction), gaine l'abdomen et serre les fessiers pour éviter la cambrure. Vise des maintiens de 20–40 sec propres plutôt que des longues tenues affaissées.", "avoid": "Ne cambre pas le bas du dos (banane) pour compenser un manque d'alignement — c'est la première cause de chute en arrière et ça surcharge les lombaires.", "alt": {"label": "Alternative si poignets sensibles ou pas de mur", "text": "Pike push-up pieds surélevés sur banc : buste à la verticale, descends le sommet du crâne vers le sol entre les mains. Travaille la même poussée verticale épaules sans la contrainte d'équilibre. 4×6–10. Ou wall walk : pieds au mur, marche progressivement vers la position verticale."}, "stats": {"Séries": "5", "Durée": "20–40 sec", "Repos": "2 min"}}, {"name": "Muscle-up — Progression", "sub": "Barre de traction · Transition tirage → poussée · Explosivité", "execution": "Le mouvement le plus technique de la séance, donc placé en premier. Travaille la transition par étapes : tractions explosives (tire la barre vers le bas des pecs, le plus haut possible), puis high pull (amène la barre vers le bas du sternum/abdomen avec une légère bascule du buste). Au sommet du tirage, bascule rapidement les poignets par-dessus la barre et enchaîne un dip. Prise pronation, légèrement plus large que les épaules. Si tu as déjà le muscle-up, fais des reps strictes contrôlées sans kipping.", "avoid": "N'essaie pas de forcer la transition avec les bras à mi-hauteur — si tu ne tires pas assez haut (barre au-dessus du nombril), la bascule est impossible et tu risques l'épaule. Monte d'abord, bascule ensuite.", "alt": {"label": "Alternative si pas encore acquis", "text": "Tractions explosives lestées (vise une amplitude maximale, barre vers le bas des pecs) 5×3–5 + négatives de muscle-up : pars du haut du dip, descends lentement en 4–5 sec à travers la transition. Excellent pour construire la force de la zone morte."}, "stats": {"Séries": "5", "Reps": "3–5", "Charge": "Poids de corps", "Repos": "2'30"}}], "supersets": []}, {"chip": "Bloc 02", "name": "Poussée", "sub": "Dips lestés + Pompes avancées", "duration": "~15 min · repos 90 sec", "icon": "💥", "exercises": [{"name": "Dips Lestés", "sub": "Barres parallèles · Ceinture de lest · Pecs inférieurs + Triceps", "execution": "Avec une ceinture de lest (ou haltère entre les chevilles). Buste légèrement penché en avant pour cibler les pectoraux, ou plus droit pour accentuer les triceps. Descends en contrôlant jusqu'à ce que les épaules passent sous les coudes, remonte sans verrouiller complètement en haut pour garder la tension. C'est le mouvement de force de poussée principal — soigne la charge progressive.", "avoid": "Ne descends pas trop bas si tu ressens une gêne à l'épaule antérieure — la zone basse est articulairement exigeante sous charge. Arrête-toi quand les bras sont parallèles au sol si besoin.", "alt": {"label": "Alternative si pas de barres ou de lest", "text": "Dips entre deux bancs pieds surélevés avec un disque sur les cuisses, ou dips sur barres au poids de corps en ajoutant un tempo lent (3-1-1) et des reps supplémentaires pour compenser l'absence de lest. 4×10–12."}, "stats": {"Séries": "4", "Reps": "6–10", "Charge": "+10–20 kg", "Repos": "90 sec"}}, {"name": "Pompes Pseudo-Planche", "sub": "Sol · Mains reculées · Épaules antérieures + Pecs sup.", "execution": "Pompes avec les mains positionnées plus bas que d'habitude (au niveau du nombril plutôt que des épaules), doigts pointés légèrement vers l'extérieur ou l'arrière. Penche le poids du corps vers l'avant pour que les épaules dépassent les poignets — c'est ce lean qui recrute fortement le deltoïde antérieur et prépare au planche. Garde le corps gainé en planche rigide tout au long.", "avoid": "Ne laisse pas les hanches s'affaisser ou les coudes s'écarter à 90° — coudes proches du corps, bassin gainé, le lean vers l'avant est la clé du recrutement.", "alt": {"label": "Alternative", "text": "Pike push-up (pompes en V inversé, fesses hautes) pour davantage de charge verticale sur les épaules, ou pompes archer (poids transféré sur un bras) pour augmenter l'intensité unilatérale. 3×8–12."}, "stats": {"Séries": "3", "Reps": "8–12", "Tempo": "2-1-1", "Repos": "90 sec"}}], "supersets": []}, {"chip": "Bloc 03", "name": "Tirage", "sub": "Tractions lestées + Front lever", "duration": "~15 min · repos 90 sec", "icon": "🔗", "exercises": [{"name": "Tractions Lestées Strictes", "sub": "Barre · Ceinture de lest · Prise pronation · Grand dorsal", "execution": "Prise pronation un peu plus large que les épaules, lest à la ceinture. Initie en rentrant les omoplates avant de tirer, monte jusqu'à ce que le menton dépasse la barre, descends en contrôlant jusqu'à l'extension quasi complète (garde une légère flexion). Strict, sans kipping ni élan de jambes. C'est ton mouvement de force de tirage vertical — vise une charge progressive d'une séance à l'autre.", "avoid": "Ne triche pas l'amplitude en haut (demi-reps) ni en bas (rebond) — une traction lestée vaut par sa rigueur. Si tu n'atteins pas l'amplitude complète, réduis le lest.", "alt": {"label": "Alternative si pas de lest", "text": "Tractions au poids de corps tempo 3-1-1 (3 sec de descente, 1 sec en bas, 1 sec de montée) avec reps supplémentaires, ou tractions archer (tire le corps vers un bras, l'autre bras tendu sur la barre) pour augmenter l'intensité unilatérale. 4×6–8 par côté."}, "stats": {"Séries": "4", "Reps": "5–8", "Charge": "+5–15 kg", "Repos": "90 sec"}}, {"name": "Front Lever — Progression", "sub": "Barre · Gainage horizontal · Grand dorsal + Abdos", "execution": "Suspendu à la barre, l'objectif est de tenir le corps horizontal, parallèle au sol, face vers le ciel. Travaille la progression adaptée à ton niveau : tuck (genoux repliés contre la poitrine), puis advanced tuck (dos plat, genoux moins repliés), puis one-leg (une jambe tendue). Tire la barre vers les hanches avec les bras tendus (dépression scapulaire active), gaine fortement l'abdomen et serre les fessiers pour garder la ligne. Maintiens des tenues propres de 5–15 sec.", "avoid": "Ne laisse pas le bassin s'affaisser ni les bras se plier — bras tendus, scapulas verrouillées vers le bas. Mieux vaut une progression plus facile tenue parfaitement qu'une position avancée affaissée.", "alt": {"label": "Alternative", "text": "Tuck front lever raises : depuis la suspension, monte le corps en position tuck horizontale puis redescends, en contrôle. Construit la force du dorsal en dynamique. Ou ice cream makers / rows inversés lestés si la barre haute n'est pas dispo. 4×6–8."}, "stats": {"Séries": "4", "Durée": "5–15 sec", "Charge": "Poids de corps", "Repos": "90 sec"}}], "supersets": []}, {"chip": "Bloc 04", "name": "Jambes & Gainage", "sub": "Unilatéral + Compression abdominale", "duration": "~10 min · repos 60 sec", "icon": "🦵", "exercises": [{"name": "Pistol Squats", "sub": "Poids de corps · Unilatéral · Quadriceps + Équilibre + Mobilité", "execution": "Squat complet sur une jambe, l'autre jambe tendue devant toi sans toucher le sol. Bras tendus devant pour le contrepoids. Descends lentement en gardant le talon d'appui au sol et le genou dans l'axe du pied, jusqu'à ce que la fesse touche presque le mollet, puis remonte en poussant sur le talon. Demande force, équilibre et mobilité de cheville — un excellent révélateur de déséquilibres.", "avoid": "Ne laisse pas le genou d'appui s'effondrer vers l'intérieur et ne décolle pas le talon — si tu n'as pas la mobilité, surélève le talon ou tiens-toi à un support.", "alt": {"label": "Alternative si équilibre ou mobilité insuffisants", "text": "Pistol assisté : tiens-toi d'une main à un poteau/TRX pour gérer la descente, ou pistol sur boîte (descends t'asseoir sur un banc bas sur une jambe puis remonte). Progresse en baissant la hauteur. 3×6–8/jambe. Ou fentes bulgares sautées pour l'explosivité."}, "stats": {"Séries": "3", "Reps": "6–10/jambe", "Charge": "Poids de corps", "Repos": "60 sec"}}, {"name": "L-sit / Relevés de Jambes Suspendus", "sub": "Barre ou sol · Compression abdominale + Fléchisseurs de hanche", "execution": "Suspendu à la barre, monte les jambes tendues jusqu'à l'horizontale (toes-to-bar si tu peux aller plus haut), sans balancier — la compression doit venir des abdos, pas de l'élan. Contrôle la descente. En version L-sit au sol (sur des paralettes ou le sol), maintiens les jambes tendues à l'horizontale, corps en L, épaules basses et bras verrouillés.", "avoid": "Ne balance pas le corps pour monter les jambes par élan — le mouvement perd tout son intérêt. Contrôle strict, redescends lentement.", "alt": {"label": "Alternative si trop difficile", "text": "Relevés de genoux suspendus (genoux repliés au lieu de jambes tendues), ou tuck L-sit au sol sur paralettes. Progresse vers les jambes tendues à mesure que la compression s'améliore. 3×10–12."}, "stats": {"Séries": "3", "Reps": "8–12", "Repos": "60 sec"}}, {"name": "Hollow Body Hold", "sub": "Sol · Gainage antérieur global · Base de toute la calisthénie", "execution": "Allongé sur le dos, bas du dos plaqué au sol (point non négociable). Décolle simultanément les épaules et les jambes tendues, bras allongés au-dessus de la tête. Le corps forme une banane creuse. C'est la position de gainage fondamentale de la calisthénie — elle se retrouve dans le handstand, le front lever, le muscle-up. Maintiens la tension, respire en gardant les côtes basses.", "avoid": "Si le bas du dos décolle du sol (espace en dessous), c'est trop dur : replie les genoux ou rapproche les bras du corps. La lombaire plaquée prime sur l'amplitude.", "alt": {"label": "Variante plus facile / plus dure", "text": "Plus facile : bras le long du corps et/ou genoux repliés (tuck hollow). Plus dur : ajoute un léger rocking (balancement avant-arrière en gardant la forme) ou tiens un disque léger dans les mains. 3×20–40 sec."}, "stats": {"Séries": "3", "Durée": "20–40 sec", "Repos": "60 sec"}}], "supersets": []}]}}}</script>
+<script>
+const PAYLOAD = JSON.parse(document.getElementById('payload').textContent);
+const { order, meta, sessions } = PAYLOAD;
+
+// ═══ RENDER HOME ═══
+function renderHome() {
+  const container = document.getElementById('home-sessions');
+  container.innerHTML = order.map(key => {
+    const s = sessions[key];
+    const m = meta[key];
+    // Count exercises for meta
+    let exCount = 0;
+    s.blocs.forEach(b => {
+      exCount += (b.exercises || []).length;
+      (b.supersets || []).forEach(ss => exCount += ss.exercises.length);
+      if (b.rounds) exCount += b.rounds.length;
+      if (b.amrap) exCount += (b.amrap.movements || []).length;
+    });
+    const blocCount = s.blocs.length;
+    let lastDoneHtml = '';
+    try {
+      const ld = localStorage.getItem('lastDone:' + key);
+      if (ld) lastDoneHtml = `<span class="last-done">· ${escape(formatDate(ld))}</span>`;
+    } catch(e) {}
+    return `
+      <div class="session-card" data-session="${key}" style="--accent-color:${m.accent}">
+        <div class="session-card-avatar">${escape((m.short || s.title).charAt(0).toUpperCase())}</div>
+        <div class="session-card-body">
+          <div class="session-card-name">${escape(s.title)}</div>
+          <div class="session-card-meta">
+            <span>⏱ 60 min</span>
+            <span>· ${blocCount} blocs</span>
+            <span>· ${exCount} exercices</span>
+            ${lastDoneHtml}
+          </div>
+        </div>
+        <span class="session-card-arrow">›</span>
+      </div>
+    `;
+  }).join('') + `
+      <div class="session-card" id="tabata-open" style="--accent-color:#ff9f0a">
+        <div class="session-card-avatar">⏱</div>
+        <div class="session-card-body">
+          <div class="session-card-name">Tabata</div>
+          <div class="session-card-meta">
+            <span id="tabata-card-meta">${tabataCfg.work}s effort · ${tabataCfg.rest}s repos · ${tabataCfg.rounds} rounds</span>
+          </div>
+        </div>
+        <span class="session-card-arrow">›</span>
+      </div>
+    `;
+
+  container.querySelectorAll('.session-card[data-session]').forEach(c => {
+    c.addEventListener('click', () => openSession(c.dataset.session));
+  });
+  document.getElementById('tabata-open').addEventListener('click', openTabataConfig);
+}
+
+// ═══ RENDER SESSION ═══
+let currentSessionKey = null;
+
+function openSession(key, updateHistory = true) {
+  currentSessionKey = key;
+  const s = sessions[key];
+  const m = meta[key];
+  if (!s || !m) return;
+  if (updateHistory) {
+    try { history.pushState({ view: 'session', key }, '', `#${key}`); } catch(e) {}
+  }
+  document.body.classList.remove('view-home');
+  document.body.classList.add('view-session');
+  document.body.style.setProperty('--accent-color', m.accent);
+  document.getElementById('topbar-accent').style.background = m.accent;
+  document.getElementById('topbar-title').textContent = s.title;
+  document.getElementById('view-home').classList.remove('active');
+  document.getElementById('view-session').classList.add('active');
+
+  const pills = (s.pills || []).map((p, i) => 
+    `<span class="session-pill${i === 0 ? ' primary' : ''}">${escape(p)}</span>`
+  ).join('');
+
+  // Bloc nav buttons
+  const blocNav = s.blocs.map((b, idx) => {
+    const num = String(idx + 1).padStart(2, '0');
+    const name = b.name || '';
+    return `<button class="bloc-nav-btn" data-bloc="${idx}"><span class="num">${num}</span>${name ? escape(name) : ''}</button>`;
+  }).join('');
+
+  const blocs = s.blocs.map((b, idx) => renderBloc(b, idx + 1, m.accent, key)).join('');
+
+  document.getElementById('session-content').innerHTML = `
+    <div class="session-hero" style="--accent-color:${m.accent}">
+      <h1>${escape(s.title)}</h1>
+      <div class="session-pills">${pills}</div>
+      <div class="session-progress hidden" id="session-progress">
+        <div class="session-progress-track"><div class="session-progress-fill" id="sp-fill"></div></div>
+        <div class="session-progress-text"><span id="sp-text"></span><span id="sp-time"></span></div>
+      </div>
+    </div>
+    <nav class="bloc-nav" id="bloc-nav">${blocNav}</nav>
+    <div id="bloc-list">${blocs}</div>
+  `;
+
+  // Bind exercise toggles
+  document.querySelectorAll('.ex-head').forEach(h => {
+    h.addEventListener('click', (e) => {
+      // don't toggle if clicking inside textarea or clear button
+      if (e.target.tagName === 'TEXTAREA' || e.target.classList.contains('ex-note-clear')) return;
+      h.closest('.ex').classList.toggle('open');
+    });
+  });
+
+  // Bind bloc nav
+  document.querySelectorAll('.bloc-nav-btn').forEach(btn => {
+    btn.addEventListener('click', () => {
+      const idx = parseInt(btn.dataset.bloc);
+      const target = document.getElementById(`bloc-${idx}`);
+      if (target) {
+        target.scrollIntoView({ behavior: 'smooth', block: 'start' });
+      }
+    });
+  });
+
+  // Bind notes
+  bindNotes();
+  restoreNotes();
+  bindCharges();
+  restoreCharges();
+  bindRestTimers();
+  bindSets();
+  startProgressTicker();
+  acquireWakeLock();
+  trackBlocScroll();
+
+  // Scroll to top
+  window.scrollTo(0, 0);
+}
+
+// Track which bloc is currently visible
+let _blocScrollHandler = null;
+
+function trackBlocScroll() {
+  const blocs = document.querySelectorAll('.bloc');
+  const navBtns = document.querySelectorAll('.bloc-nav-btn');
+  const navEl = document.getElementById('bloc-nav');
+  let ticking = false;
+  let lastActiveIdx = -1;
+
+  const update = () => {
+    ticking = false;
+    if (!navEl) return;
+    const navBottom = navEl.getBoundingClientRect().bottom;
+    let activeIdx = 0;
+    blocs.forEach((b, i) => {
+      const rect = b.getBoundingClientRect();
+      if (rect.top <= navBottom + 40) activeIdx = i;
+    });
+
+    if (activeIdx !== lastActiveIdx) {
+      navBtns.forEach((btn, i) => {
+        btn.classList.toggle('active', i === activeIdx);
+      });
+      lastActiveIdx = activeIdx;
+
+      const activeBtn = navBtns[activeIdx];
+      if (activeBtn && navEl) {
+        const btnRect = activeBtn.getBoundingClientRect();
+        const navRect = navEl.getBoundingClientRect();
+        if (btnRect.left < navRect.left + 10 || btnRect.right > navRect.right - 10) {
+          const targetLeft = activeBtn.offsetLeft - navEl.clientWidth / 2 + activeBtn.offsetWidth / 2;
+          navEl.scrollTo({ left: targetLeft, behavior: 'smooth' });
+        }
+      }
+    }
+  };
+
+  const onScroll = () => {
+    if (!ticking) {
+      ticking = true;
+      requestAnimationFrame(update);
+    }
+  };
+
+  // Properly remove previous listener
+  if (_blocScrollHandler) {
+    window.removeEventListener('scroll', _blocScrollHandler);
+  }
+  _blocScrollHandler = onScroll;
+  window.addEventListener('scroll', onScroll, { passive: true });
+  lastActiveIdx = -1;
+  update();
+}
+
+function renderBloc(b, num, accent, sessionKey) {
+  const blocIdx = num - 1;
+  const chip = b.chip || `Bloc 0${num}`;
+  const name = b.name || '';
+  const sub = b.sub || '';
+  const dur = b.duration || '';
+
+  let body = '';
+
+  // Regular exercises
+  (b.exercises || []).forEach((ex, i) => {
+    body += renderEx(ex, i + 1, false, sessionKey, blocIdx, i);
+  });
+
+  // Supersets
+  (b.supersets || []).forEach((ss, idx) => {
+    const rounds = getSupersetRounds(ss);
+    const sequence = getSupersetSequence(ss);
+    const exHtml = ss.exercises.map((ex, i) => 
+      renderEx(ex, String.fromCharCode(65 + i), true, sessionKey, blocIdx, `ss${idx}-${i}`)
+    ).join('');
+    const rest = ss.rest ? renderSupersetRest(ss.rest, idx + 1) : '';
+    const toursTotal = parseInt(rounds) || 0;
+    const ssRestSec = parseRestSeconds(ss.rest || '');
+    const toursTracker = toursTotal > 0 ? `
+      <div class="ex-sets superset-sets" data-sets-key="sets:${sessionKey}:${blocIdx}:ss${idx}" data-sets-total="${toursTotal}" data-rest-seconds="${ssRestSec}" data-rest-label="Superset ${idx + 1}">
+        <span class="ex-sets-label">Tours</span>
+        <div class="ex-sets-dots"></div>
+        <button type="button" class="ex-sets-reset" aria-label="Réinitialiser les tours">↺</button>
+      </div>` : '';
+    body += `
+      <div class="superset">
+        <div class="superset-banner">⚡ Superset ${String(idx + 1).padStart(2, '0')}</div>
+        <div class="superset-meta">
+          <div class="superset-rounds">${escape(rounds)} tours</div>
+          <div class="superset-sequence">${escape(sequence)}</div>
+        </div>
+        ${exHtml}
+        ${toursTracker}
+        ${rest}
+      </div>
+    `;
+  });
+
+  // Hyrox rounds
+  if (b.rounds && b.rounds.length) {
+    if (b.sim_title) {
+      body += `<div class="hyrox-note">${escape(b.sim_title)}</div>`;
+    }
+    b.rounds.forEach(r => {
+      body += `
+        <div class="hyrox-round">
+          <div class="round-num">${escape(r.num)}</div>
+          <div class="round-body">
+            ${r.run_val ? `
+              <div class="round-part">
+                <span class="round-part-icon">${r.run_icon || '🏃'}</span>
+                <div class="round-part-info">
+                  <div class="round-part-label">${escape(r.run_label || 'Course')}</div>
+                  <div class="round-part-val">${escape(r.run_val)}</div>
+                </div>
+              </div>
+            ` : ''}
+            ${r.st_label ? `
+              <div class="round-part">
+                <span class="round-part-icon">${r.st_icon || '💪'}</span>
+                <div class="round-part-info">
+                  <div class="round-part-label">${escape(r.st_label)}</div>
+                  <div class="round-part-val">${escape(r.st_val)}</div>
+                  ${r.st_sub ? `<div class="round-part-sub">${escape(r.st_sub)}</div>` : ''}
+                </div>
+              </div>
+            ` : ''}
+          </div>
+        </div>
+      `;
+    });
+    if (b.sim_footer) {
+      body += `<div class="hyrox-note">${escape(b.sim_footer)}</div>`;
+    }
+  }
+
+  // AMRAP
+  if (b.amrap) {
+    if (b.amrap.header) {
+      body += `<div class="hyrox-note">${escape(b.amrap.header)}</div>`;
+    }
+    (b.amrap.movements || []).forEach(mv => {
+      body += `
+        <div class="amrap-item">
+          <div class="amrap-icon">${mv.icon || '•'}</div>
+          <div>
+            <div class="amrap-label">${escape(mv.label)}</div>
+            <div class="amrap-val">${escape(mv.val)}</div>
+            ${mv.sub ? `<div class="amrap-sub">${escape(mv.sub)}</div>` : ''}
+          </div>
+        </div>
+      `;
+    });
+    if (b.amrap.footer) {
+      body += `<div class="amrap-note">${escape(b.amrap.footer)}</div>`;
+    }
+  }
+
+  return `
+    <section class="bloc" id="bloc-${blocIdx}">
+      <div class="bloc-header">
+        <div class="bloc-num">0${num}</div>
+        <div class="bloc-title-group">
+          <div class="bloc-name">${escape(name)}</div>
+          ${sub ? `<div class="bloc-sub">${escape(sub)}</div>` : ''}
+          ${dur ? `<div class="bloc-duration">${escape(dur)}</div>` : ''}
+        </div>
+      </div>
+      ${body}
+    </section>
+  `;
+}
+
+
+function getSupersetRounds(ss) {
+  if (!ss) return '3';
+  const explicit = ss.rounds || ss.tours || ss.sets || ss.series || ss.séries;
+  if (explicit) return String(explicit).replace(/\s*tours?$/i, '').trim();
+  const exercises = ss.exercises || [];
+  for (const ex of exercises) {
+    const stats = ex.stats || {};
+    const val = stats['Séries'] || stats['Series'] || stats['Tours'];
+    if (val) return String(val).replace(/\s*tours?$/i, '').trim();
+  }
+  return '3';
+}
+
+function getSupersetSequence(ss) {
+  const count = Math.max(0, (ss && ss.exercises ? ss.exercises.length : 0));
+  if (!count) return 'Enchaînement';
+  const letters = Array.from({ length: count }, (_, i) => String.fromCharCode(65 + i)).join(' + ');
+  return `Enchaîne ${letters}`;
+}
+
+function renderSupersetRest(restText, supersetNum) {
+  const seconds = parseRestSeconds(restText);
+  if (!seconds) {
+    return `<div class="superset-footer">${escape(restText)}</div>`;
+  }
+  return `
+    <button type="button" class="superset-rest-card timer-ready" data-rest-seconds="${seconds}" data-rest-label="Superset ${supersetNum}">
+      <span class="superset-rest-label">Repos superset</span>
+      <span class="superset-rest-start">Lancer</span>
+      <span class="superset-rest-value">${escape(restText)}</span>
+    </button>
+  `;
+}
+
+// Parse rest duration (seconds) from "2 min", "90 sec", "2'30", "3 min" etc.
+function parseRestSeconds(restStr) {
+  if (!restStr) return 0;
+  const s = String(restStr).toLowerCase();
+  // Try "X'YY" (e.g. 2'30)
+  let m = s.match(/(\d+)\s*['′]\s*(\d+)/);
+  if (m) return parseInt(m[1]) * 60 + parseInt(m[2]);
+  // "X min YY sec"
+  m = s.match(/(\d+)\s*min\s*(\d+)\s*sec/);
+  if (m) return parseInt(m[1]) * 60 + parseInt(m[2]);
+  // Range first: "45-60 sec" or "60–75 sec" → take lower bound
+  m = s.match(/(\d+)\s*[\-–]\s*\d+\s*sec/);
+  if (m) return parseInt(m[1]);
+  m = s.match(/(\d+)\s*[\-–]\s*\d+\s*min/);
+  if (m) return parseInt(m[1]) * 60;
+  // "X min"
+  m = s.match(/(\d+(?:[.,]\d+)?)\s*min/);
+  if (m) {
+    const v = parseFloat(m[1].replace(',', '.'));
+    return Math.round(v * 60);
+  }
+  // "XX sec"
+  m = s.match(/(\d+)\s*sec/);
+  if (m) return parseInt(m[1]);
+  // First number fallback, assume minutes if < 20
+  m = s.match(/(\d+)/);
+  if (m) {
+    const n = parseInt(m[1]);
+    return n < 20 ? n * 60 : n;
+  }
+  return 0;
+}
+
+function renderEx(ex, num, inSuperset, sessionKey, blocIdx, exIdx) {
+  const stats = ex.stats || {};
+  const statsOrder = ['Séries', 'Reps', 'Charge', 'Tempo', 'Amplitude', 'Durée', 'Taps', 'Pause', 'Repos'];
+  const sortedKeys = Object.keys(stats).sort((a, b) => {
+    const ai = statsOrder.indexOf(a);
+    const bi = statsOrder.indexOf(b);
+    return (ai === -1 ? 99 : ai) - (bi === -1 ? 99 : bi);
+  });
+
+  const statsHtml = sortedKeys.map(k => {
+    const isRest = k === 'Repos';
+    const val = String(stats[k]).replace(/Poids de corps/i, 'Poids corps');
+    const restAttr = isRest ? ` data-rest-seconds="${parseRestSeconds(val)}" data-rest-label="${escape(ex.name)}"` : '';
+    return `
+      <div class="stat${isRest ? ' rest' : ''}"${restAttr}>
+        <div class="stat-label">${escape(k)}</div>
+        <div class="stat-value">${escape(val)}</div>
+        ${isRest ? '<div class="rest-start-chip">Lancer</div>' : ''}
+      </div>
+    `;
+  }).join('');
+
+  let details = '';
+  if (ex.execution) {
+    details += `<div class="detail-block"><div class="detail-label">Exécution</div><div class="detail-text">${escape(ex.execution)}</div></div>`;
+  }
+  if (ex.avoid) {
+    details += `<div class="detail-warn">${escape(ex.avoid)}</div>`;
+  }
+  if (ex.alt) {
+    details += `<div class="detail-alt"><div><strong>${escape(ex.alt.label)}</strong>${escape(ex.alt.text)}</div></div>`;
+  }
+
+  const noteKey = `note:${sessionKey}:${blocIdx}:${exIdx}`;
+  const chargeKey = `charge:${sessionKey}:${blocIdx}:${exIdx}`;
+  const chargeHistKey = `chargeHist:${sessionKey}:${blocIdx}:${exIdx}`;
+
+  // Set tracker — only for standalone exercises with an explicit series count
+  // (supersets are tracked at the round level)
+  const setsTotal = inSuperset ? 0 : (parseInt(String(stats['Séries'] || '')) || 0);
+  const setsRestSec = parseRestSeconds(stats['Repos'] || '');
+  const setsBlock = setsTotal > 0 ? `
+      <div class="ex-sets" data-sets-key="sets:${sessionKey}:${blocIdx}:${exIdx}" data-sets-total="${setsTotal}" data-rest-seconds="${setsRestSec}" data-rest-label="${escape(ex.name)}">
+        <span class="ex-sets-label">Séries</span>
+        <div class="ex-sets-dots"></div>
+        <button type="button" class="ex-sets-reset" aria-label="Réinitialiser les séries">↺</button>
+      </div>` : '';
+
+  // Only show charge tracker if the exercise has a "Charge" stat (skip pure bodyweight)
+  const hasCharge = stats['Charge'] && !/poids.{0,5}corps/i.test(stats['Charge']);
+
+  const chargeBlock = hasCharge ? `
+    <div class="ex-charge">
+      <div class="charge-insight" data-charge-insight="${chargeHistKey}" data-target-charge="${escape(stats['Charge'])}" data-charge-context="${escape([ex.name, ex.sub, stats['Charge']].filter(Boolean).join(' '))}">
+        <div class="charge-insight-row">
+          <span class="charge-insight-label">Dernière</span>
+          <span class="charge-insight-value" data-last-charge="${chargeHistKey}">—</span>
+        </div>
+        <div class="charge-insight-row">
+          <span class="charge-insight-label">Suggestion</span>
+          <span class="charge-insight-value suggestion" data-suggest-charge="${chargeHistKey}">Objectif programme : ${escape(stats['Charge'])}</span>
+        </div>
+      </div>
+      <div class="ex-charge-row">
+        <div class="ex-charge-label">Charge</div>
+        <input type="text" inputmode="decimal" class="ex-charge-input" placeholder="${escape(stats['Charge'])}" data-charge="${chargeKey}" data-hist="${chargeHistKey}">
+        <button class="ex-charge-use-last" data-use-last="${chargeKey}" data-hist="${chargeHistKey}">Dernière</button>
+        <button class="ex-charge-save" data-charge-save="${chargeKey}" data-hist="${chargeHistKey}">Valider</button>
+      </div>
+      <div class="ex-charge-history" data-charge-hist-display="${chargeHistKey}"></div>
+    </div>
+  ` : '';
+
+  return `
+    <div class="ex" data-note-key="${noteKey}">
+      <div class="ex-head">
+        <div class="ex-num">${escape(String(num))}</div>
+        <div class="ex-head-text">
+          <div class="ex-name">${escape(ex.name)}</div>
+          ${ex.sub ? `<div class="ex-sub">${escape(ex.sub)}</div>` : ''}
+        </div>
+        <div class="ex-note-indicator"></div>
+        <div class="ex-chevron">›</div>
+      </div>
+      <div class="ex-stats cols-${sortedKeys.length}">${statsHtml}</div>
+      ${setsBlock}
+      ${details ? `<div class="ex-details"><div class="ex-details-inner">${details}</div></div>` : ''}
+      ${chargeBlock}
+      <div class="ex-note">
+        <div class="ex-note-label">
+          <span>Ma note</span>
+          <button class="ex-note-clear" data-clear="${noteKey}">Effacer</button>
+        </div>
+        <textarea placeholder="Sensations, ressenti, \u00e0 retenir\u2026" data-note="${noteKey}"></textarea>
+      </div>
+    </div>
+  `;
+}
+
+// ═══ SET TRACKER ═══
+// Counts are stored per local day and reset automatically the next day.
+function todayLocal() {
+  const d = new Date();
+  return `${d.getFullYear()}-${String(d.getMonth() + 1).padStart(2, '0')}-${String(d.getDate()).padStart(2, '0')}`;
+}
+
+function getSetsCount(key) {
+  try {
+    const raw = localStorage.getItem(key);
+    if (!raw) return 0;
+    const obj = JSON.parse(raw);
+    return obj && obj.d === todayLocal() ? (obj.n || 0) : 0;
+  } catch(e) { return 0; }
+}
+
+function setSetsCount(key, n) {
+  try {
+    if (n > 0) localStorage.setItem(key, JSON.stringify({ d: todayLocal(), n }));
+    else localStorage.removeItem(key);
+  } catch(e) {}
+}
+
+function markActivity() {
+  if (!currentSessionKey) return;
+  try {
+    localStorage.setItem('lastDone:' + currentSessionKey, new Date().toISOString());
+    const startKey = 'sessionStart:' + currentSessionKey;
+    let start = null;
+    try { start = JSON.parse(localStorage.getItem(startKey) || 'null'); } catch(e) {}
+    if (!start || start.d !== todayLocal()) {
+      localStorage.setItem(startKey, JSON.stringify({ d: todayLocal(), t: Date.now() }));
+    }
+  } catch(e) {}
+}
+
+function renderSetDots(container, popIdx = -1) {
+  const key = container.dataset.setsKey;
+  const total = parseInt(container.dataset.setsTotal) || 0;
+  const count = getSetsCount(key);
+  const dotsEl = container.querySelector('.ex-sets-dots');
+  if (!dotsEl) return;
+  dotsEl.innerHTML = Array.from({ length: total }, (_, i) =>
+    `<button type="button" class="set-dot${i < count ? ' done' : ''}${i === popIdx ? ' pop' : ''}" data-idx="${i}" aria-label="Série ${i + 1}">${i < count ? '✓' : i + 1}</button>`
+  ).join('');
+  const ex = container.closest('.ex');
+  if (ex) ex.classList.toggle('sets-done', total > 0 && count >= total);
+  dotsEl.querySelectorAll('.set-dot').forEach(dot => {
+    dot.addEventListener('click', e => {
+      e.stopPropagation();
+      const i = parseInt(dot.dataset.idx);
+      const cur = getSetsCount(key);
+      // Tap a done dot → unfill from there; tap an empty dot → fill up to it
+      const next = i < cur ? i : i + 1;
+      setSetsCount(key, next);
+      if (next > cur) {
+        markActivity();
+        const restSec = parseInt(container.dataset.restSeconds || '0');
+        if (restSec > 0) startRestTimer(restSec, container.dataset.restLabel || 'Repos');
+      }
+      renderSetDots(container, next > cur ? next - 1 : -1);
+      updateSessionProgress();
+    });
+  });
+}
+
+function bindSets() {
+  document.querySelectorAll('.ex-sets').forEach(c => {
+    renderSetDots(c);
+    const resetBtn = c.querySelector('.ex-sets-reset');
+    if (resetBtn) {
+      resetBtn.addEventListener('click', e => {
+        e.stopPropagation();
+        setSetsCount(c.dataset.setsKey, 0);
+        renderSetDots(c);
+        updateSessionProgress();
+      });
+    }
+  });
+  updateSessionProgress();
+}
+
+function updateSessionProgress() {
+  const wrap = document.getElementById('session-progress');
+  if (!wrap) return;
+  let total = 0, done = 0;
+  document.querySelectorAll('#view-session .ex-sets').forEach(c => {
+    const t = parseInt(c.dataset.setsTotal) || 0;
+    total += t;
+    done += Math.min(t, getSetsCount(c.dataset.setsKey));
+  });
+  if (!total) { wrap.classList.add('hidden'); return; }
+  wrap.classList.remove('hidden');
+  const fill = document.getElementById('sp-fill');
+  const text = document.getElementById('sp-text');
+  const time = document.getElementById('sp-time');
+  if (fill) fill.style.width = `${Math.round(done / total * 100)}%`;
+  if (text) {
+    if (done >= total) {
+      text.textContent = 'Séance complète ✓';
+      text.classList.add('done');
+    } else {
+      text.textContent = `${done}/${total} séries`;
+      text.classList.remove('done');
+    }
+  }
+  if (time) {
+    let label = '';
+    try {
+      const start = JSON.parse(localStorage.getItem('sessionStart:' + currentSessionKey) || 'null');
+      if (start && start.d === todayLocal() && done > 0) {
+        label = `${Math.max(1, Math.round((Date.now() - start.t) / 60000))} min`;
+      }
+    } catch(e) {}
+    time.textContent = label;
+  }
+}
+
+let progressTicker = null;
+function startProgressTicker() {
+  if (progressTicker) clearInterval(progressTicker);
+  progressTicker = setInterval(updateSessionProgress, 30000);
+}
+function stopProgressTicker() {
+  if (progressTicker) clearInterval(progressTicker);
+  progressTicker = null;
+}
+
+// ═══ WAKE LOCK — keep the screen on during a session ═══
+let wakeLock = null;
+async function acquireWakeLock() {
+  if (!('wakeLock' in navigator)) return;
+  try { wakeLock = await navigator.wakeLock.request('screen'); } catch(e) {}
+}
+function releaseWakeLock() {
+  if (wakeLock) {
+    try { wakeLock.release(); } catch(e) {}
+    wakeLock = null;
+  }
+}
+// Re-acquire when coming back to the app (the lock is lost on backgrounding)
+document.addEventListener('visibilitychange', () => {
+  if (document.visibilityState === 'visible' && document.body.classList.contains('view-session')) {
+    acquireWakeLock();
+    updateSessionProgress();
+  }
+});
+
+// ═══ NOTES ═══
+function bindNotes() {
+  document.querySelectorAll('textarea[data-note]').forEach(ta => {
+    ta.addEventListener('input', () => {
+      const key = ta.dataset.note;
+      const ex = ta.closest('.ex');
+      if (ta.value.trim()) {
+        try { localStorage.setItem(key, ta.value); } catch(e) {}
+        ex.classList.add('has-note');
+      } else {
+        try { localStorage.removeItem(key); } catch(e) {}
+        ex.classList.remove('has-note');
+      }
+    });
+    // prevent taps in textarea from toggling the ex
+    ta.addEventListener('click', e => e.stopPropagation());
+  });
+
+  document.querySelectorAll('.ex-note-clear').forEach(btn => {
+    btn.addEventListener('click', e => {
+      e.stopPropagation();
+      const key = btn.dataset.clear;
+      const ta = document.querySelector(`textarea[data-note="${key}"]`);
+      if (ta) {
+        ta.value = '';
+        try { localStorage.removeItem(key); } catch(e) {}
+        ta.closest('.ex').classList.remove('has-note');
+      }
+    });
+  });
+}
+
+function restoreNotes() {
+  document.querySelectorAll('textarea[data-note]').forEach(ta => {
+    try {
+      const v = localStorage.getItem(ta.dataset.note);
+      if (v) {
+        ta.value = v;
+        ta.closest('.ex').classList.add('has-note');
+      }
+    } catch(e) {}
+  });
+}
+
+
+// ═══ EXPORT / IMPORT / RESET ═══
+function getTrainingStorageData() {
+  const data = {};
+  try {
+    for (let i = 0; i < localStorage.length; i++) {
+      const key = localStorage.key(i);
+      if (/^(note:|charge:|chargeHist:|sets:|lastDone:|sessionStart:|theme$|compactMode$|tabataCfg$)/.test(key)) {
+        data[key] = localStorage.getItem(key);
+      }
+    }
+  } catch(e) {}
+  return data;
+}
+
+function exportTrainingData() {
+  const payload = {
+    app: 'training-programme',
+    version: '1.8',
+    exportedAt: new Date().toISOString(),
+    data: getTrainingStorageData()
+  };
+  const blob = new Blob([JSON.stringify(payload, null, 2)], { type: 'application/json' });
+  const url = URL.createObjectURL(blob);
+  const a = document.createElement('a');
+  a.href = url;
+  a.download = `sauvegarde-programme-${new Date().toISOString().slice(0,10)}.json`;
+  document.body.appendChild(a);
+  a.click();
+  a.remove();
+  URL.revokeObjectURL(url);
+}
+
+function importTrainingData(file) {
+  if (!file) return;
+  const reader = new FileReader();
+  reader.onload = () => {
+    try {
+      const payload = JSON.parse(reader.result);
+      const data = payload.data || payload;
+      Object.keys(data).forEach(key => {
+        if (/^(note:|charge:|chargeHist:|sets:|lastDone:|sessionStart:|theme$|compactMode$|tabataCfg$)/.test(key)) {
+          localStorage.setItem(key, data[key]);
+        }
+      });
+      alert('Données importées.');
+      location.reload();
+    } catch(e) {
+      alert('Import impossible : fichier JSON invalide.');
+    }
+  };
+  reader.readAsText(file);
+}
+
+function resetTrainingData() {
+  if (!confirm('Supprimer toutes les notes, charges et séries enregistrées ?')) return;
+  try {
+    Object.keys(localStorage).forEach(key => {
+      if (/^(note:|charge:|chargeHist:|sets:|lastDone:|sessionStart:)/.test(key)) {
+        localStorage.removeItem(key);
+      }
+    });
+  } catch(e) {}
+  location.reload();
+}
+
+// ═══ CHARGE TRACKER ═══
+function formatDate(d) {
+  const now = new Date();
+  const then = new Date(d);
+  if (isNaN(then.getTime())) return '';
+  const days = Math.max(0, Math.floor((now - then) / (1000 * 60 * 60 * 24)));
+  if (days === 0) return "aujourd'hui";
+  if (days === 1) return 'hier';
+  if (days < 7) return `il y a ${days}j`;
+  if (days < 30) return `il y a ${Math.floor(days / 7)}sem`;
+  return then.toLocaleDateString('fr-FR', { day: 'numeric', month: 'short' });
+}
+
+
+function parseChargeNumber(value) {
+  if (!value) return null;
+  const s = String(value).replace(',', '.');
+  const matches = s.match(/\d+(?:\.\d+)?/g);
+  if (!matches || !matches.length) return null;
+  // If format is "16-22" or "16–22", use the highest number as target.
+  return parseFloat(matches[matches.length - 1]);
+}
+
+function inferChargeStep(value, target, context) {
+  const s = String([value, target, context].filter(Boolean).join(' ')).toLowerCase();
+  if (s.includes('haltère') || s.includes('dumbbell') || s.includes('×2') || s.includes('x2') || s.includes('/main')) return 1;
+  if (s.includes('élévation') || s.includes('oiseau') || s.includes('curl')) return 1;
+  if (s.includes('poulie') || s.includes('câble') || s.includes('cable')) return 2.5;
+  if (s.includes('presse') || s.includes('machine')) return 5;
+  if (s.includes('kg')) return 2.5;
+  return 1;
+}
+
+function formatChargeNumber(n) {
+  if (!Number.isFinite(n)) return '';
+  const rounded = Math.round(n * 10) / 10;
+  return String(rounded).replace('.', ',');
+}
+
+function normalizeChargeUnit(original, n) {
+  const s = String(original || '').toLowerCase();
+  const suffix = (s.includes('×2') || s.includes('x2')) ? ' kg×2' : ' kg';
+  return `${formatChargeNumber(n)}${suffix}`;
+}
+
+function suggestNextCharge(lastValue, targetValue, context) {
+  const last = parseChargeNumber(lastValue);
+  if (last == null) return targetValue ? `Objectif programme : ${targetValue}` : '—';
+  const step = inferChargeStep(lastValue, targetValue, context);
+  const suggested = last + step;
+  return `Tente ${normalizeChargeUnit(lastValue || targetValue, suggested)}`;
+}
+
+function renderChargeInsight(histKey) {
+  const lastEl = document.querySelector(`[data-last-charge="${histKey}"]`);
+  const suggestEl = document.querySelector(`[data-suggest-charge="${histKey}"]`);
+  const insightEl = document.querySelector(`[data-charge-insight="${histKey}"]`);
+  if (!lastEl || !suggestEl || !insightEl) return;
+  const target = insightEl.dataset.targetCharge || '';
+  const context = insightEl.dataset.chargeContext || '';
+  let hist = [];
+  try { hist = JSON.parse(localStorage.getItem(histKey) || '[]'); } catch(e) {}
+  const latest = hist[hist.length - 1];
+  if (!latest) {
+    lastEl.textContent = 'Aucune charge enregistrée';
+    suggestEl.textContent = target ? `Objectif programme : ${target}` : '—';
+    return;
+  }
+  lastEl.textContent = `${latest.v} · ${formatDate(latest.d)}`;
+  suggestEl.textContent = suggestNextCharge(latest.v, target, context);
+}
+
+function renderChargeHistory(histKey) {
+  renderChargeInsight(histKey);
+  const displayEl = document.querySelector(`[data-charge-hist-display="${histKey}"]`);
+  if (!displayEl) return;
+  let hist = [];
+  try { hist = JSON.parse(localStorage.getItem(histKey) || '[]'); } catch(e) {}
+  if (!hist.length) {
+    displayEl.innerHTML = '';
+    return;
+  }
+  // Show up to 3 most recent; reversed means index 0 in display = last item in hist
+  const total = hist.length;
+  const recent = hist.slice(-3).reverse();
+  displayEl.innerHTML = recent.map((h, i) => {
+    const realIdx = total - 1 - i;
+    return `<span class="history-chip" data-hist-key="${histKey}" data-idx="${realIdx}"${i === 0 ? ' data-latest="1"' : ''}><strong>${escape(h.v)}</strong> · ${escape(formatDate(h.d))}</span>`;
+  }).join('');
+
+  // Apply latest style via JS since we need to know both state+role
+  displayEl.querySelectorAll('.history-chip').forEach(chip => {
+    if (chip.dataset.latest === '1') {
+      chip.classList.add('latest');
+    }
+  });
+
+  // Bind click to edit
+  displayEl.querySelectorAll('.history-chip').forEach(chip => {
+    chip.addEventListener('click', e => {
+      e.stopPropagation();
+      openChargeEdit(chip.dataset.histKey, parseInt(chip.dataset.idx));
+    });
+  });
+}
+
+function bindCharges() {
+  document.querySelectorAll('[data-charge-save]').forEach(btn => {
+    btn.addEventListener('click', e => {
+      e.stopPropagation();
+      const key = btn.dataset.chargeSave;
+      const histKey = btn.dataset.hist;
+      const input = document.querySelector(`[data-charge="${key}"]`);
+      if (!input) return;
+      const val = input.value.trim();
+      if (!val) return;
+
+      // Save current value
+      try { localStorage.setItem(key, val); } catch(e) {}
+
+      // Append to history — avoid duplicate if same value & same day
+      let hist = [];
+      try { hist = JSON.parse(localStorage.getItem(histKey) || '[]'); } catch(e) {}
+      const today = new Date().toISOString().slice(0, 10);
+      const lastEntry = hist[hist.length - 1];
+      if (!lastEntry || lastEntry.v !== val || lastEntry.d.slice(0, 10) !== today) {
+        hist.push({ v: val, d: new Date().toISOString() });
+        // Keep last 20
+        if (hist.length > 20) hist = hist.slice(-20);
+        try { localStorage.setItem(histKey, JSON.stringify(hist)); } catch(e) {}
+      }
+
+      // Visual feedback
+      btn.classList.add('saved');
+      btn.textContent = 'Enregistré';
+      setTimeout(() => {
+        btn.classList.remove('saved');
+        btn.textContent = 'Valider';
+      }, 1500);
+
+      renderChargeHistory(histKey);
+    });
+  });
+
+
+  document.querySelectorAll('[data-use-last]').forEach(btn => {
+    btn.addEventListener('click', e => {
+      e.stopPropagation();
+      const key = btn.dataset.useLast;
+      const histKey = btn.dataset.hist;
+      const input = document.querySelector(`[data-charge="${key}"]`);
+      let hist = [];
+      try { hist = JSON.parse(localStorage.getItem(histKey) || '[]'); } catch(e) {}
+      const latest = hist[hist.length - 1];
+      if (input && latest && latest.v) {
+        input.value = latest.v;
+        input.focus();
+      }
+    });
+  });
+
+  // Prevent taps inside input from collapsing the exercise
+  document.querySelectorAll('.ex-charge-input').forEach(input => {
+    input.addEventListener('click', e => e.stopPropagation());
+  });
+}
+
+function restoreCharges() {
+  document.querySelectorAll('[data-charge]').forEach(input => {
+    try {
+      const v = localStorage.getItem(input.dataset.charge);
+      if (v) input.value = v;
+    } catch(e) {}
+    renderChargeHistory(input.dataset.hist);
+  });
+}
+
+// ═══ CHARGE EDIT MODAL ═══
+const editBackdrop = document.getElementById('edit-backdrop');
+const editInput = document.getElementById('edit-input');
+const editSub = document.getElementById('edit-sub');
+const editSave = document.getElementById('edit-save');
+const editCancel = document.getElementById('edit-cancel');
+const editDelete = document.getElementById('edit-delete');
+let currentEdit = null; // { histKey, idx }
+
+function openChargeEdit(histKey, idx) {
+  let hist = [];
+  try { hist = JSON.parse(localStorage.getItem(histKey) || '[]'); } catch(e) {}
+  if (!hist[idx]) return;
+  const entry = hist[idx];
+  currentEdit = { histKey, idx };
+  editInput.value = entry.v;
+  editSub.textContent = formatDate(entry.d);
+  editBackdrop.classList.add('active');
+  // focus after transition
+  setTimeout(() => editInput.focus(), 50);
+}
+
+function closeChargeEdit() {
+  editBackdrop.classList.remove('active');
+  currentEdit = null;
+  editInput.blur();
+}
+
+editSave.addEventListener('click', () => {
+  if (!currentEdit) return;
+  const newVal = editInput.value.trim();
+  if (!newVal) return;
+  const { histKey, idx } = currentEdit;
+  let hist = [];
+  try { hist = JSON.parse(localStorage.getItem(histKey) || '[]'); } catch(e) {}
+  if (hist[idx]) {
+    hist[idx].v = newVal;
+    try { localStorage.setItem(histKey, JSON.stringify(hist)); } catch(e) {}
+    // If editing the most recent entry, also update the current-charge storage
+    if (idx === hist.length - 1) {
+      const chargeKey = histKey.replace('chargeHist:', 'charge:');
+      try { localStorage.setItem(chargeKey, newVal); } catch(e) {}
+      const input = document.querySelector(`[data-charge="${chargeKey}"]`);
+      if (input) input.value = newVal;
+    }
+    renderChargeHistory(histKey);
+  }
+  closeChargeEdit();
+});
+
+editDelete.addEventListener('click', () => {
+  if (!currentEdit) return;
+  const { histKey, idx } = currentEdit;
+  let hist = [];
+  try { hist = JSON.parse(localStorage.getItem(histKey) || '[]'); } catch(e) {}
+  if (hist[idx] !== undefined) {
+    const wasLatest = idx === hist.length - 1;
+    hist.splice(idx, 1);
+    try {
+      if (hist.length) {
+        localStorage.setItem(histKey, JSON.stringify(hist));
+      } else {
+        localStorage.removeItem(histKey);
+      }
+    } catch(e) {}
+    // If we deleted the latest, sync the current-charge value with the new latest (or clear)
+    if (wasLatest) {
+      const chargeKey = histKey.replace('chargeHist:', 'charge:');
+      const input = document.querySelector(`[data-charge="${chargeKey}"]`);
+      if (hist.length) {
+        const newLatest = hist[hist.length - 1].v;
+        try { localStorage.setItem(chargeKey, newLatest); } catch(e) {}
+        if (input) input.value = newLatest;
+      } else {
+        try { localStorage.removeItem(chargeKey); } catch(e) {}
+        if (input) input.value = '';
+      }
+    }
+    renderChargeHistory(histKey);
+  }
+  closeChargeEdit();
+});
+
+editCancel.addEventListener('click', closeChargeEdit);
+
+editBackdrop.addEventListener('click', e => {
+  if (e.target === editBackdrop) closeChargeEdit();
+});
+
+editInput.addEventListener('keydown', e => {
+  if (e.key === 'Enter') { e.preventDefault(); editSave.click(); }
+  if (e.key === 'Escape') closeChargeEdit();
+});
+
+// ═══ REST TIMER ═══
+let timerInterval = null;
+let timerEndTime = 0;
+let timerTotalSeconds = 0;
+const timerOverlay = document.getElementById('timer-overlay');
+const timerLabel = document.getElementById('timer-label');
+const timerValue = document.getElementById('timer-value');
+const timerExtend = document.getElementById('timer-extend');
+const timerReduce = document.getElementById('timer-reduce');
+const timerClose = document.getElementById('timer-close');
+
+function formatMS(totalSec) {
+  if (totalSec < 0) totalSec = 0;
+  const m = Math.floor(totalSec / 60);
+  const s = totalSec % 60;
+  return `${String(m).padStart(2, '0')}:${String(s).padStart(2, '0')}`;
+}
+
+function bindRestTimers() {
+  document.querySelectorAll('.stat.rest, .superset-footer.timer-ready, .superset-rest-card.timer-ready').forEach(stat => {
+    stat.addEventListener('click', e => {
+      e.stopPropagation();
+      const seconds = parseInt(stat.dataset.restSeconds || '0');
+      const label = stat.dataset.restLabel || 'Repos';
+      if (seconds > 0) startRestTimer(seconds, label);
+    });
+  });
+}
+
+function startRestTimer(seconds, label) {
+  if (timerInterval) clearInterval(timerInterval);
+  timerOverlay.classList.remove('done', 'ending');
+  timerOverlay.classList.add('active');
+  document.body.classList.add('timer-active');
+  timerLabel.textContent = label.length > 28 ? label.slice(0, 26) + '…' : label;
+  timerTotalSeconds = seconds;
+  timerEndTime = Date.now() + seconds * 1000;
+  updateTimerDisplay();
+
+  timerInterval = setInterval(() => {
+    const remaining = Math.ceil((timerEndTime - Date.now()) / 1000);
+    if (remaining <= 0) {
+      clearInterval(timerInterval);
+      timerInterval = null;
+      timerValue.textContent = '00:00';
+      timerOverlay.classList.remove('ending');
+      timerOverlay.classList.add('done');
+      triggerBuzz();
+    } else if (remaining <= 5) {
+      timerOverlay.classList.add('ending');
+      timerValue.textContent = formatMS(remaining);
+    } else {
+      timerValue.textContent = formatMS(remaining);
+    }
+  }, 250);
+}
+
+function updateTimerDisplay() {
+  const remaining = Math.ceil((timerEndTime - Date.now()) / 1000);
+  timerValue.textContent = formatMS(remaining);
+}
+
+function triggerBuzz() {
+  // Pas de son — vibration uniquement (Android ; iOS l'ignore) + signal visuel
+  if (navigator.vibrate) navigator.vibrate([200, 100, 200, 100, 400]);
+}
+
+
+
+timerReduce.addEventListener('click', () => {
+  if (!timerInterval) return;
+  const minEnd = Date.now() + 5 * 1000;
+  timerEndTime = Math.max(minEnd, timerEndTime - 30 * 1000);
+  timerOverlay.classList.remove('ending', 'done');
+  updateTimerDisplay();
+});
+timerExtend.addEventListener('click', () => {
+  if (timerInterval) {
+    // still running → add 30s
+    timerEndTime += 30 * 1000;
+    timerOverlay.classList.remove('ending', 'done');
+    updateTimerDisplay();
+  } else {
+    // done → restart with 30s
+    startRestTimer(30, timerLabel.textContent);
+  }
+});
+
+timerClose.addEventListener('click', () => {
+  if (timerInterval) clearInterval(timerInterval);
+  timerInterval = null;
+  timerOverlay.classList.remove('active', 'ending', 'done');
+  document.body.classList.remove('timer-active');
+});
+
+
+const exportBtn = document.getElementById('btn-export');
+const importBtn = document.getElementById('btn-import');
+const compactBtn = document.getElementById('btn-compact');
+const resetDataBtn = document.getElementById('btn-reset-data');
+const importFile = document.getElementById('import-file');
+if (exportBtn) exportBtn.addEventListener('click', exportTrainingData);
+if (importBtn && importFile) importBtn.addEventListener('click', () => importFile.click());
+if (importFile) importFile.addEventListener('change', e => importTrainingData(e.target.files[0]));
+
+function setCompactMode(active) {
+  document.body.classList.toggle('compact-mode', active);
+  if (compactBtn) compactBtn.classList.toggle('active', active);
+  try { localStorage.setItem('compactMode', active ? '1' : '0'); } catch(e) {}
+}
+if (compactBtn) {
+  compactBtn.addEventListener('click', () => setCompactMode(!document.body.classList.contains('compact-mode')));
+}
+try { setCompactMode(localStorage.getItem('compactMode') === '1'); } catch(e) {}
+if (resetDataBtn) resetDataBtn.addEventListener('click', resetTrainingData);
+
+// ═══ NAVIGATION ═══
+function goHome(updateHistory = true) {
+  document.body.classList.add('view-home');
+  document.body.classList.remove('view-session');
+  document.body.style.removeProperty('--accent-color');
+  document.getElementById('topbar-title').textContent = 'Programme';
+  document.getElementById('view-session').classList.remove('active');
+  document.getElementById('view-home').classList.add('active');
+  stopProgressTicker();
+  releaseWakeLock();
+  renderHome(); // refresh "dernière séance" on the cards
+  window.scrollTo(0, 0);
+  // Close timer on navigation back
+  if (timerInterval) clearInterval(timerInterval);
+  timerInterval = null;
+  timerOverlay.classList.remove('active', 'ending', 'done');
+  document.body.classList.remove('timer-active');
+  if (updateHistory) { try { history.pushState({ view: 'home' }, '', window.location.pathname + window.location.search); } catch(e) {} }
+}
+
+document.getElementById('btn-back').addEventListener('click', goHome);
+
+// Browser/iOS back navigation
+window.addEventListener('popstate', e => {
+  const state = e.state || { view: 'home' };
+  if (state.view === 'session' && state.key && sessions[state.key]) {
+    openSession(state.key, false);
+  } else if (document.body.classList.contains('view-session')) {
+    goHome(false);
+  }
+});
+
+// ═══ HELPERS ═══
+function escape(s) {
+  if (s == null) return '';
+  return String(s)
+    .replace(/&/g, '&amp;')
+    .replace(/</g, '&lt;')
+    .replace(/>/g, '&gt;')
+    .replace(/"/g, '&quot;')
+    .replace(/'/g, '&#39;');
+}
+
+// ═══ THEME ═══
+const themeBtn = document.getElementById('btn-theme');
+function setTheme(t) {
+  document.documentElement.setAttribute('data-theme', t);
+  themeBtn.textContent = t === 'dark' ? '☾' : '☀';
+  try { localStorage.setItem('theme', t); } catch(e) {}
+  // Update status bar meta
+  const meta = document.querySelector('meta[name="theme-color"]');
+  if (meta) meta.setAttribute('content', t === 'dark' ? '#000000' : '#f2f2f7');
+}
+themeBtn.addEventListener('click', () => {
+  const current = document.documentElement.getAttribute('data-theme') || 'dark';
+  setTheme(current === 'dark' ? 'light' : 'dark');
+});
+// Restore saved theme
+try {
+  const saved = localStorage.getItem('theme');
+  if (saved) setTheme(saved);
+  else setTheme('dark');
+} catch(e) { setTheme('dark'); }
+
+// ═══ TABATA ═══
+const TABATA_DEFAULTS = { prep: 10, work: 20, rest: 10, rounds: 8 };
+const TABATA_LIMITS = { prep: [0, 60], work: [5, 300], rest: [0, 300], rounds: [1, 30] };
+const TABATA_LABELS = { prep: 'Préparation', work: 'Effort', rest: 'Repos', done: 'Terminé' };
+let tabataCfg = { ...TABATA_DEFAULTS };
+try { tabataCfg = { ...TABATA_DEFAULTS, ...(JSON.parse(localStorage.getItem('tabataCfg') || '{}')) }; } catch(e) {}
+
+const tabataConfigEl = document.getElementById('tabata-config');
+const tabataScreen = document.getElementById('tabata-screen');
+const tabataPhaseEl = document.getElementById('tabata-phase');
+const tabataCountEl = document.getElementById('tabata-count');
+const tabataFillEl = document.getElementById('tabata-fill');
+const tabataRoundEl = document.getElementById('tabata-round');
+const tabataPauseBtn = document.getElementById('tabata-pause');
+const tabataSkipBtn = document.getElementById('tabata-skip');
+
+let tabataTimer = null;
+let tabataRun = null; // { phase, round, endTime, dur, paused, pausedLeft }
+
+function saveTabataCfg() {
+  try { localStorage.setItem('tabataCfg', JSON.stringify(tabataCfg)); } catch(e) {}
+}
+
+function tabataTotalSeconds() {
+  return tabataCfg.prep + tabataCfg.work * tabataCfg.rounds + tabataCfg.rest * Math.max(0, tabataCfg.rounds - 1);
+}
+
+function renderTabataConfig() {
+  document.querySelectorAll('[data-tabata-field]').forEach(el => {
+    const f = el.dataset.tabataField;
+    el.textContent = f === 'rounds' ? tabataCfg.rounds : `${tabataCfg[f]}s`;
+  });
+  const total = document.getElementById('tabata-total');
+  if (total) total.textContent = `Durée totale : ${formatMS(tabataTotalSeconds())}`;
+  const cardMeta = document.getElementById('tabata-card-meta');
+  if (cardMeta) cardMeta.textContent = `${tabataCfg.work}s effort · ${tabataCfg.rest}s repos · ${tabataCfg.rounds} rounds`;
+}
+
+function openTabataConfig() {
+  renderTabataConfig();
+  tabataConfigEl.classList.add('active');
+}
+
+document.querySelectorAll('[data-tabata-adjust]').forEach(btn => {
+  btn.addEventListener('click', () => {
+    const [field, deltaStr] = btn.dataset.tabataAdjust.split(':');
+    const [min, max] = TABATA_LIMITS[field];
+    tabataCfg[field] = Math.min(max, Math.max(min, (tabataCfg[field] || 0) + parseInt(deltaStr)));
+    saveTabataCfg();
+    renderTabataConfig();
+  });
+});
+
+function tabataSetPhase(phase) {
+  tabataRun.phase = phase;
+  const dur = phase === 'prep' ? tabataCfg.prep : phase === 'work' ? tabataCfg.work : tabataCfg.rest;
+  tabataRun.dur = Math.max(1, dur);
+  tabataRun.endTime = Date.now() + dur * 1000;
+  tabataScreen.classList.remove('phase-prep', 'phase-work', 'phase-rest', 'phase-done');
+  tabataScreen.classList.add(`phase-${phase}`);
+  tabataPhaseEl.textContent = TABATA_LABELS[phase];
+  tabataRoundEl.textContent = phase === 'prep'
+    ? `${tabataCfg.rounds} rounds à venir`
+    : `Round ${tabataRun.round}/${tabataCfg.rounds}`;
+  // Slide-in du label et du round à chaque changement de phase
+  [tabataPhaseEl, tabataRoundEl].forEach(el => el.classList.remove('swap'));
+  void tabataPhaseEl.offsetWidth; // reflow pour relancer l'animation
+  [tabataPhaseEl, tabataRoundEl].forEach(el => el.classList.add('swap'));
+  // Reset de la barre sans animation inverse, puis reprise du glissement continu
+  tabataFillEl.style.transition = 'none';
+  tabataFillEl.style.width = '100%';
+  void tabataFillEl.offsetWidth;
+  tabataFillEl.style.transition = '';
+  if (navigator.vibrate) navigator.vibrate(phase === 'work' ? 300 : 150);
+  tabataRenderTick();
+}
+
+function tabataRenderTick() {
+  if (!tabataRun || tabataRun.phase === 'done') return;
+  const msLeft = Math.max(0, tabataRun.endTime - Date.now());
+  const remaining = Math.ceil(msLeft / 1000);
+  const txt = String(remaining);
+  if (tabataCountEl.textContent !== txt) {
+    tabataCountEl.textContent = txt;
+    tabataCountEl.classList.remove('tick');
+    void tabataCountEl.offsetWidth; // reflow pour relancer l'animation à chaque seconde
+    tabataCountEl.classList.add('tick');
+  }
+  tabataCountEl.classList.toggle('ending', remaining <= 3 && remaining > 0);
+  tabataFillEl.style.width = `${Math.max(0, Math.min(1, msLeft / (tabataRun.dur * 1000))) * 100}%`;
+}
+
+function tabataAdvance() {
+  const r = tabataRun;
+  if (!r || r.phase === 'done') return;
+  if (r.phase === 'prep') return tabataSetPhase('work');
+  if (r.phase === 'work') {
+    if (r.round >= tabataCfg.rounds) return tabataFinish();
+    if (tabataCfg.rest <= 0) { r.round++; return tabataSetPhase('work'); }
+    return tabataSetPhase('rest');
+  }
+  // rest → next round
+  r.round++;
+  tabataSetPhase('work');
+}
+
+function tabataLaunch() {
+  tabataRun = { round: 1, paused: false };
+  tabataPauseBtn.textContent = 'Pause';
+  tabataSkipBtn.style.display = '';
+  tabataScreen.classList.remove('paused');
+  tabataSetPhase(tabataCfg.prep > 0 ? 'prep' : 'work');
+  if (tabataTimer) clearInterval(tabataTimer);
+  tabataTimer = setInterval(() => {
+    if (!tabataRun || tabataRun.paused || tabataRun.phase === 'done') return;
+    if (Date.now() >= tabataRun.endTime) tabataAdvance();
+    else tabataRenderTick();
+  }, 200);
+}
+
+function tabataFinish() {
+  tabataRun.phase = 'done';
+  tabataScreen.classList.remove('phase-prep', 'phase-work', 'phase-rest', 'paused');
+  tabataScreen.classList.add('phase-done');
+  tabataPhaseEl.textContent = TABATA_LABELS.done;
+  [tabataPhaseEl, tabataRoundEl].forEach(el => el.classList.remove('swap'));
+  void tabataPhaseEl.offsetWidth;
+  [tabataPhaseEl, tabataRoundEl].forEach(el => el.classList.add('swap'));
+  tabataCountEl.textContent = '✓';
+  tabataCountEl.classList.remove('ending', 'tick');
   tabataFillEl.style.width = '100%';
   tabataRoundEl.textContent = `${tabataCfg.rounds} rounds · ${formatMS(tabataTotalSeconds())}`;
   tabataPauseBtn.textContent = 'Refaire';
