@@ -6,24 +6,21 @@
 <meta name="apple-mobile-web-app-capable" content="yes">
 <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
 <meta name="apple-mobile-web-app-title" content="Training">
-<meta name="theme-color" content="#0d0d0d">
+<meta name="theme-color" content="#000000">
 <link rel="apple-touch-icon" sizes="180x180" href="apple-touch-icon.png">
 <link rel="icon" type="image/png" sizes="180x180" href="apple-touch-icon.png">
 <meta name="application-name" content="Training">
 <title>Training</title>
-<link rel="preconnect" href="https://fonts.googleapis.com">
-<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-<link href="https://fonts.googleapis.com/css2?family=Bebas+Neue&family=Inter:wght@300;400;500;600;700&display=swap" rel="stylesheet">
 <style>
   :root, :root[data-theme="dark"] {
-    --bg: #0a0a0a;
-    --surface: #141414;
-    --surface-2: #1c1c1c;
-    --border: #222;
-    --text: #f0f0f0;
-    --text-2: #999;
-    --text-3: #555;
-    --text-4: #333;
+    --bg: #000000;
+    --surface: #1c1c1e;
+    --surface-2: #2c2c2e;
+    --border: #38383a;
+    --text: #ffffff;
+    --text-2: #98989f;
+    --text-3: #636366;
+    --text-4: #48484a;
     --warn-bg: rgba(245, 168, 74, 0.08);
     --warn-border: rgba(245, 168, 74, 0.2);
     --warn-text: #f5a84a;
@@ -36,14 +33,14 @@
   }
 
   :root[data-theme="light"] {
-    --bg: #f5f4f1;
+    --bg: #f2f2f7;
     --surface: #ffffff;
-    --surface-2: #edece7;
-    --border: #d8d6cf;
-    --text: #1a1a1a;
-    --text-2: #55514a;
-    --text-3: #8a857c;
-    --text-4: #b5b0a6;
+    --surface-2: #e9e9ee;
+    --border: #e2e2e7;
+    --text: #000000;
+    --text-2: #515154;
+    --text-3: #8e8e93;
+    --text-4: #c7c7cc;
     --warn-bg: rgba(200, 110, 20, 0.08);
     --warn-border: rgba(200, 110, 20, 0.25);
     --warn-text: #a8540d;
@@ -57,7 +54,7 @@
   html, body {
     background: var(--bg);
     color: var(--text);
-    font-family: 'Inter', -apple-system, BlinkMacSystemFont, sans-serif;
+    font-family: -apple-system, BlinkMacSystemFont, 'SF Pro Text', 'Segoe UI', sans-serif;
     font-size: 15px;
     line-height: 1.5;
     -webkit-font-smoothing: antialiased;
@@ -105,7 +102,8 @@
   body.view-session .btn-back { display: flex; }
 
   .topbar-title {
-    font-family: 'Bebas Neue', sans-serif;
+    font-family: -apple-system, BlinkMacSystemFont, 'SF Pro Display', 'Segoe UI', sans-serif;
+    font-weight: 800;
     font-size: 22px;
     letter-spacing: 0.5px;
     color: var(--text);
@@ -154,7 +152,8 @@
   }
 
   .home-hero h1 {
-    font-family: 'Bebas Neue', sans-serif;
+    font-family: -apple-system, BlinkMacSystemFont, 'SF Pro Display', 'Segoe UI', sans-serif;
+    font-weight: 800;
     font-size: 56px;
     line-height: 0.9;
     letter-spacing: 0.5px;
@@ -255,7 +254,8 @@
   }
 
   .session-card-name {
-    font-family: 'Bebas Neue', sans-serif;
+    font-family: -apple-system, BlinkMacSystemFont, 'SF Pro Display', 'Segoe UI', sans-serif;
+    font-weight: 800;
     font-size: 26px;
     letter-spacing: 0.5px;
     line-height: 1;
@@ -301,7 +301,8 @@
   }
 
   .session-hero h1 {
-    font-family: 'Bebas Neue', sans-serif;
+    font-family: -apple-system, BlinkMacSystemFont, 'SF Pro Display', 'Segoe UI', sans-serif;
+    font-weight: 800;
     font-size: 42px;
     letter-spacing: 0.5px;
     line-height: 0.95;
@@ -344,7 +345,8 @@
   }
 
   .bloc-num {
-    font-family: 'Bebas Neue', sans-serif;
+    font-family: -apple-system, BlinkMacSystemFont, 'SF Pro Display', 'Segoe UI', sans-serif;
+    font-weight: 800;
     font-size: 42px;
     line-height: 0.85;
     color: var(--accent-color);
@@ -359,7 +361,8 @@
   }
 
   .bloc-name {
-    font-family: 'Bebas Neue', sans-serif;
+    font-family: -apple-system, BlinkMacSystemFont, 'SF Pro Display', 'Segoe UI', sans-serif;
+    font-weight: 800;
     font-size: 22px;
     letter-spacing: 0.5px;
     color: var(--text);
@@ -405,7 +408,8 @@
   .ex-head:active { background: var(--surface-2); }
 
   .ex-num {
-    font-family: 'Bebas Neue', sans-serif;
+    font-family: -apple-system, BlinkMacSystemFont, 'SF Pro Display', 'Segoe UI', sans-serif;
+    font-weight: 800;
     font-size: 20px;
     color: var(--accent-color);
     font-weight: 400;
@@ -493,7 +497,8 @@
   }
 
   .stat-value {
-    font-family: 'Bebas Neue', sans-serif;
+    font-family: -apple-system, BlinkMacSystemFont, 'SF Pro Display', 'Segoe UI', sans-serif;
+    font-weight: 800;
     font-size: 20px;
     line-height: 1;
     color: var(--text);
@@ -610,7 +615,8 @@
   }
 
   .superset-rounds {
-    font-family: 'Bebas Neue', sans-serif;
+    font-family: -apple-system, BlinkMacSystemFont, 'SF Pro Display', 'Segoe UI', sans-serif;
+    font-weight: 800;
     font-size: 22px;
     line-height: 1;
     color: var(--accent-color);
@@ -714,7 +720,8 @@
   }
 
   .round-num {
-    font-family: 'Bebas Neue', sans-serif;
+    font-family: -apple-system, BlinkMacSystemFont, 'SF Pro Display', 'Segoe UI', sans-serif;
+    font-weight: 800;
     font-size: 28px;
     color: var(--accent-color);
     line-height: 1;
@@ -869,7 +876,8 @@
     border: 1px solid var(--border);
     border-radius: 10px;
     color: var(--text-2);
-    font-family: 'Bebas Neue', sans-serif;
+    font-family: -apple-system, BlinkMacSystemFont, 'SF Pro Display', 'Segoe UI', sans-serif;
+    font-weight: 800;
     font-size: 16px;
     letter-spacing: 0.5px;
     cursor: pointer;
@@ -1042,7 +1050,8 @@
     border: 1px solid var(--border);
     border-radius: 8px;
     color: var(--text);
-    font-family: 'Bebas Neue', sans-serif;
+    font-family: -apple-system, BlinkMacSystemFont, 'SF Pro Display', 'Segoe UI', sans-serif;
+    font-weight: 800;
     font-size: 18px;
     letter-spacing: 0.5px;
     padding: 6px 12px;
@@ -1210,7 +1219,8 @@
   }
 
   .edit-title {
-    font-family: 'Bebas Neue', sans-serif;
+    font-family: -apple-system, BlinkMacSystemFont, 'SF Pro Display', 'Segoe UI', sans-serif;
+    font-weight: 800;
     font-size: 20px;
     color: var(--text);
     letter-spacing: 0.5px;
@@ -1228,7 +1238,8 @@
     border: 1px solid var(--border);
     border-radius: 10px;
     color: var(--text);
-    font-family: 'Bebas Neue', sans-serif;
+    font-family: -apple-system, BlinkMacSystemFont, 'SF Pro Display', 'Segoe UI', sans-serif;
+    font-weight: 800;
     font-size: 26px;
     letter-spacing: 0.5px;
     padding: 12px 16px;
@@ -1341,7 +1352,8 @@
   }
 
   .timer-value {
-    font-family: 'Bebas Neue', sans-serif;
+    font-family: -apple-system, BlinkMacSystemFont, 'SF Pro Display', 'Segoe UI', sans-serif;
+    font-weight: 800;
     font-size: 36px;
     line-height: 0.9;
     color: var(--text);
@@ -1416,12 +1428,386 @@
   body.compact-mode .ex-charge { padding: 10px 12px; }
   body.compact-mode .ex-charge-history { display: none; }
 
+  /* ══ SET TRACKER ══ */
+  .ex-sets {
+    display: flex;
+    align-items: center;
+    gap: 8px;
+    padding: 10px 16px 12px;
+    border-top: 1px solid var(--border);
+    flex-wrap: wrap;
+  }
+
+  .ex-sets-label {
+    font-size: 10px;
+    letter-spacing: 1.5px;
+    text-transform: uppercase;
+    color: var(--text-3);
+    font-weight: 600;
+    flex-shrink: 0;
+    margin-right: 2px;
+  }
+
+  .ex-sets-dots {
+    display: flex;
+    gap: 8px;
+    flex-wrap: wrap;
+  }
+
+  .set-dot {
+    width: 36px;
+    height: 36px;
+    border-radius: 50%;
+    border: 1.5px solid var(--border);
+    background: var(--bg);
+    color: var(--text-3);
+    font-family: inherit;
+    font-size: 13px;
+    font-weight: 600;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    cursor: pointer;
+    user-select: none;
+    -webkit-user-select: none;
+    -webkit-appearance: none;
+    font-variant-numeric: tabular-nums;
+    transition: background 0.12s, border-color 0.12s, color 0.12s, transform 0.12s;
+  }
+
+  .set-dot:active { transform: scale(0.92); }
+
+  .set-dot.done {
+    background: var(--accent-color);
+    border-color: var(--accent-color);
+    color: #fff;
+  }
+
+  .ex-sets-reset {
+    margin-left: auto;
+    width: 30px;
+    height: 30px;
+    border-radius: 50%;
+    background: none;
+    border: none;
+    color: var(--text-4);
+    font-size: 15px;
+    cursor: pointer;
+    flex-shrink: 0;
+    -webkit-appearance: none;
+  }
+
+  .ex-sets-reset:active { color: var(--text-2); }
+
+  .ex.sets-done .ex-num { color: var(--text-4); }
+  .ex.sets-done .ex-name {
+    color: var(--text-3);
+    text-decoration: line-through;
+    text-decoration-color: var(--text-4);
+  }
+
+  .ex-sets.superset-sets {
+    padding: 10px 14px 12px;
+    background: color-mix(in srgb, var(--accent-color) 6%, var(--surface));
+  }
+
+  /* ══ SESSION PROGRESS ══ */
+  .session-progress { margin-top: 14px; }
+  .session-progress.hidden { display: none; }
+
+  .session-progress-track {
+    height: 6px;
+    border-radius: 999px;
+    background: var(--surface-2);
+    border: 1px solid var(--border);
+    overflow: hidden;
+  }
+
+  .session-progress-fill {
+    height: 100%;
+    width: 0%;
+    background: var(--accent-color);
+    border-radius: 999px;
+    transition: width 0.3s ease;
+  }
+
+  .session-progress-text {
+    display: flex;
+    justify-content: space-between;
+    margin-top: 6px;
+    font-size: 11px;
+    color: var(--text-3);
+    font-variant-numeric: tabular-nums;
+  }
+
+  .session-progress-text .done {
+    color: var(--accent-color);
+    font-weight: 600;
+  }
+
+  .session-card-meta .last-done {
+    color: var(--accent-color, var(--accent));
+    font-weight: 600;
+  }
+
+  body.compact-mode .ex-sets { padding: 8px 12px 10px; }
+  body.compact-mode .set-dot { width: 32px; height: 32px; font-size: 12px; }
+  body.compact-mode .session-progress { margin-top: 10px; }
+
   /* ══ Responsive tweaks ══ */
   @media (min-width: 600px) {
-    .home-hero h1 { font-size: 72px; }
-    .session-hero h1 { font-size: 56px; }
     main { max-width: 720px; margin: 0 auto; }
   }
+
+  /* ══ iOS SKIN — typographie SF, surfaces iOS, barres floutées ══ */
+  .topbar {
+    background: color-mix(in srgb, var(--bg) 80%, transparent);
+    -webkit-backdrop-filter: saturate(180%) blur(20px);
+    backdrop-filter: saturate(180%) blur(20px);
+    border-bottom-color: color-mix(in srgb, var(--border) 55%, transparent);
+  }
+
+  .bloc-nav {
+    background: color-mix(in srgb, var(--bg) 80%, transparent);
+    -webkit-backdrop-filter: saturate(180%) blur(20px);
+    backdrop-filter: saturate(180%) blur(20px);
+  }
+
+  .topbar-title { font-size: 17px; font-weight: 700; letter-spacing: -0.2px; }
+
+  .home-hero h1 { font-size: 34px; line-height: 1.12; letter-spacing: -0.6px; }
+  .home-hero p { letter-spacing: 1.2px; }
+  .session-hero h1 { font-size: 28px; line-height: 1.1; letter-spacing: -0.5px; }
+
+  @media (min-width: 600px) {
+    .home-hero h1 { font-size: 42px; }
+    .session-hero h1 { font-size: 34px; }
+  }
+
+  /* Cartes de séance façon liste de conversations */
+  .session-card {
+    display: flex;
+    align-items: center;
+    gap: 14px;
+    padding: 12px 38px 12px 14px;
+    border-radius: 20px;
+  }
+  .session-card::before { display: none; }
+  .session-card-avatar {
+    width: 46px;
+    height: 46px;
+    border-radius: 50%;
+    background: var(--accent-color, var(--accent));
+    color: #fff;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-size: 19px;
+    font-weight: 700;
+    flex-shrink: 0;
+  }
+  .session-card-body { flex: 1; min-width: 0; }
+  .session-card-name { font-size: 17px; font-weight: 600; letter-spacing: -0.2px; margin-bottom: 3px; }
+  .session-card-meta { font-size: 13px; }
+  @media (max-width: 420px) {
+    .session-card { padding: 12px 36px 12px 12px; }
+  }
+
+  /* Tailles ex-Bebas recalibrées pour SF */
+  .session-card-name,
+  .topbar-title { font-weight: 700; }
+  .bloc-num { font-size: 26px; line-height: 1; letter-spacing: -0.4px; }
+  .bloc-name { font-size: 16px; font-weight: 700; letter-spacing: -0.2px; }
+  .bloc-title-group { padding-top: 2px; }
+  .ex-num { font-size: 15px; font-weight: 700; min-width: 22px; }
+  .stat-value { font-size: 15px; font-weight: 700; letter-spacing: -0.2px; }
+  .superset-rounds { font-size: 15px; font-weight: 800; }
+  .round-num { font-size: 22px; }
+  .bloc-nav-btn { font-size: 13px; font-weight: 600; letter-spacing: -0.1px; border-radius: 12px; }
+  .bloc-nav-btn .num { font-size: 14px; font-weight: 800; }
+  .timer-value { font-size: 32px; letter-spacing: -0.4px; }
+  .edit-title { font-size: 17px; font-weight: 700; }
+  .edit-input { font-size: 22px; font-weight: 700; }
+  .ex-charge-input { font-size: 16px; font-weight: 600; }
+  body.compact-mode .session-hero h1 { font-size: 24px; }
+  body.compact-mode .bloc-num { font-size: 22px; }
+  body.compact-mode .bloc-name { font-size: 15px; }
+  body.compact-mode .stat-value { font-size: 14px; }
+
+  /* Rayons et surfaces plus doux */
+  .ex { border-radius: 16px; }
+  .superset { border-radius: 16px; }
+  .timer-overlay {
+    border-radius: 24px;
+    background: color-mix(in srgb, var(--surface) 86%, transparent);
+    -webkit-backdrop-filter: saturate(180%) blur(20px);
+    backdrop-filter: saturate(180%) blur(20px);
+  }
+  .edit-panel { border-radius: 22px; }
+  .home-tool-btn { border-radius: 14px; }
+
+  /* ══ TABATA ══ */
+  .tabata-row {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    gap: 10px;
+  }
+
+  .tabata-row-label {
+    font-size: 15px;
+    font-weight: 600;
+    color: var(--text);
+  }
+
+  .tabata-stepper {
+    display: flex;
+    align-items: center;
+    background: var(--surface);
+    border: 1px solid var(--border);
+    border-radius: 12px;
+    overflow: hidden;
+  }
+
+  .tabata-step-btn {
+    width: 42px;
+    height: 40px;
+    background: none;
+    border: none;
+    color: var(--accent);
+    font-size: 22px;
+    font-weight: 500;
+    cursor: pointer;
+    -webkit-appearance: none;
+  }
+
+  .tabata-step-btn:active { background: var(--surface-2); }
+
+  .tabata-step-val {
+    min-width: 54px;
+    text-align: center;
+    font-size: 15px;
+    font-weight: 700;
+    font-variant-numeric: tabular-nums;
+    color: var(--text);
+  }
+
+  .tabata-total {
+    text-align: center;
+    font-size: 13px;
+    color: var(--text-3);
+    font-variant-numeric: tabular-nums;
+  }
+
+  .tabata-screen {
+    position: fixed;
+    inset: 0;
+    z-index: 200;
+    display: none;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+    gap: 10px;
+    background: var(--bg);
+    color: #fff;
+    text-align: center;
+    padding: 20px;
+    padding-top: calc(20px + var(--safe-top));
+    padding-bottom: calc(20px + var(--safe-bottom));
+    transition: background 0.35s ease;
+  }
+
+  .tabata-screen.active { display: flex; }
+  .tabata-screen.phase-prep { background: #0a84ff; }
+  .tabata-screen.phase-work { background: #ff375f; }
+  .tabata-screen.phase-rest { background: #30b350; }
+  .tabata-screen.phase-done { background: #1c1c1e; }
+
+  .tabata-close {
+    position: absolute;
+    top: calc(16px + var(--safe-top));
+    right: 16px;
+    width: 38px;
+    height: 38px;
+    border-radius: 50%;
+    background: rgba(255,255,255,0.18);
+    border: none;
+    color: #fff;
+    font-size: 17px;
+    cursor: pointer;
+    -webkit-appearance: none;
+  }
+
+  .tabata-phase {
+    font-size: 15px;
+    font-weight: 700;
+    letter-spacing: 3px;
+    text-transform: uppercase;
+    opacity: 0.85;
+  }
+
+  .tabata-count {
+    font-size: 130px;
+    font-weight: 800;
+    line-height: 1;
+    font-variant-numeric: tabular-nums;
+    letter-spacing: -2px;
+  }
+
+  .tabata-screen.paused .tabata-count { opacity: 0.35; }
+
+  .tabata-count.ending {
+    animation: tabataPulse 0.5s ease-in-out infinite alternate;
+  }
+
+  @keyframes tabataPulse {
+    from { transform: scale(1); }
+    to { transform: scale(1.08); }
+  }
+
+  .tabata-progress {
+    width: min(240px, 70vw);
+    height: 6px;
+    border-radius: 999px;
+    background: rgba(255,255,255,0.25);
+    overflow: hidden;
+    margin-top: 6px;
+  }
+
+  .tabata-progress-fill {
+    height: 100%;
+    width: 100%;
+    background: #fff;
+    border-radius: 999px;
+  }
+
+  .tabata-round {
+    font-size: 15px;
+    font-weight: 600;
+    opacity: 0.85;
+    font-variant-numeric: tabular-nums;
+  }
+
+  .tabata-controls {
+    display: flex;
+    gap: 12px;
+    margin-top: 26px;
+  }
+
+  .tabata-btn {
+    padding: 13px 28px;
+    border-radius: 999px;
+    background: rgba(255,255,255,0.18);
+    border: none;
+    color: #fff;
+    font-family: inherit;
+    font-size: 15px;
+    font-weight: 700;
+    cursor: pointer;
+    -webkit-appearance: none;
+  }
+
+  .tabata-btn:active { background: rgba(255,255,255,0.3); }
 </style>
 </head>
 <body class="view-home">
@@ -1439,7 +1825,7 @@
   <section class="view active" id="view-home">
     <div class="home-hero">
       <h1>MON<br><em>PROGRAMME</em></h1>
-      <p>5 séances · 60 min chrono</p>
+      <p>5 séances · tabata · 60 min</p>
     </div>
     <div class="home-sessions" id="home-sessions"></div>
     <div class="home-tools">
@@ -1449,7 +1835,7 @@
       <button class="home-tool-btn danger" id="btn-reset-data">Réinitialiser</button>
     </div>
     <input type="file" id="import-file" accept="application/json" hidden>
-    <div class="home-version">v3.5 · calisthénie · juin 2026</div>
+    <div class="home-version">v3.7 · tabata · style iOS · juin 2026</div>
   </section>
 
   <section class="view" id="view-session">
@@ -1465,6 +1851,62 @@
   <button class="timer-adjust" id="timer-reduce">-30s</button>
   <button class="timer-adjust primary" id="timer-extend">+30s</button>
   <button class="timer-close" id="timer-close" aria-label="Fermer">✕</button>
+</div>
+
+<div class="edit-backdrop" id="tabata-config">
+  <div class="edit-panel">
+    <div class="edit-title">Tabata</div>
+    <div class="edit-sub">Règle tes intervalles, puis lance le chrono.</div>
+    <div class="tabata-row">
+      <span class="tabata-row-label">Préparation</span>
+      <div class="tabata-stepper">
+        <button class="tabata-step-btn" data-tabata-adjust="prep:-5">−</button>
+        <span class="tabata-step-val" data-tabata-field="prep">10s</span>
+        <button class="tabata-step-btn" data-tabata-adjust="prep:5">+</button>
+      </div>
+    </div>
+    <div class="tabata-row">
+      <span class="tabata-row-label">Effort</span>
+      <div class="tabata-stepper">
+        <button class="tabata-step-btn" data-tabata-adjust="work:-5">−</button>
+        <span class="tabata-step-val" data-tabata-field="work">20s</span>
+        <button class="tabata-step-btn" data-tabata-adjust="work:5">+</button>
+      </div>
+    </div>
+    <div class="tabata-row">
+      <span class="tabata-row-label">Repos</span>
+      <div class="tabata-stepper">
+        <button class="tabata-step-btn" data-tabata-adjust="rest:-5">−</button>
+        <span class="tabata-step-val" data-tabata-field="rest">10s</span>
+        <button class="tabata-step-btn" data-tabata-adjust="rest:5">+</button>
+      </div>
+    </div>
+    <div class="tabata-row">
+      <span class="tabata-row-label">Rounds</span>
+      <div class="tabata-stepper">
+        <button class="tabata-step-btn" data-tabata-adjust="rounds:-1">−</button>
+        <span class="tabata-step-val" data-tabata-field="rounds">8</span>
+        <button class="tabata-step-btn" data-tabata-adjust="rounds:1">+</button>
+      </div>
+    </div>
+    <div class="tabata-total" id="tabata-total"></div>
+    <div class="edit-actions">
+      <button class="edit-btn" id="tabata-cancel">Fermer</button>
+      <button class="edit-btn primary" id="tabata-start">Démarrer</button>
+    </div>
+  </div>
+</div>
+
+<div class="tabata-screen" id="tabata-screen">
+  <button class="tabata-close" id="tabata-close" aria-label="Arrêter">✕</button>
+  <div class="tabata-phase" id="tabata-phase">Préparation</div>
+  <div class="tabata-count" id="tabata-count">10</div>
+  <div class="tabata-progress"><div class="tabata-progress-fill" id="tabata-fill"></div></div>
+  <div class="tabata-round" id="tabata-round"></div>
+  <div class="tabata-controls">
+    <button class="tabata-btn" id="tabata-pause">Pause</button>
+    <button class="tabata-btn" id="tabata-skip">Passer</button>
+  </div>
 </div>
 
 <div class="edit-backdrop" id="edit-backdrop">
@@ -1500,22 +1942,43 @@ function renderHome() {
       if (b.amrap) exCount += (b.amrap.movements || []).length;
     });
     const blocCount = s.blocs.length;
+    let lastDoneHtml = '';
+    try {
+      const ld = localStorage.getItem('lastDone:' + key);
+      if (ld) lastDoneHtml = `<span class="last-done">· ${escape(formatDate(ld))}</span>`;
+    } catch(e) {}
     return `
       <div class="session-card" data-session="${key}" style="--accent-color:${m.accent}">
-        <div class="session-card-name">${escape(s.title)}</div>
-        <div class="session-card-meta">
-          <span>⏱ 60 min</span>
-          <span>· ${blocCount} blocs</span>
-          <span>· ${exCount} exercices</span>
+        <div class="session-card-avatar">${escape((m.short || s.title).charAt(0).toUpperCase())}</div>
+        <div class="session-card-body">
+          <div class="session-card-name">${escape(s.title)}</div>
+          <div class="session-card-meta">
+            <span>⏱ 60 min</span>
+            <span>· ${blocCount} blocs</span>
+            <span>· ${exCount} exercices</span>
+            ${lastDoneHtml}
+          </div>
         </div>
         <span class="session-card-arrow">›</span>
       </div>
     `;
-  }).join('');
+  }).join('') + `
+      <div class="session-card" id="tabata-open" style="--accent-color:#ff9f0a">
+        <div class="session-card-avatar">⏱</div>
+        <div class="session-card-body">
+          <div class="session-card-name">Tabata</div>
+          <div class="session-card-meta">
+            <span id="tabata-card-meta">${tabataCfg.work}s effort · ${tabataCfg.rest}s repos · ${tabataCfg.rounds} rounds</span>
+          </div>
+        </div>
+        <span class="session-card-arrow">›</span>
+      </div>
+    `;
 
-  container.querySelectorAll('.session-card').forEach(c => {
+  container.querySelectorAll('.session-card[data-session]').forEach(c => {
     c.addEventListener('click', () => openSession(c.dataset.session));
   });
+  document.getElementById('tabata-open').addEventListener('click', openTabataConfig);
 }
 
 // ═══ RENDER SESSION ═══
@@ -1554,6 +2017,10 @@ function openSession(key, updateHistory = true) {
     <div class="session-hero" style="--accent-color:${m.accent}">
       <h1>${escape(s.title)}</h1>
       <div class="session-pills">${pills}</div>
+      <div class="session-progress hidden" id="session-progress">
+        <div class="session-progress-track"><div class="session-progress-fill" id="sp-fill"></div></div>
+        <div class="session-progress-text"><span id="sp-text"></span><span id="sp-time"></span></div>
+      </div>
     </div>
     <nav class="bloc-nav" id="bloc-nav">${blocNav}</nav>
     <div id="bloc-list">${blocs}</div>
@@ -1585,6 +2052,9 @@ function openSession(key, updateHistory = true) {
   bindCharges();
   restoreCharges();
   bindRestTimers();
+  bindSets();
+  startProgressTicker();
+  acquireWakeLock();
   trackBlocScroll();
 
   // Scroll to top
@@ -1668,6 +2138,14 @@ function renderBloc(b, num, accent, sessionKey) {
       renderEx(ex, String.fromCharCode(65 + i), true, sessionKey, blocIdx, `ss${idx}-${i}`)
     ).join('');
     const rest = ss.rest ? renderSupersetRest(ss.rest, idx + 1) : '';
+    const toursTotal = parseInt(rounds) || 0;
+    const ssRestSec = parseRestSeconds(ss.rest || '');
+    const toursTracker = toursTotal > 0 ? `
+      <div class="ex-sets superset-sets" data-sets-key="sets:${sessionKey}:${blocIdx}:ss${idx}" data-sets-total="${toursTotal}" data-rest-seconds="${ssRestSec}" data-rest-label="Superset ${idx + 1}">
+        <span class="ex-sets-label">Tours</span>
+        <div class="ex-sets-dots"></div>
+        <button type="button" class="ex-sets-reset" aria-label="Réinitialiser les tours">↺</button>
+      </div>` : '';
     body += `
       <div class="superset">
         <div class="superset-banner">⚡ Superset ${String(idx + 1).padStart(2, '0')}</div>
@@ -1676,6 +2154,7 @@ function renderBloc(b, num, accent, sessionKey) {
           <div class="superset-sequence">${escape(sequence)}</div>
         </div>
         ${exHtml}
+        ${toursTracker}
         ${rest}
       </div>
     `;
@@ -1861,6 +2340,17 @@ function renderEx(ex, num, inSuperset, sessionKey, blocIdx, exIdx) {
   const chargeKey = `charge:${sessionKey}:${blocIdx}:${exIdx}`;
   const chargeHistKey = `chargeHist:${sessionKey}:${blocIdx}:${exIdx}`;
 
+  // Set tracker — only for standalone exercises with an explicit series count
+  // (supersets are tracked at the round level)
+  const setsTotal = inSuperset ? 0 : (parseInt(String(stats['Séries'] || '')) || 0);
+  const setsRestSec = parseRestSeconds(stats['Repos'] || '');
+  const setsBlock = setsTotal > 0 ? `
+      <div class="ex-sets" data-sets-key="sets:${sessionKey}:${blocIdx}:${exIdx}" data-sets-total="${setsTotal}" data-rest-seconds="${setsRestSec}" data-rest-label="${escape(ex.name)}">
+        <span class="ex-sets-label">Séries</span>
+        <div class="ex-sets-dots"></div>
+        <button type="button" class="ex-sets-reset" aria-label="Réinitialiser les séries">↺</button>
+      </div>` : '';
+
   // Only show charge tracker if the exercise has a "Charge" stat (skip pure bodyweight)
   const hasCharge = stats['Charge'] && !/poids.{0,5}corps/i.test(stats['Charge']);
 
@@ -1898,6 +2388,7 @@ function renderEx(ex, num, inSuperset, sessionKey, blocIdx, exIdx) {
         <div class="ex-chevron">›</div>
       </div>
       <div class="ex-stats cols-${sortedKeys.length}">${statsHtml}</div>
+      ${setsBlock}
       ${details ? `<div class="ex-details">${details}</div>` : ''}
       ${chargeBlock}
       <div class="ex-note">
@@ -1910,6 +2401,154 @@ function renderEx(ex, num, inSuperset, sessionKey, blocIdx, exIdx) {
     </div>
   `;
 }
+
+// ═══ SET TRACKER ═══
+// Counts are stored per local day and reset automatically the next day.
+function todayLocal() {
+  const d = new Date();
+  return `${d.getFullYear()}-${String(d.getMonth() + 1).padStart(2, '0')}-${String(d.getDate()).padStart(2, '0')}`;
+}
+
+function getSetsCount(key) {
+  try {
+    const raw = localStorage.getItem(key);
+    if (!raw) return 0;
+    const obj = JSON.parse(raw);
+    return obj && obj.d === todayLocal() ? (obj.n || 0) : 0;
+  } catch(e) { return 0; }
+}
+
+function setSetsCount(key, n) {
+  try {
+    if (n > 0) localStorage.setItem(key, JSON.stringify({ d: todayLocal(), n }));
+    else localStorage.removeItem(key);
+  } catch(e) {}
+}
+
+function markActivity() {
+  if (!currentSessionKey) return;
+  try {
+    localStorage.setItem('lastDone:' + currentSessionKey, new Date().toISOString());
+    const startKey = 'sessionStart:' + currentSessionKey;
+    let start = null;
+    try { start = JSON.parse(localStorage.getItem(startKey) || 'null'); } catch(e) {}
+    if (!start || start.d !== todayLocal()) {
+      localStorage.setItem(startKey, JSON.stringify({ d: todayLocal(), t: Date.now() }));
+    }
+  } catch(e) {}
+}
+
+function renderSetDots(container) {
+  const key = container.dataset.setsKey;
+  const total = parseInt(container.dataset.setsTotal) || 0;
+  const count = getSetsCount(key);
+  const dotsEl = container.querySelector('.ex-sets-dots');
+  if (!dotsEl) return;
+  dotsEl.innerHTML = Array.from({ length: total }, (_, i) =>
+    `<button type="button" class="set-dot${i < count ? ' done' : ''}" data-idx="${i}" aria-label="Série ${i + 1}">${i < count ? '✓' : i + 1}</button>`
+  ).join('');
+  const ex = container.closest('.ex');
+  if (ex) ex.classList.toggle('sets-done', total > 0 && count >= total);
+  dotsEl.querySelectorAll('.set-dot').forEach(dot => {
+    dot.addEventListener('click', e => {
+      e.stopPropagation();
+      const i = parseInt(dot.dataset.idx);
+      const cur = getSetsCount(key);
+      // Tap a done dot → unfill from there; tap an empty dot → fill up to it
+      const next = i < cur ? i : i + 1;
+      setSetsCount(key, next);
+      if (next > cur) {
+        markActivity();
+        const restSec = parseInt(container.dataset.restSeconds || '0');
+        if (restSec > 0) startRestTimer(restSec, container.dataset.restLabel || 'Repos');
+      }
+      renderSetDots(container);
+      updateSessionProgress();
+    });
+  });
+}
+
+function bindSets() {
+  document.querySelectorAll('.ex-sets').forEach(c => {
+    renderSetDots(c);
+    const resetBtn = c.querySelector('.ex-sets-reset');
+    if (resetBtn) {
+      resetBtn.addEventListener('click', e => {
+        e.stopPropagation();
+        setSetsCount(c.dataset.setsKey, 0);
+        renderSetDots(c);
+        updateSessionProgress();
+      });
+    }
+  });
+  updateSessionProgress();
+}
+
+function updateSessionProgress() {
+  const wrap = document.getElementById('session-progress');
+  if (!wrap) return;
+  let total = 0, done = 0;
+  document.querySelectorAll('#view-session .ex-sets').forEach(c => {
+    const t = parseInt(c.dataset.setsTotal) || 0;
+    total += t;
+    done += Math.min(t, getSetsCount(c.dataset.setsKey));
+  });
+  if (!total) { wrap.classList.add('hidden'); return; }
+  wrap.classList.remove('hidden');
+  const fill = document.getElementById('sp-fill');
+  const text = document.getElementById('sp-text');
+  const time = document.getElementById('sp-time');
+  if (fill) fill.style.width = `${Math.round(done / total * 100)}%`;
+  if (text) {
+    if (done >= total) {
+      text.textContent = 'Séance complète ✓';
+      text.classList.add('done');
+    } else {
+      text.textContent = `${done}/${total} séries`;
+      text.classList.remove('done');
+    }
+  }
+  if (time) {
+    let label = '';
+    try {
+      const start = JSON.parse(localStorage.getItem('sessionStart:' + currentSessionKey) || 'null');
+      if (start && start.d === todayLocal() && done > 0) {
+        label = `${Math.max(1, Math.round((Date.now() - start.t) / 60000))} min`;
+      }
+    } catch(e) {}
+    time.textContent = label;
+  }
+}
+
+let progressTicker = null;
+function startProgressTicker() {
+  if (progressTicker) clearInterval(progressTicker);
+  progressTicker = setInterval(updateSessionProgress, 30000);
+}
+function stopProgressTicker() {
+  if (progressTicker) clearInterval(progressTicker);
+  progressTicker = null;
+}
+
+// ═══ WAKE LOCK — keep the screen on during a session ═══
+let wakeLock = null;
+async function acquireWakeLock() {
+  if (!('wakeLock' in navigator)) return;
+  try { wakeLock = await navigator.wakeLock.request('screen'); } catch(e) {}
+}
+function releaseWakeLock() {
+  if (wakeLock) {
+    try { wakeLock.release(); } catch(e) {}
+    wakeLock = null;
+  }
+}
+// Re-acquire when coming back to the app (the lock is lost on backgrounding)
+document.addEventListener('visibilitychange', () => {
+  if (document.visibilityState === 'visible' && document.body.classList.contains('view-session')) {
+    acquireWakeLock();
+    updateSessionProgress();
+  }
+});
 
 // ═══ NOTES ═══
 function bindNotes() {
@@ -1962,7 +2601,7 @@ function getTrainingStorageData() {
   try {
     for (let i = 0; i < localStorage.length; i++) {
       const key = localStorage.key(i);
-      if (/^(note:|charge:|chargeHist:|theme$)/.test(key)) {
+      if (/^(note:|charge:|chargeHist:|sets:|lastDone:|sessionStart:|theme$|compactMode$|tabataCfg$)/.test(key)) {
         data[key] = localStorage.getItem(key);
       }
     }
@@ -1973,7 +2612,7 @@ function getTrainingStorageData() {
 function exportTrainingData() {
   const payload = {
     app: 'training-programme',
-    version: '1.7',
+    version: '1.8',
     exportedAt: new Date().toISOString(),
     data: getTrainingStorageData()
   };
@@ -1996,7 +2635,7 @@ function importTrainingData(file) {
       const payload = JSON.parse(reader.result);
       const data = payload.data || payload;
       Object.keys(data).forEach(key => {
-        if (/^(note:|charge:|chargeHist:|theme$)/.test(key)) {
+        if (/^(note:|charge:|chargeHist:|sets:|lastDone:|sessionStart:|theme$|compactMode$|tabataCfg$)/.test(key)) {
           localStorage.setItem(key, data[key]);
         }
       });
@@ -2010,10 +2649,10 @@ function importTrainingData(file) {
 }
 
 function resetTrainingData() {
-  if (!confirm('Supprimer toutes les notes et charges enregistrées ?')) return;
+  if (!confirm('Supprimer toutes les notes, charges et séries enregistrées ?')) return;
   try {
     Object.keys(localStorage).forEach(key => {
-      if (/^(note:|charge:|chargeHist:)/.test(key)) {
+      if (/^(note:|charge:|chargeHist:|sets:|lastDone:|sessionStart:)/.test(key)) {
         localStorage.removeItem(key);
       }
     });
@@ -2355,26 +2994,8 @@ function updateTimerDisplay() {
 }
 
 function triggerBuzz() {
-  // iOS Safari doesn't support Vibration API but we can try
+  // Pas de son — vibration uniquement (Android ; iOS l'ignore) + signal visuel
   if (navigator.vibrate) navigator.vibrate([200, 100, 200, 100, 400]);
-
-  // Audio beep
-  try {
-    const ctx = new (window.AudioContext || window.webkitAudioContext)();
-    const now = ctx.currentTime;
-    [0, 0.25, 0.5].forEach(delay => {
-      const osc = ctx.createOscillator();
-      const gain = ctx.createGain();
-      osc.connect(gain);
-      gain.connect(ctx.destination);
-      osc.frequency.value = 880;
-      gain.gain.setValueAtTime(0, now + delay);
-      gain.gain.linearRampToValueAtTime(0.3, now + delay + 0.02);
-      gain.gain.linearRampToValueAtTime(0, now + delay + 0.18);
-      osc.start(now + delay);
-      osc.stop(now + delay + 0.2);
-    });
-  } catch(e) {}
 }
 
 
@@ -2434,6 +3055,9 @@ function goHome(updateHistory = true) {
   document.getElementById('topbar-title').textContent = 'Programme';
   document.getElementById('view-session').classList.remove('active');
   document.getElementById('view-home').classList.add('active');
+  stopProgressTicker();
+  releaseWakeLock();
+  renderHome(); // refresh "dernière séance" on the cards
   window.scrollTo(0, 0);
   // Close timer on navigation back
   if (timerInterval) clearInterval(timerInterval);
@@ -2474,7 +3098,7 @@ function setTheme(t) {
   try { localStorage.setItem('theme', t); } catch(e) {}
   // Update status bar meta
   const meta = document.querySelector('meta[name="theme-color"]');
-  if (meta) meta.setAttribute('content', t === 'dark' ? '#0a0a0a' : '#f5f4f1');
+  if (meta) meta.setAttribute('content', t === 'dark' ? '#000000' : '#f2f2f7');
 }
 themeBtn.addEventListener('click', () => {
   const current = document.documentElement.getAttribute('data-theme') || 'dark';
@@ -2486,6 +3110,173 @@ try {
   if (saved) setTheme(saved);
   else setTheme('dark');
 } catch(e) { setTheme('dark'); }
+
+// ═══ TABATA ═══
+const TABATA_DEFAULTS = { prep: 10, work: 20, rest: 10, rounds: 8 };
+const TABATA_LIMITS = { prep: [0, 60], work: [5, 300], rest: [0, 300], rounds: [1, 30] };
+const TABATA_LABELS = { prep: 'Préparation', work: 'Effort', rest: 'Repos', done: 'Terminé' };
+let tabataCfg = { ...TABATA_DEFAULTS };
+try { tabataCfg = { ...TABATA_DEFAULTS, ...(JSON.parse(localStorage.getItem('tabataCfg') || '{}')) }; } catch(e) {}
+
+const tabataConfigEl = document.getElementById('tabata-config');
+const tabataScreen = document.getElementById('tabata-screen');
+const tabataPhaseEl = document.getElementById('tabata-phase');
+const tabataCountEl = document.getElementById('tabata-count');
+const tabataFillEl = document.getElementById('tabata-fill');
+const tabataRoundEl = document.getElementById('tabata-round');
+const tabataPauseBtn = document.getElementById('tabata-pause');
+const tabataSkipBtn = document.getElementById('tabata-skip');
+
+let tabataTimer = null;
+let tabataRun = null; // { phase, round, endTime, dur, paused, pausedLeft }
+
+function saveTabataCfg() {
+  try { localStorage.setItem('tabataCfg', JSON.stringify(tabataCfg)); } catch(e) {}
+}
+
+function tabataTotalSeconds() {
+  return tabataCfg.prep + tabataCfg.work * tabataCfg.rounds + tabataCfg.rest * Math.max(0, tabataCfg.rounds - 1);
+}
+
+function renderTabataConfig() {
+  document.querySelectorAll('[data-tabata-field]').forEach(el => {
+    const f = el.dataset.tabataField;
+    el.textContent = f === 'rounds' ? tabataCfg.rounds : `${tabataCfg[f]}s`;
+  });
+  const total = document.getElementById('tabata-total');
+  if (total) total.textContent = `Durée totale : ${formatMS(tabataTotalSeconds())}`;
+  const cardMeta = document.getElementById('tabata-card-meta');
+  if (cardMeta) cardMeta.textContent = `${tabataCfg.work}s effort · ${tabataCfg.rest}s repos · ${tabataCfg.rounds} rounds`;
+}
+
+function openTabataConfig() {
+  renderTabataConfig();
+  tabataConfigEl.classList.add('active');
+}
+
+document.querySelectorAll('[data-tabata-adjust]').forEach(btn => {
+  btn.addEventListener('click', () => {
+    const [field, deltaStr] = btn.dataset.tabataAdjust.split(':');
+    const [min, max] = TABATA_LIMITS[field];
+    tabataCfg[field] = Math.min(max, Math.max(min, (tabataCfg[field] || 0) + parseInt(deltaStr)));
+    saveTabataCfg();
+    renderTabataConfig();
+  });
+});
+
+function tabataSetPhase(phase) {
+  tabataRun.phase = phase;
+  const dur = phase === 'prep' ? tabataCfg.prep : phase === 'work' ? tabataCfg.work : tabataCfg.rest;
+  tabataRun.dur = Math.max(1, dur);
+  tabataRun.endTime = Date.now() + dur * 1000;
+  tabataScreen.classList.remove('phase-prep', 'phase-work', 'phase-rest', 'phase-done');
+  tabataScreen.classList.add(`phase-${phase}`);
+  tabataPhaseEl.textContent = TABATA_LABELS[phase];
+  tabataRoundEl.textContent = phase === 'prep'
+    ? `${tabataCfg.rounds} rounds à venir`
+    : `Round ${tabataRun.round}/${tabataCfg.rounds}`;
+  if (navigator.vibrate) navigator.vibrate(phase === 'work' ? 300 : 150);
+  tabataRenderTick();
+}
+
+function tabataRenderTick() {
+  if (!tabataRun || tabataRun.phase === 'done') return;
+  const msLeft = Math.max(0, tabataRun.endTime - Date.now());
+  const remaining = Math.ceil(msLeft / 1000);
+  tabataCountEl.textContent = remaining;
+  tabataCountEl.classList.toggle('ending', remaining <= 3 && remaining > 0);
+  tabataFillEl.style.width = `${Math.max(0, Math.min(1, msLeft / (tabataRun.dur * 1000))) * 100}%`;
+}
+
+function tabataAdvance() {
+  const r = tabataRun;
+  if (!r || r.phase === 'done') return;
+  if (r.phase === 'prep') return tabataSetPhase('work');
+  if (r.phase === 'work') {
+    if (r.round >= tabataCfg.rounds) return tabataFinish();
+    if (tabataCfg.rest <= 0) { r.round++; return tabataSetPhase('work'); }
+    return tabataSetPhase('rest');
+  }
+  // rest → next round
+  r.round++;
+  tabataSetPhase('work');
+}
+
+function tabataLaunch() {
+  tabataRun = { round: 1, paused: false };
+  tabataPauseBtn.textContent = 'Pause';
+  tabataSkipBtn.style.display = '';
+  tabataScreen.classList.remove('paused');
+  tabataSetPhase(tabataCfg.prep > 0 ? 'prep' : 'work');
+  if (tabataTimer) clearInterval(tabataTimer);
+  tabataTimer = setInterval(() => {
+    if (!tabataRun || tabataRun.paused || tabataRun.phase === 'done') return;
+    if (Date.now() >= tabataRun.endTime) tabataAdvance();
+    else tabataRenderTick();
+  }, 200);
+}
+
+function tabataFinish() {
+  tabataRun.phase = 'done';
+  tabataScreen.classList.remove('phase-prep', 'phase-work', 'phase-rest', 'paused');
+  tabataScreen.classList.add('phase-done');
+  tabataPhaseEl.textContent = TABATA_LABELS.done;
+  tabataCountEl.textContent = '✓';
+  tabataCountEl.classList.remove('ending');
+  tabataFillEl.style.width = '100%';
+  tabataRoundEl.textContent = `${tabataCfg.rounds} rounds · ${formatMS(tabataTotalSeconds())}`;
+  tabataPauseBtn.textContent = 'Refaire';
+  tabataSkipBtn.style.display = 'none';
+  if (navigator.vibrate) navigator.vibrate([300, 150, 300, 150, 500]);
+}
+
+function tabataStop() {
+  if (tabataTimer) clearInterval(tabataTimer);
+  tabataTimer = null;
+  tabataRun = null;
+  tabataScreen.classList.remove('active', 'phase-prep', 'phase-work', 'phase-rest', 'phase-done', 'paused');
+  if (!document.body.classList.contains('view-session')) releaseWakeLock();
+}
+
+document.getElementById('tabata-start').addEventListener('click', () => {
+  saveTabataCfg();
+  tabataConfigEl.classList.remove('active');
+  tabataScreen.classList.add('active');
+  acquireWakeLock();
+  tabataLaunch();
+});
+
+document.getElementById('tabata-cancel').addEventListener('click', () => {
+  tabataConfigEl.classList.remove('active');
+});
+
+tabataConfigEl.addEventListener('click', e => {
+  if (e.target === tabataConfigEl) tabataConfigEl.classList.remove('active');
+});
+
+document.getElementById('tabata-close').addEventListener('click', tabataStop);
+
+tabataPauseBtn.addEventListener('click', () => {
+  if (!tabataRun) return;
+  if (tabataRun.phase === 'done') return tabataLaunch();
+  if (tabataRun.paused) {
+    tabataRun.endTime = Date.now() + tabataRun.pausedLeft;
+    tabataRun.paused = false;
+    tabataPauseBtn.textContent = 'Pause';
+    tabataScreen.classList.remove('paused');
+  } else {
+    tabataRun.pausedLeft = Math.max(0, tabataRun.endTime - Date.now());
+    tabataRun.paused = true;
+    tabataPauseBtn.textContent = 'Reprendre';
+    tabataScreen.classList.add('paused');
+  }
+});
+
+tabataSkipBtn.addEventListener('click', () => {
+  if (!tabataRun || tabataRun.phase === 'done') return;
+  if (tabataRun.paused) tabataPauseBtn.click(); // resume before skipping
+  tabataAdvance();
+});
 
 // ═══ INIT ═══
 try { history.replaceState({ view: 'home' }, '', window.location.pathname + window.location.search); } catch(e) {}
