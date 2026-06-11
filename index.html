@@ -1422,8 +1422,8 @@
   body.compact-mode .stat { padding: 8px 6px 9px; }
   body.compact-mode .stat-label { font-size: 8px; }
   body.compact-mode .stat-value { font-size: 18px; }
-  body.compact-mode .ex-details,
-  body.compact-mode .ex-note { display: none !important; }
+  /* En compact, les détails restent accessibles en développant l'exercice */
+  body.compact-mode .ex:not(.open) .ex-note { display: none; }
   body.compact-mode .charge-insight { padding: 8px 10px; margin-bottom: 8px; }
   body.compact-mode .ex-charge { padding: 10px 12px; }
   body.compact-mode .ex-charge-history { display: none; }
@@ -1835,7 +1835,7 @@
       <button class="home-tool-btn danger" id="btn-reset-data">Réinitialiser</button>
     </div>
     <input type="file" id="import-file" accept="application/json" hidden>
-    <div class="home-version">v3.7 · tabata · style iOS · juin 2026</div>
+    <div class="home-version">v3.8 · tabata · style iOS · juin 2026</div>
   </section>
 
   <section class="view" id="view-session">
