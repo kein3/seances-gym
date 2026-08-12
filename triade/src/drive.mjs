@@ -281,7 +281,7 @@ async function main() {
   await send('Log.enable');
 
   let planté = null;
-  const ATTENDUS = 25;   // nombre de contrôles du scénario complet
+  const ATTENDUS = 26;   // nombre de contrôles du scénario complet
 
   /* ─── L'instrument avant tout : que teste-t-on vraiment ? ───
      Un serveur éteint ne provoque pas d'erreur visible : le service worker sert
@@ -406,6 +406,34 @@ async function main() {
         p1.basDeLecran < 120 ? null : 'pastille à ' + p1.basDeLecran + ' px du bas, hors zone du pouce',
         p1.hauteur >= 48 ? null : 'pastille de ' + p1.hauteur + ' px de haut',
         p1.dessus === 'la pastille' ? null : 'la pastille est recouverte par : ' + p1.dessus
+      ].filter(Boolean) });
+
+    /* 5a2 — Alignement DANS la pastille : mêmes lignes de base, tout centré.
+       Un overflow:hidden sur un élément de texte décale sa ligne de base en CSS —
+       le défaut est invisible à l'œil nu et se mesure. */
+    const al = await evalJS(`(() => {
+      const p = document.getElementById('restmini');
+      const P = p.getBoundingClientRect();
+      const base = (sel) => { const el = p.querySelector(sel); if (!el) return null;
+        const s = document.createElement('span'); s.textContent = 'x';
+        s.style.cssText = 'display:inline-block;width:0;overflow:hidden';
+        el.appendChild(s); const r = s.getBoundingClientRect(); s.remove();
+        return Math.round(r.bottom - P.top); };
+      const centre = (sel) => { const el = p.querySelector(sel); if (!el) return null;
+        const r = el.getBoundingClientRect();
+        return Math.round((r.top + r.height / 2) - (P.top + P.height / 2)); };
+      const bar = p.querySelector('#mini-bar').getBoundingClientRect();
+      return { bTemps: base('#mini-time'), bLib: base('#mini-lab, #mini-ctx'), bPlus: base('#mini-plus'),
+               cStop: centre('#mini-stop'), cPlus: centre('#mini-plus'),
+               barDebord: Math.round(bar.width - P.width) };
+    })()`);
+    bilan.push({ titre: 'pastille · lignes de base et centrage', fenetre: '—', theme: '—', page: '—',
+      soucis: [
+        al.bTemps === al.bLib ? null : `temps et libellé sur deux lignes de base (${al.bTemps} vs ${al.bLib})`,
+        al.bTemps === al.bPlus ? null : `temps et « +30 » sur deux lignes de base (${al.bTemps} vs ${al.bPlus})`,
+        Math.abs(al.cStop) <= 1 ? null : `bouton de reprise décentré de ${al.cStop} px`,
+        Math.abs(al.cPlus) <= 1 ? null : `bouton « +30 » décentré de ${al.cPlus} px`,
+        al.barDebord <= 0 ? null : `la barre d’avancement dépasse de ${al.barDebord} px`
       ].filter(Boolean) });
 
     /* 5b — Le grand décompte reste accessible d'un appui, et se replie */

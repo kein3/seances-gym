@@ -3,7 +3,7 @@
 <head>
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover, maximum-scale=1">
-<meta name="triade-build" content="1ccb69bbb320">
+<meta name="triade-build" content="f2466287de39">
 <title>TRIADE — Programme full body</title>
 <meta name="description" content="TRIADE — trois séances full body en salle, avec minuteur de repos, suivi des charges et Tabata. Fonctionne hors ligne.">
 <meta name="theme-color" content="#f1f3f6" media="(prefers-color-scheme: light)">
@@ -645,17 +645,26 @@ html[data-theme="dark"] .card-code { color: color-mix(in srgb, var(--a) 55%, #ff
 }
 
 .mini.on { display: flex; }
-.mini-in { display: flex; align-items: baseline; gap: 8px; height: 46px; padding: 0 6px 0 0; }
-.mini-time { font-size: 20px; font-weight: 600; letter-spacing: -.03em; color: var(--bg); font-variant-numeric: tabular-nums; }
+/* Une seule ligne de texte : le temps et le libellé partagent la même ligne de
+   base sans arbitrage, et line-height centre le tout dans la pastille. */
+.mini-in { display: block; height: 44px; line-height: 44px; padding: 0 8px 0 0; white-space: nowrap; }
+.mini-time {
+  font-size: 20px; font-weight: 600;
+  letter-spacing: -.03em;
+  color: var(--bg);
+  font-variant-numeric: tabular-nums;
+}
 
 .mini-lab {
+  margin-left: 9px;
   font-size: 10px; font-weight: 700; letter-spacing: .13em;
-  text-transform: uppercase; color: color-mix(in srgb, var(--bg) 62%, transparent);
-  max-width: 100px; overflow: hidden; text-overflow: ellipsis; white-space: nowrap;
+  text-transform: uppercase;
+  color: color-mix(in srgb, var(--bg) 62%, transparent);
 }
 
 .mini-plus {
   height: 44px; padding: 0 10px;
+  line-height: 44px;
   font-size: 13px; font-weight: 600;
   color: color-mix(in srgb, var(--bg) 72%, transparent);
   font-variant-numeric: tabular-nums;
@@ -1717,7 +1726,9 @@ body.timer-on { padding-bottom: calc(96px + var(--safe-b)); }
     var lab = $('#quick-timer-lab');
     if (lab) lab.textContent = restLabel(sec);
     $('#rest-ctx').textContent = ctx || 'Repos';
-    $('#mini-ctx').textContent = ctx || 'repos';
+    var court = String(ctx || 'repos');
+    if (court.length > 17) court = court.slice(0, 16).trim() + '…';
+    $('#mini-ctx').textContent = court;
     /* Par défaut on n'occupe PAS l'écran : la pastille suffit, le plein écran
        reste accessible d'un appui pour qui veut le gros décompte. */
     $('#restmini').classList.remove('fini');

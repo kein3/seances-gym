@@ -848,7 +848,9 @@
     var lab = $('#quick-timer-lab');
     if (lab) lab.textContent = restLabel(sec);
     $('#rest-ctx').textContent = ctx || 'Repos';
-    $('#mini-ctx').textContent = ctx || 'repos';
+    var court = String(ctx || 'repos');
+    if (court.length > 17) court = court.slice(0, 16).trim() + '…';
+    $('#mini-ctx').textContent = court;
     /* Par défaut on n'occupe PAS l'écran : la pastille suffit, le plein écran
        reste accessible d'un appui pour qui veut le gros décompte. */
     $('#restmini').classList.remove('fini');
