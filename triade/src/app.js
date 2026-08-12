@@ -835,7 +835,6 @@
   function releaseAwake() { try { if (lock) { lock.release(); lock = null; } } catch (e) {} }
 
   /* ═══════════ MINUTEUR DE REPOS ═══════════ */
-  var C = 2 * Math.PI * 52;
   var restEnd = 0, restTotal = 0, restTick = null;
 
   var restOwner = null;
@@ -868,15 +867,15 @@
     var left = (restEnd - Date.now()) / 1000;
     if (left <= 0) {
       $('#rest-time').textContent = '0:00';
-    $('#mini-time').textContent = '0:00';
-      $('#rest-ring').setAttribute('stroke-dashoffset', C);
+      $('#mini-time').textContent = '0:00';
+      $('#rest-jauge').style.width = '0%';
       endRest(true);
       return;
     }
     $('#rest-time').textContent = mmss(left);
     $('#mini-time').textContent = mmss(left);
     $('#mini-bar').style.width = Math.max(0, Math.min(100, left / restTotal * 100)) + '%';
-    $('#rest-ring').setAttribute('stroke-dashoffset', String(C * (1 - left / restTotal)));
+    $('#rest-jauge').style.width = Math.max(0, Math.min(100, left / restTotal * 100)) + '%';
     var c = Math.ceil(left);
     if (c <= 3 && c !== lastCount) { lastCount = c;buzz(15); }
   }
@@ -901,7 +900,7 @@
       /* Fin de repos : la pastille passe au vert quelques secondes plutôt que de
          disparaître sans rien dire. */ buzz([90, 60, 90]);
       mini.classList.add('on', 'fini');
-      $('#mini-time').textContent = 'Go';
+      $('#mini-time').textContent = 'Reprends';
       $('#mini-bar').style.width = '100%';
       setTimeout(function () {
         mini.classList.remove('on', 'fini');
@@ -966,7 +965,7 @@
     var left = (T.end - Date.now()) / 1000;
     if (left <= 0) { tabAdvance(); return; }
     $('#tab-time').textContent = String(Math.ceil(left));
-    $('#tab-ring').setAttribute('stroke-dashoffset', String(C * (1 - left / T.total)));
+    $('#tab-jauge').style.width = Math.max(0, Math.min(100, left / T.total * 100)) + '%';
     var c = Math.ceil(left);
     if (c <= 3 && c !== T.lastC) { T.lastC = c;}
   }
@@ -1022,11 +1021,11 @@
     var presets = [45, 60, 75, 90, 120, 150, 180, 240];
     openSheet(
       '<h2 class="sheet-title">Minuteur de repos</h2>' +
-      '<p class="sheet-sub">Choisis une durée. L’écran reste allumé et sonne à la fin.</p>' +
+      '<p class="sheet-sub">Choisis une durée. L’écran reste allumé, et la pastille pulse à la fin — sans aucun son.</p>' +
       '<div class="field"><span class="field-lab">Durées courantes</span>' +
-        '<div style="display:grid;grid-template-columns:repeat(4,1fr);gap:8px">' +
+        '<div class="durees">' +
           presets.map(function (p) {
-            return '<button class="btn" data-preset="' + p + '" style="height:52px;padding:0;justify-content:center">' +
+            return '<button class="duree num" data-preset="' + p + '">' +
               (p >= 60 ? (p % 60 === 0 ? (p / 60) + ' min' : mmss(p)) : p + ' s') + '</button>';
           }).join('') +
         '</div></div>' +

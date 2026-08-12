@@ -27,26 +27,16 @@
 <!-- ══ Minuteur de repos ══ -->
 <div class="veil" id="rest" role="dialog" aria-modal="true" aria-label="Minuteur de repos">
   <div class="veil-in">
-    <div class="veil-title" id="rest-ctx"></div>
-    <div class="ring-box">
-      <svg class="ring" viewBox="0 0 120 120" aria-hidden="true">
-        <circle class="ring-bg" cx="60" cy="60" r="52"></circle>
-        <circle class="ring-fg" id="rest-ring" cx="60" cy="60" r="52" stroke-dasharray="326.7" stroke-dashoffset="0"></circle>
-      </svg>
-      <div class="ring-txt">
-        <div class="ring-time num" id="rest-time">0:00</div>
-        <div class="ring-lab">repos</div>
-      </div>
+    <div class="chrono-ctx cap" id="rest-ctx"></div>
+    <div class="chrono-time num" id="rest-time">0:00</div>
+    <div class="chrono-jauge"><i id="rest-jauge"></i></div>
+    <div class="chrono-actes">
+      <button class="lien" id="rest-minus">− 15 s</button>
+      <button class="lien" id="rest-plus">+ 30 s</button>
     </div>
-    <div class="veil-btns">
-      <button class="btn" id="rest-minus">− 15 s</button>
-      <button class="btn" id="rest-plus">+ 30 s</button>
-    </div>
-    <div class="veil-btns">
-      <button class="btn btn-primary btn-wide" id="rest-skip">Reprendre maintenant</button>
-    </div>
-    <div class="veil-btns">
-      <button class="btn btn-ghost btn-wide" id="rest-min">Réduire en pastille</button>
+    <div class="chrono-bas">
+      <button class="lien fort" id="rest-skip">Reprendre</button>
+      <button class="lien" id="rest-min">Réduire</button>
     </div>
   </div>
 </div>
@@ -54,23 +44,14 @@
 <!-- ══ Tabata en cours ══ -->
 <div class="veil" id="tab" role="dialog" aria-modal="true" aria-label="Tabata">
   <div class="veil-in">
-    <div class="veil-title" id="tab-round"></div>
-    <div class="ring-box">
-      <svg class="ring" viewBox="0 0 120 120" aria-hidden="true">
-        <circle class="ring-bg" cx="60" cy="60" r="52"></circle>
-        <circle class="ring-fg" id="tab-ring" cx="60" cy="60" r="52" stroke-dasharray="326.7" stroke-dashoffset="0"></circle>
-      </svg>
-      <div class="ring-txt">
-        <div class="ring-time num" id="tab-time">0</div>
-        <div class="ring-lab" id="tab-phase">prêt</div>
-      </div>
-    </div>
-    <div class="veil-btns">
-      <button class="btn" id="tab-pause">Pause</button>
-      <button class="btn" id="tab-next">Passer</button>
-    </div>
-    <div class="veil-btns">
-      <button class="btn btn-ghost btn-wide" id="tab-stop">Arrêter</button>
+    <div class="chrono-ctx cap" id="tab-phase">prêt</div>
+    <div class="chrono-time num" id="tab-time">0</div>
+    <div class="chrono-jauge"><i id="tab-jauge"></i></div>
+    <div class="chrono-ctx sourd" id="tab-round"></div>
+    <div class="chrono-bas">
+      <button class="lien" id="tab-pause">Pause</button>
+      <button class="lien" id="tab-next">Passer</button>
+      <button class="lien" id="tab-stop">Arrêter</button>
     </div>
   </div>
 </div>
