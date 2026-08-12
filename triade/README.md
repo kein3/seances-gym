@@ -56,6 +56,17 @@ python3 src/duree.py            # recalcule et met à jour le programme
 python3 src/duree.py --verifie  # échoue si une durée ne correspond plus au contenu
 ```
 
+## Le registre visuel
+
+Direction retenue après une planche de quatre propositions : **le registre d'un beau carnet**.
+Beaucoup de blanc chaud, aucune bordure inutile, un seul accent cuivre, des titres larges et
+légers. La hiérarchie vient de l'échelle et du blanc — pas du cadre. La série faite se marque
+en encre pleine ; chaque séance n'a qu'une teinte sourde (cuivre, ocre, sauge) pour sa lettre
+et sa barre d'avancement. Le thème sombre reprend la même logique en encre claire sur noir
+chaud, pas en inversion.
+
+Mesuré sur l'écran de séance : **0 surface pleine, 2 cadres fermés, aucune cible sous 44 px.**
+
 ## Ce que fait l'application
 
 - **Chaque exercice détaillé** : séries, répétitions, tempo, repos, charge repère,
