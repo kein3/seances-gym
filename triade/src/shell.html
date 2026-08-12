@@ -1,0 +1,105 @@
+<!DOCTYPE html>
+<html lang="fr" data-theme="light">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover, maximum-scale=1">
+<meta name="triade-build" content="__BUILD__">
+<title>TRIADE — Programme full body</title>
+<meta name="description" content="TRIADE — trois séances full body en salle, avec minuteur de repos, suivi des charges et Tabata. Fonctionne hors ligne.">
+<meta name="theme-color" content="#f1f3f6" media="(prefers-color-scheme: light)">
+<meta name="theme-color" content="#0b0d11" media="(prefers-color-scheme: dark)">
+<meta name="apple-mobile-web-app-capable" content="yes">
+<meta name="mobile-web-app-capable" content="yes">
+<meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
+<meta name="apple-mobile-web-app-title" content="TRIADE">
+<link rel="manifest" href="manifest.webmanifest">
+<link rel="apple-touch-icon" href="icon-180.png">
+<link rel="icon" href="icon-192.png" sizes="192x192">
+<link rel="icon" href="favicon.svg" type="image/svg+xml">
+<style>
+/*__CSS__*/
+</style>
+</head>
+<body>
+
+<div id="app"></div>
+
+<!-- ══ Minuteur de repos ══ -->
+<div class="veil" id="rest" role="dialog" aria-modal="true" aria-label="Minuteur de repos">
+  <div class="veil-in">
+    <div class="veil-title" id="rest-ctx"></div>
+    <div class="ring-box">
+      <svg class="ring" viewBox="0 0 120 120" aria-hidden="true">
+        <circle class="ring-bg" cx="60" cy="60" r="52"></circle>
+        <circle class="ring-fg" id="rest-ring" cx="60" cy="60" r="52" stroke-dasharray="326.7" stroke-dashoffset="0"></circle>
+      </svg>
+      <div class="ring-txt">
+        <div class="ring-time num" id="rest-time">0:00</div>
+        <div class="ring-lab">repos</div>
+      </div>
+    </div>
+    <div class="veil-btns">
+      <button class="btn" id="rest-minus">− 15 s</button>
+      <button class="btn" id="rest-plus">+ 30 s</button>
+    </div>
+    <div class="veil-btns">
+      <button class="btn btn-primary btn-wide" id="rest-skip">Reprendre maintenant</button>
+    </div>
+    <div class="veil-btns">
+      <button class="btn btn-ghost btn-wide" id="rest-min">Réduire en pastille</button>
+    </div>
+  </div>
+</div>
+
+<!-- ══ Tabata en cours ══ -->
+<div class="veil" id="tab" role="dialog" aria-modal="true" aria-label="Tabata">
+  <div class="veil-in">
+    <div class="veil-title" id="tab-round"></div>
+    <div class="ring-box">
+      <svg class="ring" viewBox="0 0 120 120" aria-hidden="true">
+        <circle class="ring-bg" cx="60" cy="60" r="52"></circle>
+        <circle class="ring-fg" id="tab-ring" cx="60" cy="60" r="52" stroke-dasharray="326.7" stroke-dashoffset="0"></circle>
+      </svg>
+      <div class="ring-txt">
+        <div class="ring-time num" id="tab-time">0</div>
+        <div class="ring-lab" id="tab-phase">prêt</div>
+      </div>
+    </div>
+    <div class="veil-btns">
+      <button class="btn" id="tab-pause">Pause</button>
+      <button class="btn" id="tab-next">Passer</button>
+    </div>
+    <div class="veil-btns">
+      <button class="btn btn-ghost btn-wide" id="tab-stop">Arrêter</button>
+    </div>
+  </div>
+</div>
+
+<!-- ══ Feuille modale ══ -->
+<div class="sheet" id="sheet" role="dialog" aria-modal="true">
+  <div class="sheet-in" id="sheet-in"></div>
+</div>
+
+<div class="mini" id="restmini">
+  <button class="mini-in" id="mini-open" aria-label="Afficher le grand décompte">
+    <span class="mini-time num" id="mini-time">0:00</span>
+    <span class="mini-lab" id="mini-ctx">repos</span>
+  </button>
+  <button class="mini-plus" id="mini-plus" aria-label="Ajouter 30 secondes">+30</button>
+  <button class="mini-stop" id="mini-stop" aria-label="Reprendre maintenant">
+    <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="3" stroke-linecap="round" stroke-linejoin="round"><path d="M20 6 9 17l-5-5"/></svg>
+  </button>
+  <div class="mini-bar" id="mini-bar"></div>
+</div>
+
+<div class="toast" id="toast" role="status" aria-live="polite"></div>
+
+<script type="application/json" id="payload">
+/*__PAYLOAD__*/
+</script>
+
+<script>
+/*__JS__*/
+</script>
+</body>
+</html>
