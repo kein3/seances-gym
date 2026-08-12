@@ -293,29 +293,20 @@
       var s = P.sessions[k];
       var u = sessionUnits(s);
       var pct = u.total ? Math.round(u.done / u.total * 100) : 0;
-      var ago = agoLabel(lastDone(k));
       return '' +
-        '<button class="card" data-go="' + k + '" style="--a:' + s.accent + ';--a2:' + s.accent2 + '">' +
-          '<div class="card-band">' +
-            '<div class="card-code">' + esc(s.code) + '</div>' +
-            '<div class="card-band-txt">' +
-              '<div class="card-focus">' + esc(s.focus) + '</div>' +
-              '<h2 class="card-title">' + esc(s.title) + '</h2>' +
-            '</div>' +
-          '</div>' +
-          '<div class="card-body">' +
-            '<p class="card-sub">' + esc(s.subtitle) + '</p>' +
-            '<div class="card-meta">' +
-              '<span class="tag tag-accent">' + exCount(s) + ' exercices</span>' +
-              '<span class="tag">' + esc(s.duration) + '</span>' +
-              '<span class="tag">' + esc(ago) + '</span>' +
-            '</div>' +
+        '<button class="card" data-go="' + k + '" style="--a:' + s.accent + '">' +
+          '<span class="card-code">' + esc(s.code) + '</span>' +
+          '<span class="card-body">' +
+            '<span class="card-title">' + esc(s.title) + '</span>' +
+            '<span class="card-sub">' + esc(s.subtitle) + '</span>' +
+            '<span class="card-meta">' + exCount(s) + ' exercices · ' + esc(s.duration) +
+              ' · ' + esc(agoLabel(lastDone(k))) + '</span>' +
             (u.done ?
-              '<div class="card-prog">' +
-                '<div class="bar"><div class="bar-fill" style="width:' + pct + '%"></div></div>' +
-                '<div class="card-prog-txt">' + u.done + '/' + u.total + ' séries</div>' +
-              '</div>' : '') +
-          '</div>' +
+              '<span class="card-prog">' +
+                '<span class="bar"><span class="bar-fill" style="width:' + pct + '%"></span></span>' +
+                '<span class="card-prog-txt">' + u.done + '/' + u.total + ' séries</span>' +
+              '</span>' : '') +
+          '</span>' +
         '</button>';
     }).join('');
 
@@ -396,7 +387,7 @@
     document.body.style.setProperty('--a2', s.accent2);
 
     var nav = s.blocs.map(function (b, i) {
-      return '<button class="pill' + (i === 0 ? ' on' : '') + '" data-bloc="' + i + '">' + esc(b.n) + ' · ' + esc(b.name) + '</button>';
+      return '<button class="tab' + (i === 0 ? ' on' : '') + '" data-bloc="' + i + '">' + esc(b.name.split('—')[0].trim()) + '</button>';
     }).join('');
 
     var blocs = s.blocs.map(function (b, bi) {
@@ -442,71 +433,64 @@
     var done = todayRounds(ss.id);
     var dots = '';
     for (var i = 1; i <= ss.rounds; i++) {
-      dots += '<button class="dot' + (i <= done ? ' on' : '') + '" data-round="' + ss.id + '" data-n="' + i + '" aria-label="Tour ' + i + '">' +
+      dots += '<button class="pt ronde' + (i <= done ? ' on' : '') + '" data-round="' + ss.id + '" data-n="' + i + '" aria-label="Tour ' + i + '">' +
         (i <= done ? I.check : i) + '</button>';
     }
     var exs = ss.exercises.map(function (e, i) { return renderEx(e, i + 1, true); }).join('');
+    var rs = restOf(ss.id);
     return '' +
       '<div class="ss" data-ss="' + ss.id + '">' +
-        '<div class="ss-head"><span class="ss-badge">Superset</span>' +
-          '<button class="ss-rest" data-rest="' + ss.id + '" aria-label="Lancer le repos du superset">' +
-            I.timer + '<span class="num">' + esc(restLabel(restOf(ss.id)) || '—') + '</span></button>' +
-          '<span class="ss-note">' + esc(ss.label || '') + '</span></div>' +
+        '<div class="ss-head">' +
+          '<span class="ss-badge">Superset · ' + ss.rounds + ' tours</span>' +
+          (rs ? '<button class="repos" data-rest="' + ss.id + '" aria-label="Lancer le repos du superset">' +
+            I.timer + '<span class="num">' + esc(restLabel(rs)) + '</span></button>' : '') +
+          '<span class="ss-note">' + esc(ss.label || '') + '</span>' +
+        '</div>' +
         exs +
         '<div class="ss-rounds">' +
           '<span class="ss-rounds-lab">Tours</span>' + dots +
-          '<button class="sets-reset" data-resetss="' + ss.id + '">effacer</button>' +
+          (done ? '<button class="effacer" data-resetss="' + ss.id + '">effacer</button>' : '') +
         '</div>' +
       '</div>';
   }
 
   function renderEx(ex, n, inSuper) {
-    var stats = [];
-    if (inSuper) stats.push({ k: 'Séries', v: ex.sets, key: false });
-    // « 5 min » n'est pas un nombre de répétitions : on nomme la case pour ce qu'elle est.
+    /* Une ligne de méta remplace les quatre cases : même information, aucun pavé. */
     var duree = /min|sec|s$/.test(String(ex.reps));
-    stats.push({ k: duree ? 'Durée' : 'Reps', v: ex.reps, key: true });
-    if (ex.tempo) stats.push({ k: 'Tempo', v: ex.tempo, key: false });
-    var statHtml = stats.map(function (s) {
-      return '<div class="stat' + (s.key ? ' key' : '') + '"><span class="stat-k">' + esc(s.k) + '</span><span class="stat-v num">' + esc(s.v) + '</span></div>';
-    }).join('');
+    var meta = [duree ? esc(ex.reps) : (ex.sets + ' × ' + esc(ex.reps))];
+    if (ex.tempo && /\d/.test(String(ex.tempo))) meta.push('tempo ' + esc(ex.tempo));
+    if (ex.loadHint) meta.push('repère ' + esc(ex.loadHint));
 
-    /* Le repos se lance depuis l'exercice, avec SA durée : un seul geste, au bon endroit. */
-    if (!inSuper) {
-      var rs = restOf(ex.id);
-      if (rs) statHtml += '<button class="stat stat-rest" data-rest="' + ex.id + '" aria-label="Lancer le repos de cet exercice">' +
-        '<span class="stat-k">Repos ' + I.play + '</span><span class="stat-v num">' + esc(restLabel(rs)) + '</span></button>';
-    }
+    var rs = inSuper ? 0 : restOf(ex.id);
+    var arr = todaySets(ex.id, ex.sets || 1);
+    var allDone = !inSuper && arr.every(function (v) { return v; });
 
     var setsHtml = '';
     if (!inSuper) {
-      var arr = todaySets(ex.id, ex.sets || 1);
       var dots = arr.map(function (on, i) {
-        return '<button class="dot' + (on ? ' on' : '') + '" data-set="' + ex.id + '" data-i="' + i + '" aria-label="Série ' + (i + 1) + '">' +
+        return '<button class="pt' + (on ? ' on' : '') + '" data-set="' + ex.id + '" data-i="' + i + '" aria-label="Série ' + (i + 1) + '">' +
           (on ? I.check : (i + 1)) + '</button>';
       }).join('');
-      var qqCoche = arr.some(function (v) { return v; });
-      setsHtml = '<div class="sets"><span class="sets-lab">Séries</span>' + dots +
-        (qqCoche ? '<button class="sets-reset" data-reset="' + ex.id + '">effacer</button>' : '') + '</div>';
+      setsHtml = '<div class="rang series">' + dots +
+        (arr.some(function (v) { return v; }) ? '<button class="effacer" data-reset="' + ex.id + '">effacer</button>' : '') +
+        '</div>';
     }
 
-    var loadHtml = ex.trackLoad ? renderLoad(ex) : '';
-    var allDone = !inSuper && todaySets(ex.id, ex.sets || 1).every(function (v) { return v; });
-
     return '' +
-      '<article class="ex' + (allDone ? ' done' : '') + '" data-ex="' + ex.id + '">' +
-        '<div class="ex-top">' +
-          '<div class="ex-i">' + (allDone ? I.check : n) + '</div>' +
-          '<div style="min-width:0">' +
-            '<div class="ex-name">' + esc(ex.name) + '</div>' +
-            '<div class="ex-sub">' + esc(ex.sub) + '</div>' +
+      '<article class="exo' + (allDone ? ' done' : '') + '" data-ex="' + ex.id + '">' +
+        '<div class="exo-tete">' +
+          '<div class="exo-txt">' +
+            '<div class="exo-name">' + esc(ex.name) + (allDone ? '<span class="exo-fait">✓</span>' : '') + '</div>' +
+            '<div class="exo-sub">' + esc(ex.sub) + '</div>' +
+            '<div class="exo-meta num">' + meta.join(' · ') + '</div>' +
           '</div>' +
+          (rs ? '<button class="repos" data-rest="' + ex.id + '" aria-label="Lancer le repos de cet exercice">' +
+            I.timer + '<span class="num">' + esc(restLabel(rs)) + '</span></button>' : '') +
         '</div>' +
-        '<div class="stats">' + statHtml + '</div>' +
         setsHtml +
-        loadHtml +
+        '<div class="zone-charge">' + (ex.trackLoad ? renderLoad(ex) : '') + '</div>' +
         '<div class="det">' +
-          '<button class="det-btn">Exécution, erreurs à éviter, alternative' + I.chevron + '</button>' +
+          '<button class="det-btn">Exécution, à éviter, alternative' + I.chevron + '</button>' +
           '<div class="det-body">' +
             '<div class="note-block"><div class="note-k"><span class="kdot"></span>Exécution</div>' +
               '<div class="note-t">' + esc(ex.execution) + '</div></div>' +
@@ -514,11 +498,23 @@
               '<div class="note-t warn">' + esc(ex.avoid) + '</div></div>' : '') +
             (ex.alt ? '<div class="note-block"><div class="note-k alt"><span class="kdot"></span>Alternative</div>' +
               '<div class="note-t alt">' + esc(ex.alt) + '</div></div>' : '') +
+            (ex.trackLoad ? '<div class="note-block hist-zone">' + renderHist(ex) + '</div>' : '') +
             '<div class="note-block" style="margin-bottom:0"><div class="note-k"><span class="kdot"></span>Ma note</div>' +
               '<textarea class="myn" data-note="' + ex.id + '" placeholder="Ressenti, réglage de la machine, siège n°4…">' + esc(S.notes[ex.id] || '') + '</textarea></div>' +
           '</div>' +
         '</div>' +
       '</article>';
+  }
+
+  /* L'historique des charges quitte l'écran de séance pour le volet des détails. */
+  function renderHist(ex) {
+    var h = loadHist(ex.id);
+    if (h.length < 2) return '';
+    return '<div class="note-k"><span class="kdot"></span>Historique</div>' +
+      '<div class="load-hist">' + h.slice(-10).reverse().map(function (x) {
+        return '<button class="hchip" data-hist="' + ex.id + '" data-d="' + x.d + '"><b>' + fmtNum(x.v) + '</b><span>' +
+          x.d.slice(8) + '/' + x.d.slice(5, 7) + '</span></button>';
+      }).join('') + '</div>';
   }
 
   function renderLoad(ex) {
@@ -527,38 +523,20 @@
     var h = loadHist(ex.id);
     var todayVal = (h.length && h[h.length - 1].d === today()) ? h[h.length - 1].v : '';
 
-    var info = last
-      ? 'Dernière fois : <b>' + fmtNum(last.v) + ' kg</b> (' + esc(agoLabel(last.d)) + ')' +
-        (ex.loadHint ? ' · repère ' + esc(ex.loadHint) : '')
-      : 'Repère : ' + esc(ex.loadHint || 'à définir');
+    var sugg = sg ? '<button class="sugg" data-sugg="' + ex.id + '" data-v="' + sg.value + '">' +
+      (sg.up ? '↑ ' : '= ') + fmtNum(sg.value) + ' kg</button>' : '';
 
-    var sugg = sg
-      ? '<button class="load-sugg" data-sugg="' + ex.id + '" data-v="' + sg.value + '">' +
-          (sg.up ? '↑ ' : '= ') + fmtNum(sg.value) + ' kg</button>'
-      : '';
-
-    var hist = h.length > 1
-      ? '<div class="load-hist">' + h.slice(-8).reverse().map(function (e) {
-          return '<button class="hchip" data-hist="' + ex.id + '" data-d="' + e.d + '"><b>' + fmtNum(e.v) + '</b><span>' + e.d.slice(8) + '/' + e.d.slice(5, 7) + '</span></button>';
-        }).join('') + '</div>'
-      : '';
-
-    /* Les deux boutons évitent le clavier : sous fatigue, taper un nombre est
-       le geste le plus coûteux de toute la séance. */
     return '' +
-      '<div class="load">' +
-        '<div class="load-row">' +
-          '<button class="load-step" data-step="' + ex.id + '" data-dir="-1" aria-label="Baisser la charge">−</button>' +
-          '<div class="load-field">' +
-            '<input class="load-in num" type="text" inputmode="decimal" data-load="' + ex.id + '" value="' + esc(fmtNum(todayVal)) + '" placeholder="—" aria-label="Charge en kilos">' +
-            '<span class="load-unit">kg</span>' +
-          '</div>' +
-          '<button class="load-step" data-step="' + ex.id + '" data-dir="1" aria-label="Monter la charge">+</button>' +
-          sugg +
+      '<div class="rang charge">' +
+        '<button class="pas" data-step="' + ex.id + '" data-dir="-1" aria-label="Baisser la charge">−</button>' +
+        '<div class="poids-box">' +
+          '<input class="poids num" type="text" inputmode="decimal" data-load="' + ex.id + '" value="' + esc(fmtNum(todayVal)) + '" placeholder="—" aria-label="Charge en kilos">' +
+          '<span class="poids-unit">kg</span>' +
         '</div>' +
-        '<div class="load-info">' + info + '</div>' +
-        hist +
-      '</div>';
+        '<button class="pas" data-step="' + ex.id + '" data-dir="1" aria-label="Monter la charge">+</button>' +
+        sugg +
+      '</div>' +
+      (last ? '<div class="dernier">dernière fois <b>' + fmtNum(last.v) + ' kg</b> · ' + esc(agoLabel(last.d)) + '</div>' : '');
   }
 
   /* ─────────── Interactions de la séance ─────────── */
@@ -741,12 +719,13 @@
       d.innerHTML = on ? I.check : (i + 1);
     });
     majAvancement();
-    var zone = $('.sets', card);
-    var eff = zone ? $('.sets-reset', zone) : null;
+
+    var zone = $('.series', card);
+    var eff = zone ? $('.effacer', zone) : null;
     var qq = arr.some(function (v) { return v; });
     if (zone && qq && !eff) {
       eff = document.createElement('button');
-      eff.className = 'sets-reset';
+      eff.className = 'effacer';
       eff.setAttribute('data-reset', exId);
       eff.textContent = 'effacer';
       zone.appendChild(eff);
@@ -754,29 +733,46 @@
 
     var all = arr.every(function (v) { return v; });
     card.classList.toggle('done', all);
-    var ico = $('.ex-i', card);
-    if (ico) ico.innerHTML = all ? I.check : (ico.getAttribute('data-n') || ico.textContent.trim() && !all ? ico.innerHTML : ico.innerHTML);
-    if (all && ico) ico.innerHTML = I.check;
+    var nom = $('.exo-name', card);
+    if (nom) {
+      var marque = $('.exo-fait', nom);
+      if (all && !marque) {
+        marque = document.createElement('span');
+        marque.className = 'exo-fait';
+        marque.textContent = '✓';
+        nom.appendChild(marque);
+      } else if (marque && !all) { marque.remove(); }
+    }
   }
 
   function refreshRounds(ssId) {
-    majAvancement();
     var done = todayRounds(ssId);
+    var zone = $('[data-ss="' + ssId + '"] .ss-rounds');
     $$('[data-round="' + ssId + '"]').forEach(function (d, i) {
       var on = (i + 1) <= done;
       d.classList.toggle('on', on);
       d.innerHTML = on ? I.check : (i + 1);
     });
+    majAvancement();
+    if (!zone) return;
+    var eff = $('.effacer', zone);
+    if (done && !eff) {
+      eff = document.createElement('button');
+      eff.className = 'effacer';
+      eff.setAttribute('data-resetss', ssId);
+      eff.textContent = 'effacer';
+      zone.appendChild(eff);
+    } else if (eff && !done) { eff.remove(); }
   }
 
   function refreshLoad(exId) {
     var card = $('[data-ex="' + exId + '"]');
     if (!card) return;
-    var box = $('.load', card);
+    var box = $('.zone-charge', card);
     if (!box) return;
-    var tmp = document.createElement('div');
-    tmp.innerHTML = renderLoad(findEx(exId));
-    box.parentNode.replaceChild(tmp.firstChild, box);
+    box.innerHTML = renderLoad(findEx(exId));
+    var hz = $('.hist-zone', card);
+    if (hz) hz.innerHTML = renderHist(findEx(exId));
     var inp = $('[data-load="' + exId + '"]', card);
     if (inp) {
       inp.addEventListener('change', function () {
@@ -924,7 +920,7 @@
     tickRest();
     if (restOwner) {
       setRestOf(restOwner, restTotal);
-      var el = $('[data-rest="' + restOwner + '"] .stat-v') || $('[data-rest="' + restOwner + '"] .num');
+      var el = $('[data-rest="' + restOwner + '"] .num');
       if (el) el.textContent = restLabel(restOf(restOwner));
       toast('Repos de cet exercice : ' + restLabel(restOf(restOwner)));
     }

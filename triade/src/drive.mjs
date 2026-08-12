@@ -98,7 +98,7 @@ const PROBE = `(() => {
     const propre = [...el.childNodes].some(n => n.nodeType === 3 && n.textContent.trim());
 
     // Commandes secondaires assumées petites (liens texte discrets) : comptées à part.
-    const secondaire = el.matches('.sets-reset, .hchip, .det-btn');
+    const secondaire = el.matches('.effacer, .hchip, .det-btn');
     if (['BUTTON','A','INPUT','TEXTAREA'].includes(el.tagName) && (b.height < 40 || b.width < 40)) {
       if (secondaire) r.petitesAssumees++;
       else r.petites.push({ el: nom(el), t:[Math.round(b.width), Math.round(b.height)] });
@@ -363,7 +363,8 @@ async function main() {
         const centre = document.elementFromPoint(b.left + 4, b.top + b.height / 2);
         return { ecart: Math.round(n.top - h.bottom), titreSousBarre: Math.round(b.top - n.bottom),
                  auDessus: centre ? (centre.className || centre.tagName) : 'rien',
-                 actif: document.querySelector('.pill.on')?.textContent.trim() };
+                 actif: document.querySelector('.tab.on')?.textContent.trim(),
+                 actifAttendu: document.querySelector('.tab.on') === document.querySelectorAll('[data-bloc]')[${pill}] };
       })()`);
       bilan.push({ titre: `barres collantes · bloc ${pill} visé`, fenetre: '—', theme: '—', page: '—',
         soucis: [
@@ -371,7 +372,7 @@ async function main() {
           g.titreSousBarre < 0 ? `le titre du bloc est masqué de ${-g.titreSousBarre} px par la barre` : null,
           g.titreSousBarre > 90 ? `le titre s’arrête ${g.titreSousBarre} px trop bas` : null,
           /bloc-name/.test(String(g.auDessus)) ? null : `au point du titre on trouve : ${g.auDessus}`,
-          g.actif && g.actif.startsWith('0' + (+pill + 1)) ? null : `pastille active : « ${g.actif} » au lieu du bloc ${+pill + 1}`
+          g.actifAttendu ? null : `onglet actif : « ${g.actif} » au lieu du bloc ${+pill + 1}`
         ].filter(Boolean) });
     }
     await shot('04b-barres-collantes');
@@ -423,14 +424,14 @@ async function main() {
     await tap('#mini-stop');
 
     /* 5b2 — Le repos se lance depuis l'exercice, avec SA durée, et s'ajuste pour lui */
-    const r1 = await evalJS(`document.querySelector('[data-rest="a-squat"] .stat-v').textContent`);
+    const r1 = await evalJS(`document.querySelector('[data-rest="a-squat"] .num').textContent`);
     await tap('[data-rest="a-squat"]');
     const r2 = await evalJS(`({ mini: getComputedStyle(document.getElementById('restmini')).display,
                                 t: document.getElementById('mini-time').textContent })`);
     await tap('#mini-plus');
     await pause(400);
     const r3 = await evalJS(`(() => ({
-      chip: document.querySelector('[data-rest="a-squat"] .stat-v').textContent,
+      chip: document.querySelector('[data-rest="a-squat"] .num').textContent,
       garde: /"rests":\{[^}]*a-squat/.test(localStorage.getItem('triade:v1') || '')
     }))()`);
     await shot('06c-repos-par-exercice');
