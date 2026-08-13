@@ -279,6 +279,10 @@ async function main() {
   await send('Runtime.enable');
   await send('Page.enable');
   await send('Log.enable');
+  /* Le cache HTTP de Chrome survit au profil et au vidage des caches applicatifs :
+     sans cela le pilote refuse de tester (à juste titre) et ne sait pas se débloquer. */
+  await send('Network.enable');
+  await send('Network.setCacheDisabled', { cacheDisabled: true });
 
   let planté = null;
   const ATTENDUS = 26;   // nombre de contrôles du scénario complet

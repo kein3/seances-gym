@@ -36,9 +36,11 @@
               "reps": "3 min",
               "tempo": "progressif",
               "rest": 0,
-              "execution": "Commence très facile et monte la cadence chaque minute. À la fin des 5 minutes tu doit être légèrement essoufflé et avoir chaud — pas fatigué. L'objectif est de faire monter la température des muscles et des articulations, rien d'autre.",
-              "avoid": "Ne transforme pas l'échauffement en séance de cardio : tu as du lourd juste après.",
-              "alt": "Corde à sauter 3 × 1 min, ou 5 min de marche rapide en pente sur tapis."
+              "execution": "Commence très facile et monte la cadence chaque minute. Au bout des 3 minutes tu dois être légèrement essoufflé et avoir chaud — pas fatigué. L'objectif est de faire monter la température des muscles et des articulations, rien d'autre.",
+              "avoid": "Ne transforme pas l'échauffement en séance de cardio : tu as du lourd juste après.",
+              "alt": "Corde à sauter 3 × 1 min, ou 5 min de marche rapide en pente sur tapis.",
+              "setup": "Résistance faible pour commencer. Au rameur, sangle les pieds au milieu du pied et assieds-toi jambes fléchies, bras tendus vers la barre. Au vélo, monte la selle jusqu'à ce que la jambe soit presque tendue en bas du coup de pédale.",
+              "reussi": "Tu as chaud et tu respires plus vite, mais tu pourrais encore tenir une conversation."
             },
             {
               "type": "ex",
@@ -49,9 +51,11 @@
               "reps": "20",
               "tempo": "contrôlé",
               "rest": 30,
-              "execution": "Élastique tendu devant toi à hauteur de poitrine, bras tendus. Écarte les mains en serrant les omoplates, jusqu'à ce que l'élastique touche le sternum. Reviens lentement. Choisis un élastique léger : ce n'est pas un exercice de force.",
+              "execution": "Élastique tendu devant toi à hauteur de poitrine, bras tendus. Écarte les mains en serrant les omoplates, jusqu'à ce que l'élastique touche le sternum. Reviens lentement. Choisis un élastique léger : ce n'est pas un exercice de force.",
               "avoid": "Ne cambre pas le bas du dos pour ouvrir davantage — le mouvement vient des omoplates.",
-              "alt": "Face pull à la corde très léger, 2 × 20."
+              "alt": "Face pull à la corde très léger, 2 × 20.",
+              "setup": "Un élastique léger, tenu à deux mains bras tendus devant toi à hauteur de poitrine, mains écartées d'environ la largeur des épaules. Debout, pieds largeur de bassin, côtes basses.",
+              "reussi": "Le travail se sent entre les omoplates — ni dans les bras, ni dans la nuque."
             }
           ]
         },
@@ -73,9 +77,11 @@
               "trackLoad": true,
               "step": 2.5,
               "loadHint": "70–90 kg",
-              "execution": "Barre posée sur le haut des trapèzes, pieds largeur d'épaules et pointes légèrement ouvertes. Inspire, bloque le ventre comme si tu allais recevoir un coup, puis descends en 3 secondes en poussant les genoux vers l'extérieur. Descends jusqu'à ce que le pli de la hanche passe sous le genou, si ta mobilité le permet sans que le bas du dos s'arrondisse. Remonte en poussant le sol avec tout le pied. Descendre franchement sous la parallèle plutôt que de s'arrêter à 90° ne change pas grand-chose pour le quadriceps, mais donne nettement plus de fessiers et d'adducteurs : c'est la raison de chercher la profondeur. Avant la première série lourde, monte en trois séries d'échauffement : barre à vide, puis environ 50 % et 75 % de ta charge du jour, 5 répétitions chacune. C'est le meilleur échauffement possible pour ce mouvement — plus utile que n'importe quel étirement.",
-              "avoid": "Les talons qui se décollent et les genoux qui rentrent : dans les deux cas, baisse la charge plutôt que de forcer.",
-              "alt": "Hack squat ou squat sur machine guidée si le rack est pris ou si tu t'entraînes sans partenaire : même travail, dos plus protégé."
+              "execution": "Barre posée sur le haut des trapèzes, pieds largeur d'épaules et pointes légèrement ouvertes. Inspire, bloque le ventre comme si tu allais recevoir un coup, puis descends en 3 secondes en poussant les genoux vers l'extérieur. Descends jusqu'à ce que le pli de la hanche passe sous le genou, si ta mobilité le permet sans que le bas du dos s'arrondisse. Remonte en poussant le sol avec tout le pied. Descendre franchement sous la parallèle plutôt que de s'arrêter à 90° ne change pas grand-chose pour le quadriceps, mais donne nettement plus de fessiers et d'adducteurs : c'est la raison de chercher la profondeur. Avant la première série lourde, monte en trois séries d'échauffement : barre à vide, puis environ 50 % et 75 % de ta charge du jour, 5 répétitions chacune. C'est le meilleur échauffement possible pour ce mouvement — plus utile que n'importe quel étirement.",
+              "avoid": "Les talons qui se décollent et les genoux qui rentrent : dans les deux cas, baisse la charge plutôt que de forcer.",
+              "alt": "Hack squat ou squat sur machine guidée si le rack est pris ou si tu t'entraînes sans partenaire : même travail, dos plus protégé.",
+              "setup": "Règle les crochets du rack à hauteur de sternum : tu dois dégager la barre en fléchissant à peine les genoux. Pose aussi les barres de sécurité juste sous ta position basse — c'est ce qui te permet de pousser seul sans risque. Place-toi sous la barre, mains un peu plus larges que les épaules, serre les omoplates pour créer le coussin de muscle qui portera la barre, dégage, et recule de deux pas, pas plus.",
+              "reussi": "La barre reste à l'aplomb du milieu du pied pendant toute la descente, et à la remontée les hanches et les épaules montent ensemble."
             }
           ]
         },
@@ -103,8 +109,10 @@
                   "step": 2,
                   "loadHint": "26–36 kg par haltère",
                   "execution": "Pieds à plat, omoplates serrées et abaissées pendant toute la série. Descends en 3 secondes jusqu'à ce que les coudes passent légèrement sous la ligne du torse — amplitude qu'une barre ne permet pas —, marque 1 seconde, pousse en rapprochant les haltères sans les cogner.",
-                  "avoid": "Écarter les coudes à 90° du corps : garde-les à environ 45°, sinon c'est l'épaule qui paie.",
-                  "alt": "Développé couché à la barre, 4 × 6, le mouvement de référence pour la force — mais il te renvoie au rack, compte dix minutes de plus."
+                  "avoid": "Écarter les coudes à 90° du corps : garde-les à environ 45°, sinon c'est l'épaule qui paie.",
+                  "alt": "Développé couché à la barre, 4 × 6, le mouvement de référence pour la force — mais il te renvoie au rack, compte dix minutes de plus.",
+                  "setup": "Banc plat. Assieds-toi au bout avec un haltère posé debout sur chaque cuisse, puis bascule en arrière en poussant avec les genoux pour amener les haltères en position : c'est la seule façon de les mettre en place sans tirer sur l'épaule. Pieds à plat au sol, largeur de bassin, omoplates serrées et tirées vers le bas.",
+                  "reussi": "Les omoplates restent serrées et plaquées au banc jusqu'à la dernière répétition, et tu sens l'étirement des pectoraux en bas sans rien de désagréable à l'avant de l'épaule."
                 },
                 {
                   "id": "a-rowing-hal",
@@ -117,8 +125,10 @@
                   "step": 2,
                   "loadHint": "28–40 kg",
                   "execution": "Un genou et une main sur le banc que tu viens d'utiliser, dos à plat. Tire l'haltère vers la hanche en amenant le coude le long du corps, serre l'omoplate une seconde en haut, laisse redescendre bras complètement tendu pour étirer le dos. Toutes les répétitions d'un bras, puis l'autre.",
-                  "avoid": "Tourner le buste pour arracher les dernières répétitions : le tronc reste immobile.",
-                  "alt": "Rowing barre buste penché, 4 × 8 (au rack), ou rowing machine poitrine appuyée."
+                  "avoid": "Tourner le buste pour arracher les dernières répétitions : le tronc reste immobile.",
+                  "alt": "Rowing barre buste penché, 4 × 8 (au rack), ou rowing machine poitrine appuyée.",
+                  "setup": "Le même banc. Genou et main du même côté posés dessus, l'autre pied au sol légèrement en arrière. Le dos doit arriver à l'horizontale et rester plat — si tu n'y arrives pas, avance le pied au sol. L'haltère est au sol dans l'axe de l'épaule, tu le prends bras tendu.",
+                  "reussi": "Le buste est exactement dans la même position à la dernière répétition qu'à la première, et ça tire sous l'aisselle et entre les omoplates."
                 }
               ]
             },
@@ -132,8 +142,10 @@
               "tempo": "3-0-2",
               "rest": 60,
               "execution": "À genoux, hanches légèrement en avant, bas du dos volontairement arrondi (le contraire de ce qu'on croit). Déroule aussi loin que tu peux SANS que le bas du dos se creuse, puis reviens en tirant avec les abdos. Arrête-toi à la distance que tu maîtrises.",
-              "avoid": "Aller trop loin : dès que le bassin bascule et que les lombaires se creusent, tu travailles le dos et plus les abdos.",
-              "alt": "Planche sur les coudes 3 × 45 sec, ou relevés de jambes suspendus 3 × 12."
+              "avoid": "Aller trop loin : dès que le bassin bascule et que les lombaires se creusent, tu travailles le dos et plus les abdos.",
+              "alt": "Planche sur les coudes 3 × 45 sec, ou relevés de jambes suspendus 3 × 12.",
+              "setup": "À genoux sur un tapis ou une serviette pliée, la roue posée devant toi juste sous les épaules, une main sur chaque poignée. Rentre le bassin sous toi pour arrondir légèrement le bas du dos AVANT de commencer à dérouler : cette position de départ est l'exercice.",
+              "reussi": "Tu pourrais t'arrêter net à n'importe quel moment du déroulé sans que le bas du dos s'affaisse."
             }
           ]
         },
@@ -161,8 +173,10 @@
                   "step": 2.5,
                   "loadHint": "20–32 kg",
                   "execution": "Dos à la poulie, corde derrière la tête, coudes pointés vers l'avant et maintenus le plus haut possible. C'est cette position bras au-dessus de la tête qui met le chef long du triceps en étirement — et à l'étirement, il grossit nettement plus qu'en poussée devant soi. Tends complètement, marque 1 seconde, laisse revenir jusqu'à sentir l'étirement derrière le bras.",
-                  "avoid": "Laisser les coudes s'écarter et redescendre le long du corps : on retombe sur un pushdown ordinaire et on perd tout l'intérêt de la position.",
-                  "alt": "Extension nuque assis avec un haltère à deux mains, ou barre EZ couché derrière la tête : même principe, bras au-dessus de la tête."
+                  "avoid": "Laisser les coudes s'écarter et redescendre le long du corps : on retombe sur un pushdown ordinaire et on perd tout l'intérêt de la position.",
+                  "alt": "Extension nuque assis avec un haltère à deux mains, ou barre EZ couché derrière la tête : même principe, bras au-dessus de la tête.",
+                  "setup": "Corde accrochée à la poulie BASSE. Prends-la à deux mains, tourne-toi dos à la poulie, fais un pas en avant et passe la corde derrière la tête. Un pied devant l'autre pour ne pas être tiré en arrière. Les coudes pointent vers l'avant et vers le haut, serrés vers l'intérieur.",
+                  "reussi": "Les coudes restent au même endroit dans l'espace du début à la fin, et l'étirement se sent derrière le bras en position basse."
                 },
                 {
                   "id": "a-facepull",
@@ -174,9 +188,11 @@
                   "trackLoad": true,
                   "step": 2.5,
                   "loadHint": "15–25 kg",
-                  "execution": "Poulie réglée à hauteur des yeux, pouces vers toi. Tire la corde vers le visage en écartant les mains et en tournant les avant-bras vers l'arrière, comme un double biceps de bodybuilder. Marque 1 seconde. C'est le contrepoids de toutes tes poussées : ne le saute pas.",
+                  "execution": "Poulie réglée à hauteur des yeux, pouces vers toi. Tire la corde vers le visage en écartant les mains et en tournant les avant-bras vers l'arrière, comme un double biceps de bodybuilder. Marque 1 seconde. C'est le contrepoids de toutes tes poussées : ne le saute pas.",
                   "avoid": "Prendre lourd et tirer avec le buste — reste droit, charge légère.",
-                  "alt": "Oiseau penché aux haltères légers, 3 × 15."
+                  "alt": "Oiseau penché aux haltères légers, 3 × 15.",
+                  "setup": "Corde à la poulie réglée à hauteur des yeux. Prise neutre, pouces vers toi. Recule jusqu'à ce que le câble soit déjà tendu bras tendus, un pied devant l'autre, buste droit.",
+                  "reussi": "Les mains finissent de part et d'autre du visage à hauteur des oreilles, coudes plus hauts que les poignets."
                 },
                 {
                   "id": "a-elev-lat",
@@ -188,9 +204,11 @@
                   "trackLoad": true,
                   "step": 2.5,
                   "loadHint": "7–12 kg par côté",
-                  "execution": "Poulie en position basse, poignée prise de la main opposée, câble qui passe devant les jambes. Monte le bras sur le côté jusqu'à hauteur d'épaule, descends en 3 secondes. L'avantage du câble : la tension existe déjà en bas du mouvement, là où les haltères ne pèsent presque rien.",
-                  "avoid": "Se pencher du côté opposé pour aider : le buste reste droit, quitte à baisser la charge.",
-                  "alt": "Élévations latérales aux haltères, 4 × 15 — mais elles te font quitter la station de câbles."
+                  "execution": "Poulie en position basse, poignée prise de la main opposée, câble qui passe devant les jambes. Monte le bras sur le côté jusqu'à hauteur d'épaule, descends en 3 secondes. L'avantage du câble : la tension existe déjà en bas du mouvement, là où les haltères ne pèsent presque rien.",
+                  "avoid": "Se pencher du côté opposé pour aider : le buste reste droit, quitte à baisser la charge.",
+                  "alt": "Élévations latérales aux haltères, 4 × 15 — mais elles te font quitter la station de câbles.",
+                  "setup": "Poulie en position la plus basse, poignée simple. Place-toi la poulie sur ta droite et prends la poignée de la main GAUCHE : le câble passe devant tes cuisses. Attrape la colonne de l'autre main pour t'empêcher de te pencher.",
+                  "reussi": "Le bras monte franchement sur le côté et non devant toi, sans que l'épaule remonte vers l'oreille."
                 }
               ]
             }
@@ -223,9 +241,11 @@
               "reps": "3 min",
               "tempo": "progressif",
               "rest": 0,
-              "execution": "Même principe que la séance A : monte doucement en intensité, tu dois avoir chaud sans être fatigué. Le rameur est un bon choix ici parce qu'il réveille déjà la charnière de hanche.",
+              "execution": "Même principe que la séance Socle : monte doucement en intensité, tu dois avoir chaud sans être fatigué. Le rameur est un bon choix ici parce qu'il réveille déjà la charnière de hanche — à chaque coup, les fesses partent en arrière et les ischios s'étirent, exactement le mouvement du soulevé roumain qui arrive.",
               "avoid": "Partir trop fort.",
-              "alt": "Marche en pente 5 min."
+              "alt": "Marche en pente 5 min.",
+              "setup": "Même mise en place que la séance Socle. Le rameur est le meilleur choix ici : cale les pieds, assieds-toi jambes fléchies et bras tendus vers la barre.",
+              "reussi": "Tu as chaud, la hanche se plie librement, et tu n'es pas essoufflé."
             },
             {
               "type": "ex",
@@ -237,8 +257,10 @@
               "tempo": "3-0-1",
               "rest": 30,
               "execution": "Barre à vide sur les trapèzes ou bâton dans le dos. Genoux très légèrement fléchis et FIXES, pousse les fesses vers l'arrière en gardant le dos parfaitement droit, jusqu'à sentir les ischios s'étirer. Remonte en serrant les fessiers. C'est la répétition à blanc du soulevé roumain qui arrive.",
-              "avoid": "Confondre avec un squat : ici les genoux ne bougent presque pas.",
-              "alt": "Good morning à la barre à vide, 2 × 12."
+              "avoid": "Confondre avec un squat : ici les genoux ne bougent presque pas.",
+              "alt": "Good morning à la barre à vide, 2 × 12.",
+              "setup": "Une barre à vide sur les trapèzes, ou un bâton tenu contre le dos en trois points de contact : l'arrière du crâne, le haut du dos, le sacrum. Pieds largeur de bassin, genoux à peine déverrouillés.",
+              "reussi": "Les trois points de contact du bâton ne se décollent jamais, et l'étirement se sent à l'arrière des cuisses en position basse."
             }
           ]
         },
@@ -260,9 +282,11 @@
               "trackLoad": true,
               "step": 2.5,
               "loadHint": "70–100 kg",
-              "execution": "Départ debout, barre contre les cuisses, prise en pronation largeur d'épaules. Genoux à peine fléchis et fixes. Descends la barre le long des jambes en poussant les fesses loin derrière, dos droit et barre en contact avec la peau. Arrête-toi quand les ischios sont au maximum de l'étirement — en général juste sous le genou — puis remonte en serrant les fessiers. Avant la première série lourde, monte en trois séries d'échauffement : barre à vide, puis environ 50 % et 75 % de ta charge du jour, 5 répétitions chacune. C'est le meilleur échauffement possible pour ce mouvement — plus utile que n'importe quel étirement.",
-              "avoid": "Descendre plus bas que ce que la souplesse permet : c'est là que le dos s'arrondit. La barre ne doit jamais s'éloigner des jambes.",
-              "alt": "Soulevé roumain aux haltères, 4 × 8, ou hyperextension lestée si le bas du dos est sensible."
+              "execution": "Départ debout, barre contre les cuisses, prise en pronation largeur d'épaules. Genoux à peine fléchis et fixes. Descends la barre le long des jambes en poussant les fesses loin derrière, dos droit et barre en contact avec la peau. Arrête-toi quand les ischios sont au maximum de l'étirement — en général juste sous le genou — puis remonte en serrant les fessiers. Avant la première série lourde, monte en trois séries d'échauffement : barre à vide, puis environ 50 % et 75 % de ta charge du jour, 5 répétitions chacune. C'est le meilleur échauffement possible pour ce mouvement — plus utile que n'importe quel étirement.",
+              "avoid": "Descendre plus bas que ce que la souplesse permet : c'est là que le dos s'arrondit. La barre ne doit jamais s'éloigner des jambes.",
+              "alt": "Soulevé roumain aux haltères, 4 × 8, ou hyperextension lestée si le bas du dos est sensible.",
+              "setup": "Pose la barre sur les crochets du rack à hauteur de mi-cuisse : tu la prends debout, tu ne la ramasses pas au sol — c'est ce qui économise le dos avant les séries lourdes. Prise en pronation largeur d'épaules, un pas en arrière, pieds largeur de bassin.",
+              "reussi": "La barre frotte les cuisses pendant toute la descente, et ce sont les ischios qui t'arrêtent — pas le bas du dos."
             }
           ]
         },
@@ -289,9 +313,11 @@
                   "trackLoad": true,
                   "step": 2,
                   "loadHint": "22–32 kg par haltère",
-                  "execution": "Banc réglé à 30° maximum — au-delà ce sont les épaules qui prennent tout. Descends les haltères en 3 secondes jusqu'à ce que les coudes soient légèrement sous la ligne du torse, puis pousse en rapprochant les haltères sans les cogner. L'inclinaison a sa raison d'être : c'est elle qui développe le haut des pectoraux, que le développé couché à plat de la séance A ne va pas chercher.",
+                  "execution": "Banc réglé à 30° maximum — au-delà ce sont les épaules qui prennent tout. Descends les haltères en 3 secondes jusqu'à ce que les coudes soient légèrement sous la ligne du torse, puis pousse en rapprochant les haltères sans les cogner. L'inclinaison a sa raison d'être : c'est elle qui développe le haut des pectoraux, que le développé couché à plat de la séance A ne va pas chercher.",
                   "avoid": "Un banc trop redressé, et une descente non contrôlée.",
-                  "alt": "Dips pectoraux buste penché, 4 × 8–10 (lestés si tu dépasses 12) : excellente alternative, un peu moins ciblée sur le haut des pectoraux. Ou développé incliné à la barre."
+                  "alt": "Dips pectoraux buste penché, 4 × 8–10 (lestés si tu dépasses 12) : excellente alternative, un peu moins ciblée sur le haut des pectoraux. Ou développé incliné à la barre.",
+                  "setup": "Banc réglé à 30°, soit le premier ou le deuxième cran depuis l'horizontale sur la plupart des bancs — pas au-delà. Assieds-toi haltères debout sur les cuisses, puis bascule en arrière en les poussant avec les genoux. Pieds à plat, omoplates serrées.",
+                  "reussi": "Ça travaille sur le haut des pectoraux, juste sous la clavicule, et pas à l'avant de l'épaule."
                 },
                 {
                   "id": "b-curl-incline",
@@ -303,9 +329,11 @@
                   "trackLoad": true,
                   "step": 2,
                   "loadHint": "10–16 kg",
-                  "execution": "Assis sur un banc incliné, laisse les bras pendre derrière la ligne du corps. Cette position, épaule en extension, étire le biceps sur sa partie haute — c'est là qu'il répond le mieux. Monte sans avancer le coude, marque 1 seconde en haut, descends en 3 secondes jusqu'aux bras complètement tendus. La charge sera plus légère qu'un curl debout : c'est normal et ce n'est pas un recul.",
-                  "avoid": "Ramener les coudes vers l'avant pendant la montée : l'étirement disparaît, et avec lui la raison de faire cet exercice.",
-                  "alt": "Curl à la poulie basse en se plaçant un pas devant la poulie, bras en arrière ; ou curl marteau debout si les bancs inclinés sont pris — prise neutre pour le brachial, moins d'étirement."
+                  "execution": "Assis sur un banc incliné, laisse les bras pendre derrière la ligne du corps. Cette position, épaule en extension, étire le biceps sur sa partie haute — c'est là qu'il répond le mieux. Monte sans avancer le coude, marque 1 seconde en haut, descends en 3 secondes jusqu'aux bras complètement tendus. La charge sera plus légère qu'un curl debout : c'est normal et ce n'est pas un recul.",
+                  "avoid": "Ramener les coudes vers l'avant pendant la montée : l'étirement disparaît, et avec lui la raison de faire cet exercice.",
+                  "alt": "Curl à la poulie basse en se plaçant un pas devant la poulie, bras en arrière ; ou curl marteau debout si les bancs inclinés sont pris — prise neutre pour le brachial, moins d'étirement.",
+                  "setup": "Le même banc, redressé à 45–60°. Assieds-toi dos entièrement plaqué au dossier et laisse les bras pendre librement derrière la ligne du corps, haltères en supination, paumes vers l'avant. Les épaules restent en arrière, contre le dossier.",
+                  "reussi": "Au départ de chaque répétition les bras pendent en arrière de la ligne du corps, et le coude ne s'avance pas d'un centimètre pendant la montée."
                 }
               ]
             }
@@ -334,9 +362,11 @@
                   "trackLoad": true,
                   "step": 5,
                   "loadHint": "35–55 kg",
-                  "execution": "Règle le siège pour que les poignées arrivent au niveau des oreilles, dos plaqué au dossier. Pousse jusqu'à bras presque tendus sans verrouiller, redescends en contrôlant jusqu'aux oreilles. La machine est ici pour une raison pratique : elle est dans la même zone que les mollets, et à volume égal elle fait grossir autant que la barre.",
-                  "avoid": "Descendre plus bas que les oreilles en cherchant l'amplitude : l'épaule n'aime pas, et le gain est nul.",
-                  "alt": "Développé militaire à la barre debout, 4 × 6 (le mouvement de référence, mais il te renvoie au rack) : Barre sur le haut des pectoraux, prise juste plus large que les épaules, coudes légèrement en avant. Serre les fessiers et le ventre pour verrouiller …"
+                  "execution": "Règle le siège pour que les poignées arrivent au niveau des oreilles, dos plaqué au dossier. Pousse jusqu'à bras presque tendus sans verrouiller, redescends en contrôlant jusqu'aux oreilles. La machine est ici pour une raison pratique : elle est dans la même zone que les mollets, et à volume égal elle fait grossir autant que la barre.",
+                  "avoid": "Descendre plus bas que les oreilles en cherchant l'amplitude : l'épaule n'aime pas, et le gain est nul.",
+                  "alt": "Développé militaire à la barre debout, 4 × 6 (le mouvement de référence, mais il te renvoie au rack) : Barre sur le haut des pectoraux, prise juste plus large que les épaules, coudes légèrement en avant. Serre les fessiers et le ventre pour verrouiller …",
+                  "setup": "Règle la hauteur du siège pour que les poignées arrivent au niveau des oreilles, pas plus haut. Dos et bas du dos plaqués au dossier, pieds à plat au sol.",
+                  "reussi": "Le dos reste collé au dossier même sur la dernière répétition, et les coudes ne descendent pas sous les oreilles."
                 },
                 {
                   "id": "c-rowing-machine",
@@ -349,8 +379,10 @@
                   "step": 5,
                   "loadHint": "40–60 kg",
                   "execution": "Poitrine calée contre le support, ce qui supprime toute triche du buste et tout travail du bas du dos — c'est l'intérêt de la machine ici, en fin de semaine. Tire les coudes vers l'arrière le long du corps, serre les omoplates une seconde, reviens en laissant les bras s'étendre complètement pour étirer le dos.",
-                  "avoid": "Tirer avec les bras seuls : le mouvement commence par les omoplates qui se rapprochent.",
-                  "alt": "Rowing barre buste penché, 4 × 8, si tu préfères la barre : Buste incliné à environ 70°, dos droit, barre pendue bras tendus. Tire la barre vers le bas des abdominaux en …"
+                  "avoid": "Tirer avec les bras seuls : le mouvement commence par les omoplates qui se rapprochent.",
+                  "alt": "Rowing barre buste penché, 4 × 8, si tu préfères la barre : Buste incliné à environ 70°, dos droit, barre pendue bras tendus. Tire la barre vers le bas des abdominaux en …",
+                  "setup": "Règle la hauteur du siège pour que les poignées arrivent au niveau du bas des pectoraux, puis la butée de poitrine pour que le sternum soit calé sans être écrasé. Pieds sur les cales, poitrine en appui avant de saisir les poignées.",
+                  "reussi": "La poitrine ne décolle pas du support, et le mouvement commence par les omoplates qui se rapprochent avant que les bras plient."
                 },
                 {
                   "id": "b-mollets",
@@ -362,9 +394,11 @@
                   "trackLoad": true,
                   "step": 5,
                   "loadHint": "60–100 kg",
-                  "execution": "Avant-pieds sur la plateforme. Laisse les talons descendre le plus bas possible pour étirer complètement, puis monte sur la pointe des pieds et tiens 1 seconde en haut. L'amplitude complète compte plus que la charge. Debout genou tendu, et non assis : c'est cette position qui étire le mollet et le fait grossir, la version assise n'apporte presque rien de plus sur le soléaire.",
+                  "execution": "Avant-pieds sur la plateforme. Laisse les talons descendre le plus bas possible pour étirer complètement, puis monte sur la pointe des pieds et tiens 1 seconde en haut. L'amplitude complète compte plus que la charge. Debout genou tendu, et non assis : c'est cette position qui étire le mollet et le fait grossir, la version assise n'apporte presque rien de plus sur le soléaire.",
                   "avoid": "Les demi-répétitions rapides en rebond.",
-                  "alt": "Mollets à la presse à cuisses, 3 × 20."
+                  "alt": "Mollets à la presse à cuisses, 3 × 20.",
+                  "setup": "Avant-pieds sur le bord de la plateforme, talons dans le vide. Règle les épaulières pour être en appui debout jambes tendues sans avoir à te tasser pour t'y glisser.",
+                  "reussi": "En bas le talon descend nettement sous le niveau de l'avant-pied, en haut tu tiens une seconde pleine sur la pointe."
                 }
               ]
             }
@@ -397,9 +431,11 @@
               "reps": "3 min",
               "tempo": "progressif",
               "rest": 0,
-              "execution": "4 minutes suffisent ici, la séance monte en température toute seule. Si tu prends la corde, alterne 40 secondes de saut et 20 secondes de pause.",
+              "execution": "Reste léger : la séance monte en température toute seule avec les bulgares. Si tu prends la corde, alterne 40 secondes de saut et 20 secondes de pause.",
               "avoid": "Rien à surveiller, reste léger.",
-              "alt": "Rameur 4 min."
+              "alt": "Rameur 4 min.",
+              "setup": "Résistance faible. À la corde, garde-la courte : les poignées doivent arriver aux aisselles quand tu poses un pied au milieu.",
+              "reussi": "Tu as chaud, les épaules et les chevilles sont déliées, et tu n'as rien entamé."
             },
             {
               "type": "ex",
@@ -410,9 +446,11 @@
               "reps": "15",
               "tempo": "lent",
               "rest": 30,
-              "execution": "Haltères de 3 à 5 kg maximum. Monte jusqu'à hauteur d'épaules, descends lentement. Le but est d'irriguer l'articulation avant les dips, pas de fatiguer l'épaule.",
+              "execution": "Monte les bras sur les côtés jusqu'à hauteur d'épaules, descends lentement en freinant. Le but est d'irriguer l'articulation et de réveiller les rotateurs avant les tractions et les élévations lourdes, pas de fatiguer l'épaule : si tu sens le muscle brûler, c'est trop lourd.",
               "avoid": "Prendre les mêmes haltères qu'au bloc 04.",
-              "alt": "Rotations externes à l'élastique, 2 × 15 par bras."
+              "alt": "Rotations externes à l'élastique, 2 × 15 par bras.",
+              "setup": "Deux haltères de 3 à 5 kg au maximum. Debout, pieds largeur de bassin, bras le long du corps, coudes très légèrement fléchis et figés.",
+              "reussi": "L'épaule est chaude et le mouvement est libre — aucune sensation de fatigue."
             }
           ]
         },
@@ -440,8 +478,10 @@
                   "step": 2,
                   "loadHint": "14–24 kg par haltère",
                   "execution": "Pied arrière posé sur un banc, pied avant assez loin devant pour que le genou reste au-dessus de la cheville en bas. Descends en 3 secondes jusqu'à ce que le genou arrière frôle le sol, buste légèrement penché en avant pour charger le fessier. Fais les 8 répétitions d'une jambe, puis l'autre sans repos.",
-                  "avoid": "Un pied avant trop proche du banc : le genou passe devant les orteils et prend tout.",
-                  "alt": "Fentes marchées haltères 4 × 10 par jambe, ou split squat statique si l'équilibre pose problème."
+                  "avoid": "Un pied avant trop proche du banc : le genou passe devant les orteils et prend tout.",
+                  "alt": "Fentes marchées haltères 4 × 10 par jambe, ou split squat statique si l'équilibre pose problème.",
+                  "setup": "Banc dans le dos. Pose le dessus du pied arrière dessus, puis avance le pied avant jusqu'à ce qu'en descendant, le tibia avant reste vertical — repère cette distance une bonne fois. Prends les haltères ensuite, bras le long du corps.",
+                  "reussi": "Le genou arrière descend à quelques centimètres du sol pendant que le genou avant reste au-dessus de la cheville."
                 },
                 {
                   "id": "c-elev-lat",
@@ -453,9 +493,11 @@
                   "trackLoad": true,
                   "step": 2,
                   "loadHint": "8–12 kg",
-                  "execution": "Légère flexion des coudes, monte jusqu'à hauteur d'épaules comme si tu versais un verre d'eau (petit doigt un peu plus haut que le pouce), puis descends en 3 secondes. Charge légère et exécution stricte : ce muscle répond aux répétitions propres, pas au poids.",
+                  "execution": "Légère flexion des coudes, monte jusqu'à hauteur d'épaules comme si tu versais un verre d'eau (petit doigt un peu plus haut que le pouce), puis descends en 3 secondes. Charge légère et exécution stricte : ce muscle répond aux répétitions propres, pas au poids.",
                   "avoid": "Se pencher en arrière et monter d'un coup de reins.",
-                  "alt": "Élévations à la poulie basse un bras si un poste est libre : tension constante même en bas."
+                  "alt": "Élévations à la poulie basse un bras si un poste est libre : tension constante même en bas.",
+                  "setup": "Deux haltères, debout, pieds largeur de bassin, buste très légèrement penché en avant, coudes fléchis d'un rien et figés dans cet angle.",
+                  "reussi": "Les coudes montent avant les mains, et les trapèzes ne se contractent pas vers les oreilles."
                 }
               ]
             }
@@ -478,10 +520,12 @@
               "step": 2.5,
               "loadHint": "poids de corps ou + 5 à 15 kg",
               "execution": "Prise un peu plus large que les épaules. Avant de tirer, abaisse les épaules pour éloigner les oreilles des mains — c'est ce geste qui met le dos en action. Monte jusqu'à ce que le menton dépasse la barre, redescends en 2 secondes bras presque tendus.",
-              "avoid": "Le coup de reins pour arracher la répétition : mieux vaut 5 tractions propres que 8 balancées.",
-              "alt": "Tractions à la machine assistée ou en élastique si tu ne tiens pas 6 répétitions strictes ; ceinture de lest quand tu passes 10.",
+              "avoid": "Le coup de reins pour arracher la répétition : mieux vaut 5 tractions propres que 8 balancées.",
+              "alt": "Tractions à la machine assistée ou en élastique si tu ne tiens pas 6 répétitions strictes ; ceinture de lest quand tu passes 10.",
               "type": "ex",
-              "rest": 75
+              "rest": 75,
+              "setup": "Barre fixe, prise en pronation un peu plus large que les épaules. Suspends-toi bras tendus, jambes croisées derrière toi, puis abaisse les épaules — éloigne les oreilles des mains — avant la première traction.",
+              "reussi": "Le menton passe la barre sans coup de reins, et en bas les bras se tendent complètement à chaque répétition."
             },
             {
               "id": "c-tractions-sup",
@@ -493,11 +537,13 @@
               "trackLoad": true,
               "step": 2.5,
               "loadHint": "poids de corps ou + 5 à 12 kg",
-              "execution": "Prise supination largeur d'épaules. Tire les coudes vers le bas et vers l'arrière, marque 1 seconde en haut poitrine près de la barre, descends en 2 secondes. La prise supination fait beaucoup travailler le biceps : c'est voulu, il n'y a pas de bloc bras dans cette séance.",
+              "execution": "Prise supination largeur d'épaules. Tire les coudes vers le bas et vers l'arrière, marque 1 seconde en haut poitrine près de la barre, descends en 2 secondes. La prise supination fait beaucoup travailler le biceps : c'est voulu, il n'y a pas de bloc bras dans cette séance.",
               "avoid": "Une descente en chute libre, très irritante pour le coude en supination.",
               "alt": "Tirage vertical prise neutre serrée, 4 × 10, ou machine assistée.",
               "type": "ex",
-              "rest": 75
+              "rest": 75,
+              "setup": "La même barre, prise en supination largeur d'épaules, paumes vers toi. Suspends-toi bras tendus, abaisse les épaules, laisse le corps s'immobiliser.",
+              "reussi": "La poitrine approche la barre en haut, et la descente prend deux bonnes secondes jusqu'aux bras tendus."
             }
           ]
         },
@@ -525,8 +571,10 @@
                   "step": 2.5,
                   "loadHint": "12–20 kg par côté",
                   "execution": "Poulies en position haute, un pas en avant, buste légèrement penché. Amène les mains l'une vers l'autre devant le bas du torse en gardant une petite flexion de coude constante, croise-les de quelques centimètres et marque 1 seconde. Laisse revenir en 3 secondes jusqu'à sentir l'étirement complet.",
-                  "avoid": "Plier et déplier les coudes : ça devient une extension triceps.",
-                  "alt": "Écartés à la machine pec deck, 3 × 15."
+                  "avoid": "Plier et déplier les coudes : ça devient une extension triceps.",
+                  "alt": "Écartés à la machine pec deck, 3 × 15.",
+                  "setup": "Les deux poulies en position haute, une poignée dans chaque main. Prends-les, fais un pas en avant pour te placer au centre, un pied devant l'autre, buste légèrement penché. Le câble doit déjà tirer bras écartés.",
+                  "reussi": "L'angle du coude est le même en position écartée et en position croisée, et l'étirement se sent en travers de la poitrine."
                 },
                 {
                   "id": "c-curl-poulie",
@@ -538,9 +586,11 @@
                   "trackLoad": true,
                   "step": 2.5,
                   "loadHint": "25–40 kg",
-                  "execution": "Debout face à la poulie basse, coudes collés au corps et immobiles. L'intérêt du câble : la tension existe déjà en bas du mouvement, là où un haltère ne pèse presque rien — le biceps travaille donc sur toute la course. Marque 1 seconde en haut, descends en 3 secondes jusqu'aux bras tendus.",
-                  "avoid": "Reculer les coudes ou balancer le buste pour finir la série : baisse la charge plutôt.",
-                  "alt": "Curl haltères debout, ou curl à la barre EZ, 4 × 12 — mais ils te font quitter la station."
+                  "execution": "Debout face à la poulie basse, coudes collés au corps et immobiles. L'intérêt du câble : la tension existe déjà en bas du mouvement, là où un haltère ne pèse presque rien — le biceps travaille donc sur toute la course. Marque 1 seconde en haut, descends en 3 secondes jusqu'aux bras tendus.",
+                  "avoid": "Reculer les coudes ou balancer le buste pour finir la série : baisse la charge plutôt.",
+                  "alt": "Curl haltères debout, ou curl à la barre EZ, 4 × 12 — mais ils te font quitter la station.",
+                  "setup": "Barre EZ ou corde accrochée à la poulie basse. Debout face à la poulie, à un pas d'elle, coudes contre les côtes, bras tendus vers le bas.",
+                  "reussi": "Les coudes restent collés aux côtes et le buste ne recule pas pour aider."
                 }
               ]
             }
@@ -569,9 +619,11 @@
                   "trackLoad": true,
                   "step": 5,
                   "loadHint": "35–55 kg",
-                  "execution": "Règle le dossier pour que les genoux soient dans l'axe de l'articulation de la machine. Plie en tirant les talons sous le siège, marque 1 seconde en position courte, puis laisse remonter en 3 secondes en freinant. C'est la descente freinée qui fait le travail ici. Le leg curl ASSIS est choisi volontairement plutôt que couché : hanche fléchie, l'ischio travaille plus étiré, et il grossit davantage — surtout sa partie longue.",
+                  "execution": "Règle le dossier pour que les genoux soient dans l'axe de l'articulation de la machine. Plie en tirant les talons sous le siège, marque 1 seconde en position courte, puis laisse remonter en 3 secondes en freinant. C'est la descente freinée qui fait le travail ici. Le leg curl ASSIS est choisi volontairement plutôt que couché : hanche fléchie, l'ischio travaille plus étiré, et il grossit davantage — surtout sa partie longue.",
                   "avoid": "Décoller les fesses du siège pour gagner de l'amplitude.",
-                  "alt": "Leg curl couché, ou nordic curl à deux si aucune machine n'est libre."
+                  "alt": "Leg curl couché, ou nordic curl à deux si aucune machine n'est libre.",
+                  "setup": "Règle le dossier pour que l'axe de ton genou soit aligné avec l'axe de rotation de la machine, serre la barre de cuisses pour ne pas décoller, et place le rouleau juste au-dessus des talons.",
+                  "reussi": "Les fesses restent dans le siège, et la remontée dure vraiment trois secondes."
                 },
                 {
                   "id": "c-mollets",
@@ -583,9 +635,11 @@
                   "trackLoad": true,
                   "step": 5,
                   "loadHint": "60–100 kg",
-                  "execution": "Avant-pieds sur la plateforme. Laisse les talons descendre le plus bas possible pour étirer complètement, puis monte sur la pointe des pieds et tiens 1 seconde en haut. L'amplitude complète compte plus que la charge. Debout genou tendu, et non assis : c'est cette position qui étire le mollet et le fait grossir, la version assise n'apporte presque rien de plus sur le soléaire.",
+                  "execution": "Avant-pieds sur la plateforme. Laisse les talons descendre le plus bas possible pour étirer complètement, puis monte sur la pointe des pieds et tiens 1 seconde en haut. L'amplitude complète compte plus que la charge. Debout genou tendu, et non assis : c'est cette position qui étire le mollet et le fait grossir, la version assise n'apporte presque rien de plus sur le soléaire.",
                   "avoid": "Les demi-répétitions rapides en rebond.",
-                  "alt": "Mollets à la presse à cuisses, 3 × 20."
+                  "alt": "Mollets à la presse à cuisses, 3 × 20.",
+                  "setup": "Avant-pieds sur le bord de la plateforme, talons dans le vide. Règle les épaulières pour être en appui debout jambes tendues sans avoir à te tasser pour t'y glisser.",
+                  "reussi": "En bas le talon descend nettement sous le niveau de l'avant-pied, en haut tu tiens une seconde pleine sur la pointe."
                 },
                 {
                   "id": "c-releves",
@@ -595,8 +649,10 @@
                   "reps": "12",
                   "tempo": "2-1-3",
                   "execution": "Suspendu à la barre, épaules actives (pas complètement relâché). Monte les jambes tendues le plus haut possible en enroulant le bassin vers le haut à la fin du mouvement, puis redescends en 3 secondes sans balancer.",
-                  "avoid": "Le balancier : si tu te balances, plie les genoux et fais des relevés genoux fléchis.",
-                  "alt": "Relevés de genoux suspendus 3 × 15, ou hollow hold 3 × 30 sec."
+                  "avoid": "Le balancier : si tu te balances, plie les genoux et fais des relevés genoux fléchis.",
+                  "alt": "Relevés de genoux suspendus 3 × 15, ou hollow hold 3 × 30 sec.",
+                  "setup": "Suspendu à la barre en pronation, largeur d'épaules. Pousse légèrement sur la barre pour garder les épaules actives plutôt que de pendre au bout des articulations. Attends que le corps s'immobilise avant la première répétition.",
+                  "reussi": "Le bassin s'enroule vers le haut en fin de montée, et le corps ne se balance pas entre deux répétitions."
                 }
               ]
             }

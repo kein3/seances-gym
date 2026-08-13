@@ -15,7 +15,9 @@
   --muted: #6e675d;
   --line: #eeeae3;
   --line-strong: #d6cfc4;
-  --cuivre: #a85f22;
+  /* Cuivre repris d'un cran : sur le fond teinté d'un poste, l'ancien
+     #a85f22 tombait à 4,23 de contraste — sous le seuil lisible. */
+  --cuivre: #9d5820;
   --cuivre-clair: #b4682b;
   --ok: #1f1d1b;
   --warn: #b4682b;
@@ -30,6 +32,10 @@
   --r-s: 9px;
   --safe-b: env(safe-area-inset-bottom, 0px);
   --safe-t: env(safe-area-inset-top, 0px);
+  /* Le poste est un CREUX, l'exercice une carte posée dedans. Même logique
+     dans les deux thèmes : le creux s'éloigne du fond, la carte s'en approche. */
+  --poste: #f2efe8;
+  --poste-line: #e7e2d9;
   color-scheme: light;
 }
 
@@ -51,6 +57,8 @@ html[data-theme="dark"] {
   --shadow-s: 0 1px 2px rgba(0, 0, 0, .5);
   --shadow-m: 0 4px 14px rgba(0, 0, 0, .4);
   --shadow-l: 0 12px 36px rgba(0, 0, 0, .55);
+  --poste: #0d0c0b;
+  --poste-line: #211f1c;
   color-scheme: dark;
 }
 
@@ -289,20 +297,30 @@ html[data-theme="dark"] .card-code { color: color-mix(in srgb, var(--a) 55%, #ff
   line-height: 1.6;
 }
 
-/* ═══════════ BLOC ═══════════ */
-.bloc { margin: 30px 0 0; scroll-margin-top: calc(var(--head-h, 86px) + 58px); }
-.bloc-head { display: flex; align-items: baseline; gap: 9px; }
+/* ═══════════ BLOC — un poste de salle ═══════════ */
+/* Le poste déborde de 8 px la gouttière de page : sans cela, le creux et la
+   carte cumulaient leurs marges et le texte perdait 48 px de largeur utile. */
+.bloc {
+  margin: 26px -8px 0;
+  padding: 16px 10px 14px;
+  background: var(--poste);
+  border: 1px solid var(--poste-line);
+  border-radius: var(--r-xl);
+  scroll-margin-top: calc(var(--head-h, 86px) + 58px);
+}
+
+.bloc-head { display: flex; align-items: baseline; gap: 9px; padding: 0 5px; }
 
 .bloc-n {
-  font-size: 11px; font-weight: 700; letter-spacing: .1em;
+  font-size: 12px; font-weight: 700; letter-spacing: .1em;
   color: var(--cuivre);
   font-variant-numeric: tabular-nums;
   flex: 0 0 auto;
 }
 
 .bloc-name {
-  font-size: 11px; font-weight: 700; letter-spacing: .14em;
-  text-transform: uppercase; color: var(--muted);
+  font-size: 12px; font-weight: 700; letter-spacing: .13em;
+  text-transform: uppercase; color: var(--text);
 }
 
 .bloc-dur {
@@ -311,10 +329,16 @@ html[data-theme="dark"] .card-code { color: color-mix(in srgb, var(--a) 55%, #ff
   white-space: nowrap; font-variant-numeric: tabular-nums;
 }
 
-.bloc-sub { font-size: 12.5px; color: var(--muted); margin-top: 5px; }
+.bloc-sub { font-size: 12.5px; color: var(--muted); margin-top: 5px; padding: 0 5px; }
+.bloc-corps { display: flex; flex-direction: column; gap: 8px; margin-top: 13px; }
 
 /* ═══════════ EXERCICE ═══════════ */
-.exo { padding: 22px 0 16px; border-top: 1px solid var(--line); margin-top: 8px; }
+.exo {
+  padding: 18px 14px 15px;
+  background: var(--surface);
+  border-radius: var(--r-l);
+  box-shadow: var(--shadow-s);
+}
 .exo-tete { display: flex; align-items: flex-start; gap: 10px; }
 .exo-txt { min-width: 0; flex: 1; }
 
@@ -413,13 +437,16 @@ html[data-theme="dark"] .card-code { color: color-mix(in srgb, var(--a) 55%, #ff
 .dernier { margin-top: 11px; font-size: 12px; color: var(--muted); font-variant-numeric: tabular-nums; }
 .dernier b { color: var(--text-2); font-weight: 700; }
 
-/* ─── Superset : un filet cuivre ─── */
-.ss { margin-top: 10px; padding-left: 15px; border-left: 1px solid var(--cuivre); }
+/* ─── Superset : un filet cuivre qui tient les cartes ensemble ─── */
+.ss {
+  display: flex; flex-direction: column; gap: 8px;
+  padding-left: 11px;
+  border-left: 2px solid var(--cuivre);
+}
 
 .ss-head {
   display: flex; align-items: center; gap: 10px; flex-wrap: wrap;
-  padding-top: 22px;
-  border-top: 1px solid var(--line);
+  padding: 2px 4px 2px 0;
   min-width: 0;
 }
 
@@ -429,8 +456,7 @@ html[data-theme="dark"] .card-code { color: color-mix(in srgb, var(--a) 55%, #ff
 }
 
 .ss-note { flex: 1 1 100%; min-width: 0; font-size: 12.5px; color: var(--muted); }
-.ss .exo:first-of-type { border-top: 0; padding-top: 14px; margin-top: 0; }
-.ss-rounds { display: flex; align-items: center; gap: 8px; margin-top: 16px; flex-wrap: wrap; }
+.ss-rounds { display: flex; align-items: center; gap: 8px; margin-top: 2px; padding-left: 2px; flex-wrap: wrap; }
 
 .ss-rounds-lab {
   font-size: 11px; font-weight: 700; letter-spacing: .13em;
@@ -455,6 +481,37 @@ html[data-theme="dark"] .card-code { color: color-mix(in srgb, var(--a) 55%, #ff
 
 .note-block { margin-bottom: 16px; }
 
+/* ─── Schéma du mouvement ─── */
+.fig-zone {
+  background: var(--poste);
+  border-radius: var(--r-m);
+  padding: 6px 8px 8px;
+}
+
+.fig { width: 100%; height: auto; display: block; max-width: 300px; margin: 0 auto; }
+.fig-a, .fig-b, .fig-mat, .fig-sol, .fig-cable, .fig-fleche {
+  fill: none; stroke-linecap: round; stroke-linejoin: round;
+}
+
+.fig-a { stroke: var(--text); stroke-width: 2; opacity: .25; }
+.fig-b { stroke: var(--text); stroke-width: 2.6; }
+.fig-a.fig-fond { opacity: .16; }
+.fig-b.fig-fond { opacity: .5; stroke-width: 2; }
+.fig-mat { stroke: var(--muted); stroke-width: 1.9; }
+.fig-sol { stroke: var(--muted); stroke-width: 1.4; opacity: .45; }
+.fig-cable { stroke: var(--muted); stroke-width: 1.2; opacity: .8; }
+.fig-fleche { stroke: var(--cuivre); stroke-width: 2.2; }
+
+.fig-leg {
+  display: flex; align-items: center; justify-content: center; gap: 6px;
+  font-size: 10.5px; letter-spacing: .1em; text-transform: uppercase;
+  color: var(--muted);
+}
+
+.fig-leg span { width: 15px; height: 2px; background: var(--text); border-radius: 2px; }
+.fig-leg-a { opacity: .28; }
+.fig-leg-b { margin-left: 8px; }
+
 .note-k {
   font-size: 10.5px; font-weight: 700; letter-spacing: .14em;
   text-transform: uppercase; color: var(--muted);
@@ -464,6 +521,8 @@ html[data-theme="dark"] .card-code { color: color-mix(in srgb, var(--a) 55%, #ff
 
 .note-k .kdot { display: none; }
 .note-t { font-size: 14px; color: var(--text-2); line-height: 1.62; }
+/* Deux repères de geste, deux filets : le bon en encre, le mauvais en cuivre. */
+.note-t.ok { color: var(--text-2); border-left: 1px solid var(--ok); padding-left: 12px; }
 .note-t.warn { color: var(--text-2); border-left: 1px solid var(--cuivre); padding-left: 12px; }
 .note-t.alt { color: var(--muted); }
 

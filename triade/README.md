@@ -56,6 +56,25 @@ python3 src/duree.py            # recalcule et met à jour le programme
 python3 src/duree.py --verifie  # échoue si une durée ne correspond plus au contenu
 ```
 
+### Les schémas de mouvement
+
+Chaque exercice a un schéma au trait dans son volet « Comment le faire » : la pose de
+départ en gris, la pose d'arrivée en encre, une flèche cuivre pour le sens.
+
+Ils ne sont pas dessinés un par un mais **calculés** : le corps est un squelette de
+longueurs fixes, et une figure ne décrit que des angles d'articulation et deux poses.
+C'est ce qui leur donne les mêmes proportions et le même trait — et ce qui fait qu'un
+exercice ajouté sans figure **arrête le build** au lieu d'ouvrir un volet sans dessin.
+
+```bash
+python3 src/figures.py            # écrit src/figures.json
+python3 src/figures.py --planche  # planche de contact, pour juger les 28 d'un coup
+python3 src/figures.py --seul a-squat,b-rdl   # planche limitée, pour retoucher
+```
+
+⚠ Les angles se règlent **en regardant la planche**, jamais en aveugle : la moitié des
+figures étaient anatomiquement fausses au premier jet, et rien dans le code ne le disait.
+
 ## Le registre visuel
 
 Direction retenue après une planche de quatre propositions : **le registre d'un beau carnet**.
@@ -65,12 +84,19 @@ en encre pleine ; chaque séance n'a qu'une teinte sourde (cuivre, ocre, sauge) 
 et sa barre d'avancement. Le thème sombre reprend la même logique en encre claire sur noir
 chaud, pas en inversion.
 
-Mesuré sur l'écran de séance : **0 surface pleine, 2 cadres fermés, aucune cible sous 44 px.**
+Un ajout depuis : **chaque poste est un creux teinté, chaque exercice une carte posée
+dedans.** Tout au blanc, un titre de poste et un exercice se ressemblaient trop pour qu'on
+sache d'un coup d'œil où on en est. Le creux et la carte suivent la même logique dans les
+deux thèmes : le creux s'éloigne du fond de page, la carte s'en rapproche.
+
+Sur l'écran de séance : **aucune surface pleine en couleur, aucune cible sous 44 px.**
 
 ## Ce que fait l'application
 
-- **Chaque exercice détaillé** : séries, répétitions, tempo, repos, charge repère,
-  consignes d'exécution, erreur à éviter, et une alternative si la machine est prise.
+- **Chaque exercice détaillé** : séries, répétitions, tempo, repos, charge repère, et un
+  volet « Comment le faire » qui donne le schéma du mouvement, la mise en place (réglage
+  de la machine, position de départ), l'exécution, le repère « c'est bien fait quand… »,
+  l'erreur à éviter, et une alternative si la machine est prise.
 - **Cases à cocher par série**, et par tour pour les supersets.
 - **Minuteur de repos qui n'occupe pas l'écran** : il apparaît en pastille en bas, avec le
   nom de l'exercice et une barre d'avancement, et passe au vert à la fin. Il se lance tout
@@ -116,6 +142,7 @@ compte, aucun serveur, rien qui sorte du téléphone. L'export sert à passer d'
 | `src/drive.mjs` | vérifie l'application dans un vrai Chrome (voir plus bas) |
 | `src/volume.py` | compte le volume hebdomadaire par muscle |
 | `src/duree.py` | calcule les durées et les écrit dans le programme |
+| `src/figures.py` | calcule les 28 schémas de mouvement → `src/figures.json` |
 | `SOURCES.md` | les études derrière chaque choix, et leurs limites |
 
 `index.html` est **généré**. Pour changer quelque chose, modifier le fichier

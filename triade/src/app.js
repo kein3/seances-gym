@@ -6,6 +6,7 @@
   'use strict';
 
   var P = JSON.parse(document.getElementById('payload').textContent);
+  var FIG = JSON.parse(document.getElementById('figures').textContent);
   var KEY = 'triade:v1';
   var app = document.getElementById('app');
 
@@ -394,6 +395,8 @@
       var items = b.items.map(function (it, ii) {
         return it.type === 'superset' ? renderSuperset(it, ii) : renderEx(it, ii + 1, false);
       }).join('');
+      /* Le poste est un creux teinté ; chaque exercice est une carte posée dedans.
+         Sans ce contraste, un titre de poste et un exercice se ressemblaient. */
       return '' +
         '<section class="bloc" id="bloc-' + bi + '">' +
           '<div class="bloc-head">' +
@@ -402,7 +405,7 @@
             '<span class="bloc-dur">' + esc(b.duration || '') + '</span>' +
           '</div>' +
           (b.sub ? '<div class="bloc-sub">' + esc(b.sub) + '</div>' : '') +
-          items +
+          '<div class="bloc-corps">' + items + '</div>' +
         '</section>';
     }).join('');
 
@@ -490,10 +493,19 @@
         setsHtml +
         '<div class="zone-charge">' + (ex.trackLoad ? renderLoad(ex) : '') + '</div>' +
         '<div class="det">' +
-          '<button class="det-btn">Exécution, à éviter, alternative' + I.chevron + '</button>' +
+          '<button class="det-btn">Comment le faire' + I.chevron + '</button>' +
           '<div class="det-body">' +
+            /* Ordre du volet : on regarde le geste, on se met en place, on
+               exécute, on vérifie — l'ordre dans lequel ça arrive au poste. */
+            (FIG[ex.id] ? '<div class="note-block fig-zone">' + FIG[ex.id] +
+              '<div class="fig-leg"><span class="fig-leg-a"></span>départ' +
+              '<span class="fig-leg-b"></span>fin</div></div>' : '') +
+            (ex.setup ? '<div class="note-block"><div class="note-k"><span class="kdot"></span>Mise en place</div>' +
+              '<div class="note-t">' + esc(ex.setup) + '</div></div>' : '') +
             '<div class="note-block"><div class="note-k"><span class="kdot"></span>Exécution</div>' +
               '<div class="note-t">' + esc(ex.execution) + '</div></div>' +
+            (ex.reussi ? '<div class="note-block"><div class="note-k ok"><span class="kdot"></span>C’est bien fait quand</div>' +
+              '<div class="note-t ok">' + esc(ex.reussi) + '</div></div>' : '') +
             (ex.avoid ? '<div class="note-block"><div class="note-k warn"><span class="kdot"></span>À éviter</div>' +
               '<div class="note-t warn">' + esc(ex.avoid) + '</div></div>' : '') +
             (ex.alt ? '<div class="note-block"><div class="note-k alt"><span class="kdot"></span>Alternative</div>' +
