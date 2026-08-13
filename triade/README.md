@@ -58,13 +58,29 @@ python3 src/duree.py --verifie  # échoue si une durée ne correspond plus au co
 
 ### Les schémas de mouvement
 
-Chaque exercice a un schéma au trait dans son volet « Comment le faire » : la pose de
-départ en gris, la pose d'arrivée en encre, une flèche cuivre pour le sens.
+Chaque exercice a un schéma dans son volet « Comment le faire » : la pose de départ en
+fil de fer, la pose d'arrivée en silhouette pleine, une flèche cuivre pour le sens — et
+**le muscle travaillé qui s'allume en cuivre** sur la silhouette, franc pour le travail
+direct, pâle pour le soutien.
 
 Ils ne sont pas dessinés un par un mais **calculés** : le corps est un squelette de
 longueurs fixes, et une figure ne décrit que des angles d'articulation et deux poses.
 C'est ce qui leur donne les mêmes proportions et le même trait — et ce qui fait qu'un
 exercice ajouté sans figure **arrête le build** au lieu d'ouvrir un volet sans dessin.
+
+La liste des muscles n'est pas réécrite pour les schémas : elle est lue dans
+`src/volume.py`, qui s'en sert déjà pour compter le volume hebdomadaire. Une seule
+source — reclasser un exercice corrige le compte et le dessin d'un coup. Un muscle
+sans zone dessinée arrête aussi la génération.
+
+Deux pièges de géométrie, réglés une fois :
+
+- **le côté avant d'un segment** ne peut pas se déduire d'une direction globale : assis,
+  la cuisse pointe vers l'avant et sa perpendiculaire devient indécidable. Chaque segment
+  porte donc un signe mesuré en position debout, qui tourne ensuite avec lui — sans quoi
+  l'ischio-jambier s'allumait sur le *dessus* de la cuisse au leg curl ;
+- **le corps retourné** (couché sur le dos, dos en l'air) inverse ce côté : les cinq
+  figures concernées portent `ventre=-1`.
 
 ```bash
 python3 src/figures.py            # écrit src/figures.json
@@ -94,9 +110,10 @@ Sur l'écran de séance : **aucune surface pleine en couleur, aucune cible sous 
 ## Ce que fait l'application
 
 - **Chaque exercice détaillé** : séries, répétitions, tempo, repos, charge repère, et un
-  volet « Comment le faire » qui donne le schéma du mouvement, la mise en place (réglage
-  de la machine, position de départ), l'exécution, le repère « c'est bien fait quand… »,
-  l'erreur à éviter, et une alternative si la machine est prise.
+  volet « Comment le faire » qui donne le schéma du mouvement avec le muscle travaillé,
+  la mise en place (réglage de la machine, position de départ), l'exécution, le repère
+  « c'est bien fait quand… », l'erreur à éviter, et une alternative si la machine est
+  prise.
 - **Cases à cocher par série**, et par tour pour les supersets.
 - **Minuteur de repos qui n'occupe pas l'écran** : il apparaît en pastille en bas, avec le
   nom de l'exercice et une barre d'avancement, et passe au vert à la fin. Il se lance tout

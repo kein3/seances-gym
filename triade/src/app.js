@@ -457,6 +457,20 @@
       '</div>';
   }
 
+  /* Ce que le cuivre du schéma désigne. Les échauffements n'ont pas de muscle
+     visé — la ligne disparaît alors au lieu d'annoncer un travail qui n'est
+     pas le but de l'exercice. */
+  function musclesTexte(id) {
+    var m = FIG.muscles[id];
+    if (!m) return '';
+    var directs = [], soutien = [];
+    Object.keys(m).forEach(function (k) { (m[k] >= 1 ? directs : soutien).push(k); });
+    if (!directs.length) return '';
+    return '<div class="fig-mus-txt">Travaille <b>' + esc(directs.join(' · ')) + '</b>' +
+      (soutien.length ? '<span> — en soutien : ' + esc(soutien.join(', ')) + '</span>' : '') +
+      '</div>';
+  }
+
   function renderEx(ex, n, inSuper) {
     /* Une ligne de méta remplace les quatre cases : même information, aucun pavé. */
     var duree = /min|sec|s$/.test(String(ex.reps));
@@ -497,9 +511,10 @@
           '<div class="det-body">' +
             /* Ordre du volet : on regarde le geste, on se met en place, on
                exécute, on vérifie — l'ordre dans lequel ça arrive au poste. */
-            (FIG[ex.id] ? '<div class="note-block fig-zone">' + FIG[ex.id] +
+            (FIG.svg[ex.id] ? '<div class="note-block fig-zone">' + FIG.svg[ex.id] +
               '<div class="fig-leg"><span class="fig-leg-a"></span>départ' +
-              '<span class="fig-leg-b"></span>fin</div></div>' : '') +
+              '<span class="fig-leg-b"></span>fin</div>' + musclesTexte(ex.id) +
+              '</div>' : '') +
             (ex.setup ? '<div class="note-block"><div class="note-k"><span class="kdot"></span>Mise en place</div>' +
               '<div class="note-t">' + esc(ex.setup) + '</div></div>' : '') +
             '<div class="note-block"><div class="note-k"><span class="kdot"></span>Exécution</div>' +

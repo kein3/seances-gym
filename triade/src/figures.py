@@ -148,6 +148,7 @@ def poly(pts, noms, cls):
 
 
 def silhouette(pts, cls, vue, poser2):
+    """La pose de départ, au trait : un fil de fer derrière la pose habillée."""
     o = []
     if vue == 'profil':
         if poser2:
@@ -161,6 +162,179 @@ def silhouette(pts, cls, vue, poser2):
     c = pts['tete']
     o.append('<circle class="%s" cx="%s" cy="%s" r="%s"/>' % (cls, n(c[0]), n(c[1]), TETE_R))
     return ''.join(o)
+
+
+# ─────────────────── Le corps habillé ───────────────────
+# Largeur de chaque segment à son départ et à son arrivée : une cuisse est
+# large à la hanche et fine au genou, et c'est ce qui fait qu'une silhouette
+# ressemble à un corps plutôt qu'à un bonhomme allumettes.
+LARG_PROFIL = {
+    'tronc': (17, 19), 'cou': (9, 9), 'bras': (11, 8.5), 'avantbras': (8.5, 6.5),
+    'cuisse': (15, 10), 'tibia': (10, 6.5), 'pied': (6, 4),
+    'bras2': (10, 7.5), 'avantbras2': (7.5, 6), 'cuisse2': (14, 9.5),
+    'tibia2': (9.5, 6), 'pied2': (5.5, 4),
+}
+LARG_FACE = {
+    'tronc': (20, 25), 'cou': (9, 9), 'clav_g': (7, 7), 'clav_d': (7, 7),
+    'brasG': (10.5, 8), 'avantbrasG': (8, 6), 'brasD': (10.5, 8), 'avantbrasD': (8, 6),
+    'cuisseG': (14, 9.5), 'tibiaG': (9.5, 6), 'cuisseD': (14, 9.5), 'tibiaD': (9.5, 6),
+}
+# Ordre de tracé : le fond d'abord, sinon un bras du fond passerait devant le buste.
+ORDRE_PROFIL = ['cuisse2', 'tibia2', 'pied2', 'bras2', 'avantbras2',
+                'tronc', 'cou', 'cuisse', 'tibia', 'pied', 'bras', 'avantbras']
+ORDRE_FACE = ['cuisseG', 'tibiaG', 'cuisseD', 'tibiaD', 'tronc', 'cou',
+              'clav_g', 'clav_d', 'brasG', 'avantbrasG', 'brasD', 'avantbrasD']
+
+
+def unite(a, b):
+    dx, dy = b[0] - a[0], b[1] - a[1]
+    d = math.hypot(dx, dy) or 1
+    return (dx / d, dy / d)
+
+
+def capsule(a, b, wa, wb):
+    """Un segment épais : un quadrilatère et un rond à chaque extrémité.
+
+    Les ronds servent aussi d'articulation — sans eux, deux segments pliés
+    laissent un coin vide au genou ou au coude.
+    """
+    u = unite(a, b)
+    p = (-u[1], u[0])
+    q = [(a[0] + p[0] * wa / 2, a[1] + p[1] * wa / 2),
+         (b[0] + p[0] * wb / 2, b[1] + p[1] * wb / 2),
+         (b[0] - p[0] * wb / 2, b[1] - p[1] * wb / 2),
+         (a[0] - p[0] * wa / 2, a[1] - p[1] * wa / 2)]
+    d = 'M%s,%s L%s,%s L%s,%s L%s,%s Z' % tuple(x for pt in q for x in (n(pt[0]), n(pt[1])))
+    return ('<path d="%s"/><circle cx="%s" cy="%s" r="%s"/><circle cx="%s" cy="%s" r="%s"/>' % (
+        d, n(a[0]), n(a[1]), n(wa / 2), n(b[0]), n(b[1]), n(wb / 2)))
+
+
+def corps(pts, squelette, vue, poser2):
+    """La silhouette en deux passes : le contour, puis la chair par-dessus.
+
+    Dessiner chaque segment bordé laisserait apparaître les traits INTÉRIEURS
+    des jointures. Ici la première passe déborde d'un demi-trait tout autour,
+    la seconde la recouvre jusqu'au bord : il ne reste qu'un contour extérieur.
+    """
+    larg = LARG_PROFIL if vue == 'profil' else LARG_FACE
+    ordre = ORDRE_PROFIL if vue == 'profil' else ORDRE_FACE
+    formes = []
+    for seg in ordre:
+        if seg not in squelette:
+            continue
+        a, b, _ln, _r = squelette[seg]
+        if a not in pts or b not in pts:
+            continue
+        if not poser2 and seg.endswith('2'):
+            continue
+        wa, wb = larg[seg]
+        formes.append(capsule(pts[a], pts[b], wa, wb))
+    t = pts['tete']
+    formes.append('<circle cx="%s" cy="%s" r="%s"/>' % (n(t[0]), n(t[1]), n(TETE_R + 1)))
+    corps_svg = ''.join(formes)
+    return ('<g class="fig-trait">' + corps_svg + '</g>'
+            '<g class="fig-chair">' + corps_svg + '</g>')
+
+
+# ─────────────────── Le muscle travaillé ───────────────────
+# Où s'allume chaque muscle : (zone du corps, côté, début et fin le long du
+# segment). La LISTE des muscles, elle, n'est pas réécrite ici — elle est lue
+# dans volume.py, qui s'en sert déjà pour compter le volume hebdomadaire. Une
+# seule source : un exercice reclassé change les deux d'un coup.
+ZONES = {
+    'quadriceps':            [('cuisse', 'avant', .12, .92)],
+    'ischio-jambiers':       [('cuisse', 'arriere', .12, .92)],
+    'fessiers':              [('cuisse', 'arriere', -.02, .3)],
+    'adducteurs':            [('cuisse', 'avant', .28, .68)],
+    'mollets':               [('jambe', 'arriere', .05, .72)],
+    'pectoraux':             [('tronc', 'avant', .42, .88)],
+    'dorsaux':               [('tronc', 'arriere', .3, .8)],
+    'dos, épaisseur':        [('tronc', 'arriere', .46, .96)],
+    'lombaires':             [('tronc', 'arriere', .02, .4)],
+    'abdominaux':            [('tronc', 'avant', .06, .5)],
+    'biceps':                [('bras', 'avant', .22, .95)],
+    'triceps':               [('bras', 'arriere', .22, .95)],
+    'deltoïdes antérieurs':  [('bras', 'avant', -.05, .3)],
+    'deltoïdes postérieurs': [('bras', 'arriere', -.05, .3)],
+    'deltoïdes latéraux':    [('bras', 'tout', -.05, .28)],
+}
+# Une zone logique -> les segments qui la portent, selon la vue.
+SEGMENTS_ZONE = {
+    'profil': {'tronc': ['tronc'], 'cuisse': ['cuisse'], 'jambe': ['tibia'],
+               'bras': ['bras'], 'avantbras': ['avantbras']},
+    'face': {'tronc': ['tronc'], 'cuisse': ['cuisseG', 'cuisseD'],
+             'jambe': ['tibiaG', 'tibiaD'], 'bras': ['brasG', 'brasD'],
+             'avantbras': ['avantbrasG', 'avantbrasD']},
+}
+
+
+# De quel côté de son axe se trouve l'AVANT de chaque segment, mesuré une fois
+# en position debout. Ce signe ne change plus ensuite : la face avant tourne
+# avec le segment, comme dans un vrai corps. Un vecteur « avant » global ne
+# marchait pas — assis, la cuisse pointe vers l'avant et sa perpendiculaire
+# devient indécidable, ce qui mettait l'ischio-jambier sur le dessus.
+SIGNE_AVANT = {'tronc': 1, 'cou': 1, 'bras': -1, 'avantbras': -1, 'cuisse': -1,
+               'tibia': -1, 'pied': -1, 'bras2': -1, 'avantbras2': -1,
+               'cuisse2': -1, 'tibia2': -1, 'pied2': -1,
+               'clav_g': 1, 'clav_d': 1, 'brasG': -1, 'avantbrasG': -1,
+               'brasD': -1, 'avantbrasD': -1, 'cuisseG': -1, 'tibiaG': -1,
+               'cuisseD': -1, 'tibiaD': -1}
+
+
+def patch(a, b, wa, wb, cote, t0, t1, signe):
+    """L'aplat d'un muscle : une tranche du segment, d'un côté de son axe."""
+    u = unite(a, b)
+    p = (-u[1] * signe, u[0] * signe)
+    if cote == 'arriere':
+        p = (-p[0], -p[1])
+
+    def pos(t):
+        return (a[0] + (b[0] - a[0]) * t, a[1] + (b[1] - a[1]) * t)
+
+    def w(t):
+        # Un aplat qui couvre les deux côtés est resserré : à pleine largeur,
+        # il déborde du contour dès que le segment est court.
+        k = .7 if cote == 'tout' else .96
+        return (wa + (wb - wa) * t) / 2 * k
+
+    p0, p1 = pos(t0), pos(t1)
+    if cote == 'tout':
+        q = [(p0[0] - p[0] * w(t0), p0[1] - p[1] * w(t0)),
+             (p1[0] - p[0] * w(t1), p1[1] - p[1] * w(t1)),
+             (p1[0] + p[0] * w(t1), p1[1] + p[1] * w(t1)),
+             (p0[0] + p[0] * w(t0), p0[1] + p[1] * w(t0))]
+    else:
+        q = [p0, p1,
+             (p1[0] + p[0] * w(t1), p1[1] + p[1] * w(t1)),
+             (p0[0] + p[0] * w(t0), p0[1] + p[1] * w(t0))]
+    return '<path d="M%s,%s L%s,%s L%s,%s L%s,%s Z"/>' % tuple(
+        x for pt in q for x in (n(pt[0]), n(pt[1])))
+
+
+def muscles_svg(pts, squelette, vue, muscles, ventre):
+    """Les zones sollicitées, l'appui direct plus franc que le soutien."""
+    larg = LARG_PROFIL if vue == 'profil' else LARG_FACE
+    directs, indirects = [], []
+    for muscle, poids in sorted(muscles.items(), key=lambda kv: -kv[1]):
+        for zone, cote, t0, t1 in ZONES.get(muscle, []):
+            if vue == 'face' and cote in ('avant', 'arriere'):
+                cote = 'tout'
+            for seg in SEGMENTS_ZONE[vue].get(zone, []):
+                if seg not in squelette:
+                    continue
+                a, b, _l, _r = squelette[seg]
+                if a not in pts or b not in pts:
+                    continue
+                wa, wb = larg[seg]
+                d = patch(pts[a], pts[b], wa, wb, cote, t0, t1,
+                          SIGNE_AVANT[seg] * ventre)
+                (directs if poids >= 1 else indirects).append(d)
+    out = ''
+    if indirects:
+        out += '<g class="fig-mus-2">' + ''.join(indirects) + '</g>'
+    if directs:
+        out += '<g class="fig-mus">' + ''.join(directs) + '</g>'
+    return out
 
 
 # ─────────────────── Le matériel ───────────────────
@@ -238,9 +412,14 @@ def fleche(a, b, courbe=0.26):
         n(p1[0]), n(p1[1]), n(b[0]), n(b[1]), n(p2[0]), n(p2[1]))
 
 
-def M(vue, ancre, a, b, suivi, materiel=None, devant=None, sol=True, ancre_b=None):
+def M(vue, ancre, a, b, suivi, materiel=None, devant=None, sol=True, ancre_b=None,
+      ventre=1):
+    """ventre = -1 quand le corps est retourné (couché sur le dos, dos en l'air) :
+    c'est ce qui dit de quel côté du buste se trouve le ventre, donc lequel du
+    quadriceps ou de l'ischio-jambier s'allume."""
     return {'vue': vue, 'ancre': ancre, 'ancre_b': ancre_b or ancre, 'a': a, 'b': b,
-            'suivi': suivi, 'materiel': materiel, 'devant': devant, 'sol': sol}
+            'suivi': suivi, 'materiel': materiel, 'devant': devant, 'sol': sol,
+            'ventre': ventre}
 
 
 rien = None
@@ -304,6 +483,7 @@ FIGS['a-couche-hal'] = M(
     dict(_couche, bras=-62, avantbras=178),
     dict(_couche, bras=88, avantbras=0),
     'poignet',
+    ventre=-1,
     materiel=lambda pa, pb: banc(56, 110, 106),
     devant=lambda pa, pb: halteres(pa['poignet']) + halteres(pb['poignet']))
 
@@ -321,6 +501,7 @@ FIGS['a-rowing-hal'] = M(
     dict(_row, bras=113, avantbras=0),
     dict(_row, bras=-157.6, avantbras=-103.6),
     'poignet',
+    ventre=-1,
     materiel=lambda pa, pb: banc(24, 137, 92),
     devant=lambda pa, pb: halteres(pa['poignet']) + halteres(pb['poignet']))
 
@@ -395,6 +576,7 @@ FIGS['b-incline'] = M(
     dict(_inc, bras=-90, avantbras=176),
     dict(_inc, bras=58, avantbras=0),
     'poignet',
+    ventre=-1,
     materiel=lambda pa, pb: banc(44, 124, 78, 30),
     devant=lambda pa, pb: halteres(pa['poignet']) + halteres(pb['poignet']))
 
@@ -405,6 +587,7 @@ FIGS['b-curl-incline'] = M(
     dict(_cur, bras=190, avantbras=0),
     dict(_cur, bras=190, avantbras=126),
     'poignet',
+    ventre=-1,
     materiel=lambda pa, pb: banc(44, 134, 66, 54),
     devant=lambda pa, pb: halteres(pa['poignet']) + halteres(pb['poignet']))
 
@@ -428,6 +611,7 @@ FIGS['c-rowing-machine'] = M(
     dict(_rm, bras=86, avantbras=0),
     dict(_rm, bras=111, avantbras=135),
     'poignet',
+    ventre=-1,
     materiel=lambda pa, pb: (rect(96, 120, 50, 7) + ligne((104, 127), (104, SOL)) +
                              ligne((138, 127), (138, SOL)) +
                              rect(94, 56, 8, 52) + ligne((98, 108), (98, SOL)) +
@@ -536,7 +720,7 @@ FIGS['c-releves'] = M(
 
 # ─────────────────── Assemblage ───────────────────
 
-def dessine(fig):
+def dessine(fig, muscles=None):
     sq, defauts = (PROFIL, DEBOUT) if fig['vue'] == 'profil' else (FACE, DEBOUT_FACE)
     pa = resous(sq, defauts, fig['a'], fig['ancre'])
     pb = resous(sq, defauts, fig['b'], fig['ancre_b'])
@@ -547,8 +731,12 @@ def dessine(fig):
         o.append(sol_())
     if fig['materiel']:
         o.append(fig['materiel'](pa, pb))
+    # Le départ reste un fil de fer : deux silhouettes pleines superposées
+    # s'annulent, on ne sait plus laquelle est laquelle.
     o.append(silhouette(pa, 'fig-a', fig['vue'], poser2))
-    o.append(silhouette(pb, 'fig-b', fig['vue'], poser2))
+    o.append(corps(pb, sq, fig['vue'], poser2))
+    if muscles:
+        o.append(muscles_svg(pb, sq, fig['vue'], muscles, fig['ventre']))
     if fig['devant']:
         o.append(fig['devant'](pa, pb))
     o.append(fleche(pa[fig['suivi']], pb[fig['suivi']]))
@@ -578,10 +766,20 @@ def main():
     if orphelins:
         raise SystemExit('schémas orphelins (exercice supprimé ?) : ' + ', '.join(orphelins))
 
-    out = {i: dessine(FIGS[i]) for i in ids}
+    # La liste des muscles vient de volume.py, seul endroit où elle est écrite.
+    sys.path.insert(0, str(SRC))
+    import volume
+    inconnus = sorted({m for v in volume.MUSCLES.values() for m in v} - set(ZONES))
+    if inconnus:
+        raise SystemExit('muscles sans zone dessinée : ' + ', '.join(inconnus))
+
+    svg = {i: dessine(FIGS[i], volume.MUSCLES.get(i)) for i in ids}
+    mus = {i: volume.MUSCLES[i] for i in ids if i in volume.MUSCLES}
+    out = {'svg': svg, 'muscles': mus}
     (SRC / 'figures.json').write_text(
         json.dumps(out, ensure_ascii=False, indent=1) + '\n', encoding='utf-8')
-    print('%d schémas écrits — %.1f Ko' % (len(out), sum(len(v) for v in out.values()) / 1024))
+    print('%d schémas écrits (%d avec muscles) — %.1f Ko' % (
+        len(svg), len(mus), sum(len(v) for v in svg.values()) / 1024))
 
     if '--planche' in sys.argv or '--seul' in sys.argv:
         garde = ids
@@ -589,20 +787,26 @@ def main():
             garde = sys.argv[sys.argv.index('--seul') + 1].split(',')
         noms = dict(liste)
         cases = ''.join(
-            '<figure><div>%s</div><figcaption>%s<br><small>%s</small></figcaption></figure>' % (
-                out[i], noms[i], i) for i in garde)
+            '<figure><div>%s</div><figcaption>%s<br><small>%s</small><br><small>%s</small>'
+            '</figcaption></figure>' % (
+                svg[i], noms[i], i,
+                ' · '.join('%s%s' % (m, '' if p >= 1 else ' (indirect)')
+                           for m, p in sorted(mus.get(i, {}).items(), key=lambda kv: -kv[1]))
+                or '—') for i in garde)
         html = ('<!doctype html><meta charset="utf-8"><title>Planche des schémas</title>'
                 '<style>body{background:#fdfcfa;color:#1f1d1b;font:14px system-ui;margin:18px}'
                 'main{display:grid;grid-template-columns:repeat(auto-fill,minmax(240px,1fr));gap:16px}'
                 'figure{margin:0;background:#fff;border:1px solid #e7e2d9;border-radius:12px;padding:8px}'
                 'figcaption{font-size:12px;margin-top:4px}small{color:#6e675d}'
                 '.fig{width:100%;height:auto;display:block}'
-                '.fig-a,.fig-b,.fig-mat,.fig-sol,.fig-cable,.fig-fleche{fill:none;'
+                '.fig-a,.fig-mat,.fig-sol,.fig-cable,.fig-fleche{fill:none;'
                 'stroke-linecap:round;stroke-linejoin:round}'
-                '.fig-a{stroke:#1f1d1b;stroke-width:2;opacity:.25}'
-                '.fig-b{stroke:#1f1d1b;stroke-width:2.6}'
-                '.fig-b.fig-fond{opacity:.55;stroke-width:2}'
-                '.fig-a.fig-fond{opacity:.5}'
+                '.fig-a{stroke:#1f1d1b;stroke-width:1.8;opacity:.3}'
+                '.fig-a.fig-fond{opacity:.18}'
+                '.fig-trait{fill:#1f1d1b;stroke:#1f1d1b;stroke-width:3;stroke-linejoin:round}'
+                '.fig-chair{fill:#fdfcfa;stroke:none}'
+                '.fig-mus{fill:#9d5820;stroke:none}'
+                '.fig-mus-2{fill:#9d5820;stroke:none;opacity:.34}'
                 '.fig-mat{stroke:#6e675d;stroke-width:1.9}'
                 '.fig-sol{stroke:#6e675d;stroke-width:1.4;opacity:.45}'
                 '.fig-cable{stroke:#6e675d;stroke-width:1.2;opacity:.8}'

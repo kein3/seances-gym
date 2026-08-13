@@ -489,14 +489,19 @@ html[data-theme="dark"] .card-code { color: color-mix(in srgb, var(--a) 55%, #ff
 }
 
 .fig { width: 100%; height: auto; display: block; max-width: 300px; margin: 0 auto; }
-.fig-a, .fig-b, .fig-mat, .fig-sol, .fig-cable, .fig-fleche {
+.fig-a, .fig-mat, .fig-sol, .fig-cable, .fig-fleche {
   fill: none; stroke-linecap: round; stroke-linejoin: round;
 }
 
-.fig-a { stroke: var(--text); stroke-width: 2; opacity: .25; }
-.fig-b { stroke: var(--text); stroke-width: 2.6; }
-.fig-a.fig-fond { opacity: .16; }
-.fig-b.fig-fond { opacity: .5; stroke-width: 2; }
+/* La pose de départ reste un fil de fer ; la pose finale est un corps :
+   son contour d'abord, sa chair par-dessus — c'est ce qui efface les
+   jointures intérieures — puis le muscle travaillé en cuivre. */
+.fig-a { stroke: var(--text); stroke-width: 1.8; opacity: .3; }
+.fig-a.fig-fond { opacity: .18; }
+.fig-trait { fill: var(--text); stroke: var(--text); stroke-width: 3; stroke-linejoin: round; }
+.fig-chair { fill: var(--poste); stroke: none; }
+.fig-mus { fill: var(--cuivre); stroke: none; }
+.fig-mus-2 { fill: var(--cuivre); stroke: none; opacity: .34; }
 .fig-mat { stroke: var(--muted); stroke-width: 1.9; }
 .fig-sol { stroke: var(--muted); stroke-width: 1.4; opacity: .45; }
 .fig-cable { stroke: var(--muted); stroke-width: 1.2; opacity: .8; }
@@ -509,8 +514,16 @@ html[data-theme="dark"] .card-code { color: color-mix(in srgb, var(--a) 55%, #ff
 }
 
 .fig-leg span { width: 15px; height: 2px; background: var(--text); border-radius: 2px; }
-.fig-leg-a { opacity: .28; }
+.fig-leg-a { opacity: .3; }
 .fig-leg-b { margin-left: 8px; }
+
+.fig-mus-txt {
+  margin-top: 7px; padding-top: 8px;
+  border-top: 1px solid var(--line);
+  font-size: 12.5px; color: var(--muted); line-height: 1.45; text-align: center;
+}
+
+.fig-mus-txt b { color: var(--cuivre); font-weight: 700; }
 
 .note-k {
   font-size: 10.5px; font-weight: 700; letter-spacing: .14em;

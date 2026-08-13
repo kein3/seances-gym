@@ -44,7 +44,7 @@ def main():
     # Un exercice sans schéma passerait inaperçu à l'écran : le volet s'ouvrirait
     # simplement sans dessin. On le refuse ici plutôt que de le découvrir en salle.
     figures = json.loads(figures_raw)
-    sans = [i for i in ids_exos if i not in figures]
+    sans = [i for i in ids_exos if i not in figures.get("svg", {})]
     if sans:
         sys.exit(f"exercices sans schéma : {sans} — lancer python3 src/figures.py")
 
