@@ -17,8 +17,8 @@ amplitudes ou deux façons de faire. L'application en donne la version courte da
 | **Développé incliné en plus du couché à plat** | L'incliné développe le haut des pectoraux, que le plat ne va pas chercher | Chaves et coll., 2020 — [lien](https://pubmed.ncbi.nlm.nih.gov/32922646/) |
 | **Hip thrust retiré**, squat gardé | Croissance des fessiers équivalente entre les deux (IRM, 9 semaines) : le hip thrust faisait doublon, et le squat ajoute quadriceps et adducteurs | Plotkin et coll., 2023 — [lien](https://www.ncbi.nlm.nih.gov/pmc/articles/PMC10593473/) |
 | **Alternatives sur machine assumées** | Pas de différence d'hypertrophie entre poids libres et machines ; la barre garde l'avantage sur la force testée à la barre | Haugen et coll., méta-analyse, 2023 — [lien](https://link.springer.com/article/10.1186/s13102-023-00713-4) |
-| **Supersets antagonistes, mais dans un seul poste** | Séance nettement plus courte, sans perte de répétitions, de volume ni d'adaptation. Le gain ne tient que si les deux exercices sont au même endroit : sinon il est mangé par les allers-retours et par le poste qu'on perd | Méta-analyse, *Sports Medicine*, 2025 — [lien](https://pmc.ncbi.nlm.nih.gov/articles/PMC12011898/) |
-| **Développé épaules et rowing à la machine** | Choix logistique assumé : ils tiennent dans la même zone que les mollets. À volume égal, machines et poids libres donnent la même hypertrophie — le regroupement ne coûte donc rien | Haugen et coll., 2023 — [lien](https://link.springer.com/article/10.1186/s13102-023-00713-4) |
+| **Enchaînements (supersets) écartés malgré la littérature** | Ils raccourcissent nettement la séance sans perte de répétitions, de volume ni d'adaptation : sur le papier, le meilleur raccourci disponible. Écartés le 01/09/2026 après essai en salle — ils demandent de tenir deux postes à la fois, ce qui ne passe pas aux heures pleines. Le temps est récupéré sur le repos des accessoires (1 min) | Méta-analyse, *Sports Medicine*, 2025 — [lien](https://pmc.ncbi.nlm.nih.gov/articles/PMC12011898/) |
+| **Développé épaules et rowing à la machine** | Choix logistique assumé : ils tiennent dans la même zone que les mollets, faits l'un après l'autre. À volume égal, machines et poids libres donnent la même hypertrophie — le regroupement ne coûte donc rien | Haugen et coll., 2023 — [lien](https://link.springer.com/article/10.1186/s13102-023-00713-4) |
 
 ## Réglages de la séance
 
@@ -72,7 +72,7 @@ restent dans la zone utile.
 Les adducteurs et les lombaires n'ont pas d'exercice dédié : le squat et le soulevé roumain
 les chargent assez dans ce cadre. Les **quadriceps à 7 séries** sont le poste le plus bas,
 et c'est un choix : trois exercices de jambes redondants (presse, leg extension, hip thrust)
-ont été retirés pour tenir la séance sous une heure. Pour en remettre, une presse à cuisses
+ont été retirés pour tenir la durée de séance. Pour en remettre, une presse à cuisses
 3 × 12 en fin de séance B suffit.
 
 Le décompte est reproductible : `python3 src/volume.py`. Les durées aussi :

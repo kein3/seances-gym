@@ -5,9 +5,9 @@ dans une page web qui fonctionne hors ligne et s'installe sur l'écran d'accueil
 
 | Séance | Nom | Mouvements centraux | Durée |
 |---|---|---|---|
-| A | **Socle** | Rack → un banc + haltères → les câbles | ~57 min |
-| B | **Charnière** | Rack → un banc inclinable → les machines | ~55 min |
-| C | **Amplitude** | Un banc → barre de traction → les câbles → les machines | ~58 min |
+| A | **Socle** | Rack → un banc + haltères → les câbles | ~65 min |
+| B | **Charnière** | Rack → un banc inclinable → les machines | ~64 min |
+| C | **Amplitude** | Un banc → barre de traction → les câbles → les machines | ~67 min |
 
 Ordre A → B → C, avec au moins un jour de repos entre chaque (lundi / mercredi / vendredi
 fonctionne bien).
@@ -15,9 +15,16 @@ fonctionne bien).
 Chaque séance est organisée **par poste de salle**, pas par muscle : trois postes, on
 s'installe, on fait tout ce qu'il y a à y faire, on ne revient pas. Le rack pour le **seul**
 mouvement lourd, un banc gardé pour deux ou trois exercices d'affilée, puis une zone
-(câbles ou machines) où tout s'enchaîne. Aucun superset ne mélange deux postes éloignés —
-c'est ce qui fait perdre son banc. Ce regroupement coûte deux à trois minutes par séance
-par rapport à un enchaînement libre : c'est le prix pour ne rien rendre.
+(câbles ou machines) pour les derniers. Les exercices d'un même poste se font **l'un après
+l'autre, en entier** : les quatre séries de développé, puis les quatre de rowing, sans
+rendre le banc. Ce regroupement coûte deux à trois minutes par séance par rapport à un
+ordre libre : c'est le prix pour ne rien rendre.
+
+**Aucun enchaînement de deux mouvements** (« superset »). Le programme en comptait sept
+jusqu'au 01/09/2026 : ils tenaient sur le papier, mais demandaient d'occuper deux postes en
+même temps dans une salle fréquentée, ce qui a été jugé impraticable à l'usage. Les dix
+minutes qu'ils faisaient gagner sont récupérées sur le repos des exercices d'accessoire,
+ramené à une minute — le mouvement lourd garde ses 2'30.
 
 Le programme est nettement orienté haut du corps, et **pectoraux et biceps sont traités en
 priorité** : 15,5 séries de biceps et 12 de pectoraux par semaine, contre 7 pour les
@@ -114,7 +121,7 @@ Sur l'écran de séance : **aucune surface pleine en couleur, aucune cible sous 
   la mise en place (réglage de la machine, position de départ), l'exécution, le repère
   « c'est bien fait quand… », l'erreur à éviter, et une alternative si la machine est
   prise.
-- **Cases à cocher par série**, et par tour pour les supersets.
+- **Cases à cocher par série**, propres à chaque exercice.
 - **Minuteur de repos qui n'occupe pas l'écran** : il apparaît en pastille en bas, avec le
   nom de l'exercice et une barre d'avancement, et passe au vert à la fin. Il se lance tout
   seul quand tu coches une série et garde l'écran allumé. Un appui dessus affiche le grand
@@ -173,7 +180,7 @@ node src/drive.mjs /tmp/captures                             # dans un autre
 ```
 
 Le pilote ouvre l'application dans Chrome, **émule un téléphone de 390 px**, joue les
-24 contrôles du scénario (cocher une série, lancer un repos depuis l'exercice, l'ajuster,
+27 contrôles du scénario (cocher une série, lancer un repos depuis l'exercice, l'ajuster,
 régler une charge, ouvrir chaque écran) et vérifie :
 débordements horizontaux, cibles tactiles trop petites, contrastes de texte insuffisants,
 titres masqués par les barres collantes, erreurs JavaScript. Il écrit aussi une capture
@@ -193,7 +200,7 @@ Deux précautions qui expliquent la forme du fichier :
   provoque aucune erreur visible : le service worker sert sa copie en cache et le rapport
   porte sur du code qui n'existe plus.
 - **Un scénario interrompu échoue bruyamment.** S'il s'arrête à mi-parcours, le rapport dit
-  lequel des 24 contrôles a planté et combien n'ont pas été joués — un plantage ne peut plus
+  lequel des 27 contrôles a planté et combien n'ont pas été joués — un plantage ne peut plus
   ressembler à un succès.
 
 Un rapport à `0 point à corriger` et `0 erreur JavaScript` est la condition pour publier.

@@ -27,16 +27,12 @@ def main():
     for key in payload["order"]:
         sess = payload["sessions"][key]
         for bloc in sess["blocs"]:
-            for item in bloc["items"]:
-                exos = item["exercises"] if item.get("type") == "superset" else [item]
-                if item.get("type") == "superset":
-                    ids.append(item["id"])
-                for ex in exos:
-                    ids.append(ex["id"])
-                    ids_exos.append(ex["id"])
-                    for champ in ("name", "sub", "execution"):
-                        if not ex.get(champ):
-                            sys.exit(f"champ '{champ}' manquant sur {ex.get('id')}")
+            for ex in bloc["items"]:
+                ids.append(ex["id"])
+                ids_exos.append(ex["id"])
+                for champ in ("name", "sub", "execution"):
+                    if not ex.get(champ):
+                        sys.exit(f"champ '{champ}' manquant sur {ex.get('id')}")
     doublons = {i for i in ids if ids.count(i) > 1}
     if doublons:
         sys.exit(f"identifiants en doublon : {sorted(doublons)}")

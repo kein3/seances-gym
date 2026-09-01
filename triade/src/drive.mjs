@@ -477,17 +477,18 @@ async function main() {
         r3.garde ? null : 'le repos ajusté n’est pas conservé pour cet exercice'
       ].filter(Boolean) });
 
-    /* 5b3 — Le superset a aussi son bouton de repos */
-    const ssr = await evalJS(`(() => {
-      const b = document.querySelector('[data-rest="a-ss1"]');
-      return b ? b.textContent.trim() : null;
+    /* 5b3 — Chaque exercice du poste porte SON repos, y compris le deuxième du banc */
+    const dr = await evalJS(`(() => {
+      const b = document.querySelector('[data-rest="a-rowing-hal"]');
+      return b ? b.querySelector('.num').textContent.trim() : null;
     })()`);
-    if (ssr) { await tap('[data-rest="a-ss1"]'); }
-    const ssOk = ssr ? await evalJS(`getComputedStyle(document.getElementById('restmini')).display`) : 'none';
-    if (ssr) await tap('#mini-stop');
-    bilan.push({ titre: 'repos du superset lancé depuis son en-tête', fenetre: '—', theme: '—', page: '—',
-      soucis: [ssr ? null : 'pas de bouton de repos sur le superset',
-               ssr && ssOk === 'flex' ? null : 'le bouton du superset ne lance pas le repos'].filter(Boolean) });
+    if (dr) { await tap('[data-rest="a-rowing-hal"]'); }
+    const drOk = dr ? await evalJS(`getComputedStyle(document.getElementById('restmini')).display`) : 'none';
+    if (dr) await tap('#mini-stop');
+    bilan.push({ titre: 'le deuxième exercice du banc porte son propre repos', fenetre: '—', theme: '—', page: '—',
+      soucis: [dr ? null : 'pas de bouton de repos sur le rowing haltère',
+               /1 min/.test(dr || '') ? null : 'le repos du rowing affiche « ' + dr + ' » au lieu de 1 min',
+               dr && drOk === 'flex' ? null : 'le bouton du rowing ne lance pas le repos'].filter(Boolean) });
 
     /* 5c — Régler la charge sans clavier */
     const av = await evalJS(`document.querySelector('[data-load="a-squat"]').value`);
@@ -539,17 +540,21 @@ async function main() {
         etat.relu === '82,5' ? null : 'le champ affiche « ' + etat.relu + " » au lieu de 82,5"
       ].filter(Boolean) });
 
-    /* 7 — Superset : les tours */
+    /* 7 — Un exercice de poste a ses propres séries : elles se cochent et lancent son repos */
     await goto('#/socle');
-    await tap('[data-round="a-ss1"][data-n="2"]');
-    const tours = await evalJS(`(() => {
-      const on = [...document.querySelectorAll('[data-round="a-ss1"]')].filter(d => d.classList.contains('on')).length;
-      return { on, minuteur: getComputedStyle(document.getElementById('restmini')).display };
+    await tap('[data-set="a-couche-hal"][data-i="0"]');
+    const suivi = await evalJS(`(() => {
+      const pts = [...document.querySelectorAll('[data-set="a-couche-hal"]')];
+      return { total: pts.length, on: pts.filter(d => d.classList.contains('on')).length,
+               minuteur: getComputedStyle(document.getElementById('restmini')).display,
+               temps: document.getElementById('mini-time').textContent };
     })()`);
-    bilan.push({ titre: 'superset · 2 tours cochés d’un coup', fenetre: '—', theme: '—', page: '—',
-      soucis: [tours.on === 2 ? null : 'nombre de tours cochés : ' + tours.on + ' au lieu de 2',
-               tours.minuteur === 'flex' ? null : 'pas de repos lancé après un tour'].filter(Boolean) });
-    await shot('07-superset');
+    bilan.push({ titre: 'séries propres à chaque exercice du poste', fenetre: '—', theme: '—', page: '—',
+      soucis: [suivi.total === 4 ? null : 'le développé haltères montre ' + suivi.total + ' séries au lieu de 4',
+               suivi.on === 1 ? null : 'la série cochée n’est pas retenue (' + suivi.on + ')',
+               suivi.minuteur === 'flex' ? null : 'cocher une série ne lance pas le repos',
+               /0:5\d|1:00/.test(suivi.temps) ? null : 'repos lancé à ' + suivi.temps + ' au lieu de 1 min'].filter(Boolean) });
+    await shot('07-series-par-exercice');
     await tap('#mini-stop');
 
     /* 8 — Les feuilles modales */

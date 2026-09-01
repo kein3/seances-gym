@@ -18,7 +18,6 @@ ROOT = pathlib.Path(__file__).resolve().parent.parent
 FICHIER = ROOT / "src/payload.json"
 
 MISE_EN_PLACE = 45      # trouver la machine, régler, charger
-MISE_EN_PLACE_SS = 60   # un superset occupe deux postes
 MONTEE_EN_CHARGE = 240  # 3 séries progressives avant un mouvement lourd
 SEUIL_LOURD = 150       # au-delà de ce repos, l'exercice est traité comme lourd
 BATTEMENT = 180         # transitions, gourde, attente d'un banc
@@ -60,10 +59,6 @@ def travail(ex):
 
 
 def duree_item(item):
-    if item.get("type") == "superset":
-        tours = item["rounds"]
-        boucle = sum(travail(e) for e in item["exercises"])
-        return MISE_EN_PLACE_SS + tours * boucle + (tours - 1) * item["rest"]
     series = item.get("sets", 1)
     rest = item.get("rest", 0) or 0
     total = MISE_EN_PLACE + series * travail(item) + max(0, series - 1) * rest
@@ -94,17 +89,14 @@ def main():
         for bloc in sess["blocs"]:
             sec = sum(duree_item(it) for it in bloc["items"])
             total += sec
-            repos = {it.get("rest") or (it["rest"] if it.get("type") == "superset" else 0)
-                     for it in bloc["items"]}
-            repos = {r for r in repos if r}
+            repos = {it.get("rest") for it in bloc["items"] if it.get("rest")}
             texte = f"~{round(sec / 60)} min"
             if len(repos) == 1:
                 texte += f" · repos {label_repos(repos.pop())}"
             if bloc.get("duration") != texte:
                 ecarts.append(f"{sess['title']} / bloc {bloc['n']} : « {bloc.get('duration')} » → « {texte} »")
             bloc["duration"] = texte
-            series = sum(it["rounds"] * len(it["exercises"]) if it.get("type") == "superset"
-                         else it.get("sets", 0) for it in bloc["items"])
+            series = sum(it.get("sets", 0) for it in bloc["items"])
             print(f"   {bloc['n']} {bloc['name']:<38}{round(sec/60):>4} min   {series:>2} séries")
         texte = f"~{round(total / 60)} min"
         if sess.get("duration") != texte:

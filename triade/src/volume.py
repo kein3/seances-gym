@@ -60,19 +60,15 @@ def main():
 
     for cle in d["order"]:
         for bloc in d["sessions"][cle]["blocs"]:
-            for item in bloc["items"]:
-                if item.get("type") == "superset":
-                    paires = [(e, item["rounds"]) for e in item["exercises"]]
-                else:
-                    paires = [(item, item.get("sets", 0))]
-                for ex, series in paires:
-                    if ex["id"] in ECHAUFFEMENT:
-                        continue
-                    if ex["id"] not in MUSCLES:
-                        orphelins.append(ex["id"])
-                        continue
-                    for muscle, poids in MUSCLES[ex["id"]].items():
-                        total[muscle] = total.get(muscle, 0) + series * poids
+            for ex in bloc["items"]:
+                if ex["id"] in ECHAUFFEMENT:
+                    continue
+                if ex["id"] not in MUSCLES:
+                    orphelins.append(ex["id"])
+                    continue
+                series = ex.get("sets", 0)
+                for muscle, poids in MUSCLES[ex["id"]].items():
+                    total[muscle] = total.get(muscle, 0) + series * poids
 
     if orphelins:
         print("⚠ exercices non classés — le total les ignore : " + ", ".join(sorted(set(orphelins))))

@@ -748,9 +748,7 @@ def exercices(payload):
     out = []
     for k in payload['order']:
         for b in payload['sessions'][k]['blocs']:
-            for it in b['items']:
-                exos = it['exercises'] if it.get('type') == 'superset' else [it]
-                out += [(e['id'], e['name']) for e in exos]
+            out += [(e['id'], e['name']) for e in b['items']]
     return out
 
 

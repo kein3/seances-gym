@@ -106,9 +106,8 @@
     loads: {},   // exId -> [{d:'YYYY-MM-DD', v:82.5}]
     notes: {},   // exId -> texte
     sets: {},    // date -> { exId: [bool,...] }
-    rounds: {},  // date -> { ssId: n }
     hist: {},    // sessionKey -> ['YYYY-MM-DD', ...]
-    rests: {},   // exId | ssId -> repos ajusté à la main pour cet exercice
+    rests: {},   // exId -> repos ajusté à la main pour cet exercice
     tabata: { work: 20, rest: 10, rounds: 8, prep: 10 },
     lastTimer: 90
   };
@@ -119,7 +118,7 @@
       if (!raw) return;
       var o = JSON.parse(raw);
       ['theme', 'lastTimer'].forEach(function (k) { if (o[k] != null) S[k] = o[k]; });
-      ['loads', 'notes', 'sets', 'rounds', 'hist', 'rests'].forEach(function (k) { if (o[k]) S[k] = o[k]; });
+      ['loads', 'notes', 'sets', 'hist', 'rests'].forEach(function (k) { if (o[k]) S[k] = o[k]; });
       if (o.tabata) for (var k in o.tabata) S.tabata[k] = o.tabata[k];
     } catch (e) { console.warn('mémoire illisible', e); }
   }
@@ -150,32 +149,15 @@
     return out;
   }
 
-  function exercisesOf(item) {
-    return item.type === 'superset' ? item.exercises : [item];
-  }
-
   function findEx(id) {
     for (var k in P.sessions) {
       var items = allItems(P.sessions[k]);
-      for (var i = 0; i < items.length; i++) {
-        var list = exercisesOf(items[i]);
-        for (var j = 0; j < list.length; j++) if (list[j].id === id) return list[j];
-      }
+      for (var i = 0; i < items.length; i++) if (items[i].id === id) return items[i];
     }
     return null;
   }
 
-  function findAny(id) {
-    for (var k in P.sessions) {
-      var items = allItems(P.sessions[k]);
-      for (var i = 0; i < items.length; i++) {
-        if (items[i].id === id) return items[i];
-        var list = exercisesOf(items[i]);
-        for (var j2 = 0; j2 < list.length; j2++) if (list[j2].id === id) return list[j2];
-      }
-    }
-    return null;
-  }
+  var findAny = findEx;
 
   /* Repos de CET exercice : celui du programme, ou celui que tu as réglé toi-même. */
   function restOf(id) {
@@ -204,31 +186,17 @@
     return a;
   }
 
-  function todayRounds(ssId) {
-    var d = today();
-    S.rounds[d] = S.rounds[d] || {};
-    if (typeof S.rounds[d][ssId] !== 'number') S.rounds[d][ssId] = 0;
-    return S.rounds[d][ssId];
-  }
-
   function sessionUnits(sess) {
     var total = 0, done = 0;
     allItems(sess).forEach(function (it) {
-      if (it.type === 'superset') {
-        total += it.rounds;
-        done += Math.min(it.rounds, todayRounds(it.id));
-      } else {
-        total += it.sets || 1;
-        todaySets(it.id, it.sets || 1).forEach(function (v) { if (v) done++; });
-      }
+      total += it.sets || 1;
+      todaySets(it.id, it.sets || 1).forEach(function (v) { if (v) done++; });
     });
     return { total: total, done: done };
   }
 
   function exCount(sess) {
-    var n = 0;
-    allItems(sess).forEach(function (it) { n += exercisesOf(it).length; });
-    return n;
+    return allItems(sess).length;
   }
 
   function markSessionDone(key) {
@@ -392,9 +360,7 @@
     }).join('');
 
     var blocs = s.blocs.map(function (b, bi) {
-      var items = b.items.map(function (it, ii) {
-        return it.type === 'superset' ? renderSuperset(it, ii) : renderEx(it, ii + 1, false);
-      }).join('');
+      var items = b.items.map(renderEx).join('');
       /* Le poste est un creux teinté ; chaque exercice est une carte posée dedans.
          Sans ce contraste, un titre de poste et un exercice se ressemblaient. */
       return '' +
@@ -432,31 +398,6 @@
     window.scrollTo(0, 0);
   }
 
-  function renderSuperset(ss, idx) {
-    var done = todayRounds(ss.id);
-    var dots = '';
-    for (var i = 1; i <= ss.rounds; i++) {
-      dots += '<button class="pt ronde' + (i <= done ? ' on' : '') + '" data-round="' + ss.id + '" data-n="' + i + '" aria-label="Tour ' + i + '">' +
-        (i <= done ? I.check : i) + '</button>';
-    }
-    var exs = ss.exercises.map(function (e, i) { return renderEx(e, i + 1, true); }).join('');
-    var rs = restOf(ss.id);
-    return '' +
-      '<div class="ss" data-ss="' + ss.id + '">' +
-        '<div class="ss-head">' +
-          '<span class="ss-badge">Superset · ' + ss.rounds + ' tours</span>' +
-          (rs ? '<button class="repos" data-rest="' + ss.id + '" aria-label="Lancer le repos du superset">' +
-            I.timer + '<span class="num">' + esc(restLabel(rs)) + '</span></button>' : '') +
-          '<span class="ss-note">' + esc(ss.label || '') + '</span>' +
-        '</div>' +
-        exs +
-        '<div class="ss-rounds">' +
-          '<span class="ss-rounds-lab">Tours</span>' + dots +
-          (done ? '<button class="effacer" data-resetss="' + ss.id + '">effacer</button>' : '') +
-        '</div>' +
-      '</div>';
-  }
-
   /* Ce que le cuivre du schéma désigne. Les échauffements n'ont pas de muscle
      visé — la ligne disparaît alors au lieu d'annoncer un travail qui n'est
      pas le but de l'exercice. */
@@ -471,27 +412,24 @@
       '</div>';
   }
 
-  function renderEx(ex, n, inSuper) {
+  function renderEx(ex) {
     /* Une ligne de méta remplace les quatre cases : même information, aucun pavé. */
     var duree = /min|sec|s$/.test(String(ex.reps));
     var meta = [duree ? esc(ex.reps) : (ex.sets + ' × ' + esc(ex.reps))];
     if (ex.tempo && /\d/.test(String(ex.tempo))) meta.push('tempo ' + esc(ex.tempo));
     if (ex.loadHint) meta.push('repère ' + esc(ex.loadHint));
 
-    var rs = inSuper ? 0 : restOf(ex.id);
+    var rs = restOf(ex.id);
     var arr = todaySets(ex.id, ex.sets || 1);
-    var allDone = !inSuper && arr.every(function (v) { return v; });
+    var allDone = arr.every(function (v) { return v; });
 
-    var setsHtml = '';
-    if (!inSuper) {
-      var dots = arr.map(function (on, i) {
-        return '<button class="pt' + (on ? ' on' : '') + '" data-set="' + ex.id + '" data-i="' + i + '" aria-label="Série ' + (i + 1) + '">' +
-          (on ? I.check : (i + 1)) + '</button>';
-      }).join('');
-      setsHtml = '<div class="rang series">' + dots +
-        (arr.some(function (v) { return v; }) ? '<button class="effacer" data-reset="' + ex.id + '">effacer</button>' : '') +
-        '</div>';
-    }
+    var dots = arr.map(function (on, i) {
+      return '<button class="pt' + (on ? ' on' : '') + '" data-set="' + ex.id + '" data-i="' + i + '" aria-label="Série ' + (i + 1) + '">' +
+        (on ? I.check : (i + 1)) + '</button>';
+    }).join('');
+    var setsHtml = '<div class="rang series">' + dots +
+      (arr.some(function (v) { return v; }) ? '<button class="effacer" data-reset="' + ex.id + '">effacer</button>' : '') +
+      '</div>';
 
     return '' +
       '<article class="exo' + (allDone ? ' done' : '') + '" data-ex="' + ex.id + '">' +
@@ -648,34 +586,12 @@
       return;
     }
 
-    // un tour de superset
-    if (t.hasAttribute('data-round')) {
-      var ssId = t.getAttribute('data-round');
-      var n = +t.getAttribute('data-n');
-      var cur = todayRounds(ssId);
-      S.rounds[today()][ssId] = (cur === n) ? n - 1 : n;
-      save();
-      markSessionDone(curKey);
-      var ss = findSuperset(ssId);
-      refreshRounds(ssId);
-      buzz(18);
-      if (S.rounds[today()][ssId] === n && ss && restOf(ssId) && n < ss.rounds) startRest(restOf(ssId), 'Tour ' + n + ' sur ' + ss.rounds, ssId);
-      return;
-    }
-
     if (t.hasAttribute('data-reset')) {
       var rid = t.getAttribute('data-reset');
       var rex = findEx(rid);
       var a = todaySets(rid, rex.sets || 1);
       for (var k = 0; k < a.length; k++) a[k] = false;
       save(); refreshSets(rid);
-      return;
-    }
-
-    if (t.hasAttribute('data-resetss')) {
-      var sid = t.getAttribute('data-resetss');
-      S.rounds[today()][sid] = 0;
-      save(); refreshRounds(sid);
       return;
     }
 
@@ -715,14 +631,6 @@
       sheetEditHist(t.getAttribute('data-hist'), t.getAttribute('data-d'));
       return;
     }
-  }
-
-  function findSuperset(id) {
-    for (var k in P.sessions) {
-      var items = allItems(P.sessions[k]);
-      for (var i = 0; i < items.length; i++) if (items[i].type === 'superset' && items[i].id === id) return items[i];
-    }
-    return null;
   }
 
   /* Avancement de la séance : lisible d'un coup d'œil sans quitter l'exercice. */
@@ -770,26 +678,6 @@
         nom.appendChild(marque);
       } else if (marque && !all) { marque.remove(); }
     }
-  }
-
-  function refreshRounds(ssId) {
-    var done = todayRounds(ssId);
-    var zone = $('[data-ss="' + ssId + '"] .ss-rounds');
-    $$('[data-round="' + ssId + '"]').forEach(function (d, i) {
-      var on = (i + 1) <= done;
-      d.classList.toggle('on', on);
-      d.innerHTML = on ? I.check : (i + 1);
-    });
-    majAvancement();
-    if (!zone) return;
-    var eff = $('.effacer', zone);
-    if (done && !eff) {
-      eff = document.createElement('button');
-      eff.className = 'effacer';
-      eff.setAttribute('data-resetss', ssId);
-      eff.textContent = 'effacer';
-      zone.appendChild(eff);
-    } else if (eff && !done) { eff.remove(); }
   }
 
   function refreshLoad(exId) {
@@ -1163,7 +1051,7 @@
       '<h2 class="sheet-title">Comment mener le programme</h2>' +
       '<p class="sheet-sub">Trois séances par semaine, dans l’ordre A puis B puis C, avec au moins un jour de repos entre chacune. Lundi / mercredi / vendredi fonctionne très bien.</p>' +
       bloc('Une séance = trois postes, et on ne revient pas',
-        'Chaque séance est organisée par poste de salle, pas par muscle : tu t’installes, tu fais tout ce qu’il y a à faire là, puis tu passes au suivant. Le rack pour le seul mouvement lourd, un banc que tu gardes pour deux ou trois exercices, puis une zone — câbles ou machines — où tout s’enchaîne. Aucun superset ne mélange deux postes éloignés : c’est exactement ce qui te fait perdre ton banc. Regrouper ainsi coûte deux à trois minutes par séance, et c’est le prix pour ne rien rendre.') +
+        'Chaque séance est organisée par poste de salle, pas par muscle : tu t’installes, tu fais tout ce qu’il y a à faire là, puis tu passes au suivant. Le rack pour le seul mouvement lourd, un banc que tu gardes pour deux ou trois exercices, puis une zone — câbles ou machines — pour les derniers. Les exercices d’un même poste se font l’un après l’autre, en entier : tu finis tes séries de développé avant de passer au rowing, sans rendre le banc. Regrouper ainsi coûte deux à trois minutes par séance, et c’est le prix pour ne rien rendre.') +
       bloc('Pourquoi trois séances complètes',
         'Chaque muscle est ainsi travaillé trois fois par semaine. Le seuil utile se situe à deux fois : au-delà, c’est le nombre total de séries dans la semaine qui compte, pas la façon de les répartir. Trois séances complètes sont donc un moyen de répartir le volume, pas une fin en soi — et si tu n’en fais que deux dans une semaine, tu gardes l’essentiel.') +
       bloc('Combien de séries par muscle',
@@ -1181,7 +1069,7 @@
       bloc('Ce qui n’est pas négociable',
         'L’échauffement du bloc 01 avant les charges lourdes, et l’arrêt d’une série dès que la technique se casse. Une douleur articulaire vive n’est pas une courbature : passe à l’alternative proposée sous l’exercice.', 'warn') +
       bloc('Si tu manques de temps',
-        'Saute le dernier poste. Tu gardes le mouvement lourd et le banc, soit l’essentiel, en 40 minutes.', 'alt') +
+        'Saute le dernier poste. Tu gardes le mouvement lourd et le banc, soit l’essentiel, en 45 minutes.', 'alt') +
       '<button class="btn btn-primary btn-wide" id="g-src">Pourquoi ces exercices précisément</button>' +
       '<div style="height:9px"></div>' +
       '<button class="btn btn-ghost btn-wide" id="g-close">Fermer</button>'
@@ -1210,9 +1098,9 @@
       bloc('Développé incliné en plus du couché à plat',
         'Le développé incliné développe le haut des pectoraux, que le développé à plat ne va pas chercher. Les deux sont dans le programme pour cette raison, en séances différentes. <i>Chaves et coll., 2020.</i>') +
       bloc('Un seul mouvement lourd par séance',
-        'Le reste passe en supersets de deux exercices qui ne se gênent pas. C’est ce qui fait tenir la séance en 55 minutes au lieu de 75, sans retirer une seule série utile. <i>Méta-analyse Sports Medicine, 2025.</i>') +
-      bloc('Les supersets',
-        'Enchaîner deux exercices qui ne se gênent pas (un tirage et une poussée) raccourcit nettement la séance sans faire perdre de répétitions ni de résultat. C’est le seul raccourci de temps qui ne coûte rien. <i>Méta-analyse Sports Medicine, 2025.</i>') +
+        'Un seul mouvement à charge lourde et à repos long par séance — squat, soulevé roumain, ou rien en séance C. Tout le reste tient en séries simples à répétitions plus hautes, ce qui produit le même muscle sans allonger la séance de vingt minutes de repos. <i>Méta-analyse Sports Medicine, 2025.</i>') +
+      bloc('Pourquoi aucun enchaînement',
+        'Enchaîner deux exercices sans repos entre eux raccourcit la séance de dix minutes, sans perte de résultat : sur le papier, c’est le meilleur raccourci qui existe. À l’usage, il demande de tenir deux postes en même temps dans une salle fréquentée, et il a été retiré du programme pour cette raison. Les dix minutes sont récupérées autrement : une minute de repos sur les exercices d’accessoire au lieu d’une minute et quart.', 'alt') +
       bloc('Ce que le programme ne cherche pas',
         'Le programme est orienté haut du corps : 2,3 séries de haut pour 1 de bas. Les quadriceps sont à 7 séries par semaine, le poste le plus bas, et c’est assumé. Si tu veux plus de jambes, ajoute une presse à cuisses 3 × 12 en fin de séance B. Aucun exercice direct pour les adducteurs ni les lombaires : le squat et le soulevé roumain les chargent assez dans ce cadre.', 'alt') +
       '<button class="btn btn-ghost btn-wide" id="p-back">Retour à la méthode</button>'
@@ -1275,7 +1163,7 @@
             var d = o.data || o;
             if (!d || typeof d !== 'object' || (!d.loads && !d.sets && !d.hist)) throw new Error('format');
             ['theme', 'lastTimer'].forEach(function (k) { if (d[k] != null) S[k] = d[k]; });
-            ['loads', 'notes', 'sets', 'rounds', 'hist', 'rests'].forEach(function (k) { if (d[k]) S[k] = d[k]; });
+            ['loads', 'notes', 'sets', 'hist', 'rests'].forEach(function (k) { if (d[k]) S[k] = d[k]; });
             if (d.tabata) for (var k in d.tabata) S.tabata[k] = d.tabata[k];
             save(); applyTheme(); closeSheet(); route();
             toast('Données importées');
@@ -1297,7 +1185,7 @@
       );
       $('#rs-no').addEventListener('click', closeSheet);
       $('#rs-yes').addEventListener('click', function () {
-        S.loads = {}; S.notes = {}; S.sets = {}; S.rounds = {}; S.hist = {}; S.rests = {};
+        S.loads = {}; S.notes = {}; S.sets = {}; S.hist = {}; S.rests = {};
         try { localStorage.removeItem(KEY); } catch (e) {}
         save(); closeSheet(); route(); toast('Données effacées');
       });
